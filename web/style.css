@@ -39,7 +39,7 @@ body {
 .header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: white;
-    padding: 0rem 0;
+    padding: 0.5rem 0;
     box-shadow: var(--shadow);
     position: sticky;
     top: 0;
@@ -58,6 +58,9 @@ body {
 
 .header-main {
     flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
 }
 
 .header-controls {
@@ -106,14 +109,26 @@ body {
 
 .header h1 {
     margin: 0;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.5px;
 }
 
+.header-title {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.header-title:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+}
+
 .header p {
-    margin: 0.5rem 0 0 0;
-    font-size: 0.95rem;
+    margin: 0;
+    font-size: 0.85rem;
     opacity: 0.9;
 }
 
@@ -138,7 +153,7 @@ body {
 
 .container {
     display: flex;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 80px);
     gap: 0;
 }
 
@@ -188,21 +203,19 @@ body {
 }
 
 .section-header {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .section-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: var(--primary-color);
     font-weight: 600;
+    margin: 0;
 }
 
 .manage-section {
     flex: 1;
-    padding: 1.5rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -210,12 +223,17 @@ body {
 
 .generate-section {
     flex: 1;
-    padding: 1.5rem;
-    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .manage-controls {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .search-wrapper {
@@ -257,7 +275,15 @@ body {
     border-radius: 0.5rem;
     background: var(--bg-primary);
     padding: 0.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    align-content: start;
+}
+
+.prompt-list-container.detail-mode {
+    grid-template-columns: 1fr;
 }
 
 .prompt-item {
@@ -268,6 +294,8 @@ body {
     border: 1px solid var(--border-color);
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .prompt-item:hover {
@@ -303,6 +331,24 @@ body {
     word-break: break-word;
 }
 
+.prompt-item.color-positive {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+.prompt-item.color-positive:hover {
+    border-color: rgb(16, 185, 129);
+}
+
+.prompt-item.color-negative {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.04) 100%);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.prompt-item.color-negative:hover {
+    border-color: rgb(239, 68, 68);
+}
+
 .add-form {
     margin-top: auto;
     padding-top: 1rem;
@@ -310,20 +356,20 @@ body {
 }
 
 .add-form h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1rem;
+    margin: 0 0 0.75rem 0;
+    font-size: 0.95rem;
     color: var(--text-primary);
 }
 
 .form-input,
 .form-textarea {
     width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 0.75rem;
+    padding: 0.6rem;
+    margin-bottom: 0.6rem;
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text-primary);
     background-color: var(--bg-secondary);
     transition: all 0.3s ease;
@@ -338,7 +384,7 @@ body {
 
 .form-textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 60px;
 }
 
 .btn {
@@ -389,21 +435,119 @@ body {
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
+.btn-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.btn-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.4);
+}
+
 .manage-buttons {
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.manage-buttons .btn {
+    flex: 1;
+}
+
+.manage-buttons .detail-checkbox {
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.form-buttons {
     display: flex;
     gap: 0.5rem;
 }
 
-.manage-buttons .btn-danger {
+.form-buttons .btn {
     flex: 1;
+}
+
+.control-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.detail-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background: var(--bg-secondary);
+    transition: all 0.3s ease;
+}
+
+.detail-checkbox:hover {
+    border-color: var(--primary-color);
+}
+
+.detail-checkbox input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+}
+
+.detail-checkbox span {
+    user-select: none;
+}
+
+.prompt-item.detail-view {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.prompt-item.compact-view {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.prompt-item.compact-view strong {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.prompt-item.compact-view small,
+.prompt-item.compact-view pre {
+    display: none;
 }
 
 .generate-area {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 .prompt-group h3 {
@@ -413,8 +557,15 @@ body {
     font-weight: 600;
 }
 
+.prompt-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
 .tags-div {
-    min-height: 60px;
+    min-height: 40px;
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     padding: 0.75rem;
@@ -424,6 +575,7 @@ body {
     flex-wrap: wrap;
     gap: 0.5rem;
     align-content: flex-start;
+    overflow-y: auto;
 }
 
 .tag-item {
@@ -446,7 +598,7 @@ body {
 
 .output-text {
     width: 100%;
-    height: 120px;
+    flex: 1;
     padding: 0.75rem;
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
@@ -454,8 +606,9 @@ body {
     font-size: 0.9rem;
     color: var(--text-primary);
     background: var(--bg-primary);
-    resize: vertical;
+    resize: none;
     transition: all 0.3s ease;
+    min-height: 80px;
 }
 
 .output-text:focus {
@@ -468,7 +621,8 @@ body {
     display: flex;
     gap: 1rem;
     justify-content: center;
-    margin-top: 1rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
 }
 
 .action-buttons button {

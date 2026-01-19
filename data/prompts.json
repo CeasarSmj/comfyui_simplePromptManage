@@ -1,1 +1,77 @@
-[]
+[
+    {
+        "name": "通用高质量画面P",
+        "note": "",
+        "text": "masterpiece, best quality, absurdres, ultra detailed, high resolution, newest, highly aesthetic, intricate details, professional artwork, trending on ArtStation"
+    },
+    {
+        "name": "通用高质量画面N",
+        "note": "",
+        "text": "low quality, worst quality, lowres, blurry, pixelated, jpeg artifacts, bad art, poorly drawn, low detail, oversaturated, underexposed, bad composition, signature, watermark, text, error, cropped"
+    },
+    {
+        "name": "畸形人体N",
+        "note": "",
+        "text": "bad anatomy, deformed, mutated, poorly drawn hands, poorly drawn feet, extra limbs, missing limbs, extra fingers, fused fingers, too many fingers, long neck, malformed limbs, extra arms, extra legs, disfigured, bad proportions, gross proportions, ugly, duplicate, morbid, mutilated, out of frame, cloned face, malformed hands, mutation, deformed face, cross-eyed, bad hands, bad feet, poorly drawn face"
+    },
+    {
+        "name": "传统动漫风格P",
+        "note": "平面动漫风格，例如原神3渲2",
+        "text": "cel shaded, flat shading, flat colors, bold outlines, thick lines, hard shadows, simple shading, anime screencap style, genshin impact style, 2d anime, clean lineart, vibrant flat colors, sharp edges, no gradients, comic style"
+    },
+    {
+        "name": "传统动漫风格N",
+        "note": "平面动漫风格，例如原神3渲2",
+        "text": "soft shading, gradient shading, painterly, airbrush, volumetric lighting, subsurface scattering, rim lighting, gentle highlights, smooth blending, depth of field, bokeh, cinematic lighting, realistic shading, 2.5d, semi-realistic, digital painting"
+    },
+    {
+        "name": "现代动漫插画风格P",
+        "note": "这种风格偏向高端数字插画（ArtStation 风、WLOP/Ross Tran 式），有柔和渐变、空气感体积、湿润皮肤纹理（你之前想要的“非平面”效果）。",
+        "text": "digital illustration, painterly style, soft gradient shading, gentle color transitions, airbrush rendering, soft cinematic lighting, volumetric lighting, rim lighting, subsurface scattering on skin, gentle highlights and shadows, depth of field, bokeh, dreamy atmosphere, highly detailed texture, semi-realistic anime illustration, professional digital painting, intricate soft shading, (soft shading:1.2), (gradient lighting:1.1)"
+    },
+    {
+        "name": "现代动漫插画风格N",
+        "note": "这种风格偏向高端数字插画（ArtStation 风、WLOP/Ross Tran 式），有柔和渐变、空气感体积、湿润皮肤纹理（你之前想要的“非平面”效果）。",
+        "text": "flat colors, cel shaded, flat shading, hard edges, bold outlines, thick lines, simple shading, no gradients, low contrast, 2d anime screencap, manga style, comic, lineart, hard shadows, (flat:1.4), (cel shaded:1.3)"
+    },
+    {
+        "name": "光影与照明P",
+        "note": "提升画面氛围、立体感",
+        "text": "soft cinematic lighting, dramatic lighting, volumetric god rays, rim lighting, backlighting, side lighting, golden hour lighting, moody lighting, ambient lighting, glowing, lens flare, depth of field, bokeh"
+    },
+    {
+        "name": "光影与照明N",
+        "note": "提升画面氛围、立体感",
+        "text": "overexposed, underexposed, harsh lighting, flat lighting, bad lighting, dark face, shadowed face, too bright, too dark"
+    },
+    {
+        "name": "相机角度与构图P",
+        "note": "控制视角、动态感，常用于人物图。",
+        "text": "from below, low angle, from above, high angle, cowboy shot, upper body, full body, dynamic pose, dynamic angle, dutch angle, close-up portrait, extreme close-up, wide shot, fisheye"
+    },
+    {
+        "name": "相机角度与构图N",
+        "note": "控制视角、动态感，常用于人物图。",
+        "text": "bad composition, off-center, cropped head, out of frame, tilted horizon, bad perspective, distorted perspective"
+    },
+    {
+        "name": "人体细节增强P",
+        "note": "针对头发、眼睛、皮肤、衣服等局部细节。",
+        "text": "highly detailed eyes, sparkling eyes, detailed face, intricate hair, flowing hair, shiny hair, detailed skin texture, pores, freckles, detailed clothing, fabric texture, lace details, jewelry details"
+    },
+    {
+        "name": "人体细节增强N",
+        "note": "针对头发、眼睛、皮肤、衣服等局部细节。",
+        "text": "blurry eyes, blurry face, low detail face, simplified face, no detail hair, bad texture"
+    },
+    {
+        "name": "动态与特效P",
+        "note": "加动态感、水滴、粒子等。",
+        "text": "motion blur, speed lines, floating particles, sparkles, glowing particles, water droplets, sweat, tears, wind effect, hair blowing in wind"
+    },
+    {
+        "name": "动态与特效N",
+        "note": "加动态感、水滴、粒子等。",
+        "text": "static pose, no motion, stiff pose"
+    }
+]

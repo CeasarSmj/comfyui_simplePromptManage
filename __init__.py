@@ -46,11 +46,25 @@ async def delete_prompt(request):
         save_prompts(prompts)
     return web.json_response(prompts)
 
+async def update_prompt(request):
+    data = await request.json()
+    index = data["index"]
+    prompts = load_prompts()
+    if 0 <= index < len(prompts):
+        prompts[index] = {
+            "name": data.get("name", prompts[index].get("name", "")),
+            "note": data.get("note", prompts[index].get("note", "")),
+            "text": data.get("text", prompts[index].get("text", ""))
+        }
+        save_prompts(prompts)
+    return web.json_response(prompts)
+
 # 注册路由
 PromptServer.instance.routes.post("/prompt_manage/get")(get_prompts)
 PromptServer.instance.routes.post("/prompt_manage/save")(save_prompts_api)
 PromptServer.instance.routes.post("/prompt_manage/add")(add_prompt)
 PromptServer.instance.routes.post("/prompt_manage/delete")(delete_prompt)
+PromptServer.instance.routes.post("/prompt_manage/update")(update_prompt)
 
 # 静态文件服务
 web_dir = os.path.join(os.path.dirname(__file__), "web")
