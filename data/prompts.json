@@ -10,11 +10,6 @@
         "text": "low quality, worst quality, lowres, blurry, pixelated, jpeg artifacts, bad art, poorly drawn, low detail, oversaturated, underexposed, bad composition, signature, watermark, text, error, cropped"
     },
     {
-        "name": "畸形人体N",
-        "note": "",
-        "text": "bad anatomy, deformed, mutated, poorly drawn hands, poorly drawn feet, extra limbs, missing limbs, extra fingers, fused fingers, too many fingers, long neck, malformed limbs, extra arms, extra legs, disfigured, bad proportions, gross proportions, ugly, duplicate, morbid, mutilated, out of frame, cloned face, malformed hands, mutation, deformed face, cross-eyed, bad hands, bad feet, poorly drawn face"
-    },
-    {
         "name": "传统动漫风格P",
         "note": "平面动漫风格，例如原神3渲2",
         "text": "cel shaded, flat shading, flat colors, bold outlines, thick lines, hard shadows, simple shading, anime screencap style, genshin impact style, 2d anime, clean lineart, vibrant flat colors, sharp edges, no gradients, comic style"
@@ -73,5 +68,10 @@
         "name": "动态与特效N",
         "note": "加动态感、水滴、粒子等。",
         "text": "static pose, no motion, stiff pose"
+    },
+    {
+        "name": "畸形人体N",
+        "note": "",
+        "text": "bad anatomy, deformed, mutated, poorly drawn hands, poorly drawn feet, extra limbs, missing limbs, extra fingers, fused fingers, too many fingers, long neck, malformed limbs, extra arms, extra legs, disfigured, bad proportions, gross proportions, ugly, duplicate, morbid, mutilated, out of frame, cloned face, malformed hands, mutation, deformed face, cross-eyed, bad hands, bad feet, poorly drawn face"
     }
 ]
