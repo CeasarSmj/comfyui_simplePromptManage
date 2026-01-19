@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Manage</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="light" data-lang="zh">
+    <div class="header">
+        <div class="header-content">
+            <div class="header-main">
+                <h1>✨ Prompt 管理系统</h1>
+                <p>优雅地管理和生成 AI 提示词</p>
+            </div>
+            <div class="header-controls">
+                <div class="control-group">
+                    <label for="langToggle" class="control-label">🌐</label>
+                    <select id="langToggle" class="control-select">
+                        <option value="zh">中文</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="themeToggle" class="control-label">🎨</label>
+                    <select id="themeToggle" class="control-select">
+                        <option value="light">☀️ 白天</option>
+                        <option value="dark">🌙 黑夜</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <!-- 左侧：提示词管理 (50%) -->
+        <div class="left-panel">
+            <div class="manage-section">
+                <div class="section-header">
+                    <h2>📚 提示词库</h2>
+                </div>
+                <div class="manage-controls">
+                    <div class="search-wrapper">
+                        <input type="text" id="searchInput" placeholder="🔍 搜索提示词..." class="search-input">
+                        <select id="searchMode" class="search-mode">
+                            <option value="fuzzy">模糊</option>
+                            <option value="exact">精确</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="promptList" class="prompt-list-container"></div>
+                <div class="manage-buttons">
+                    <button id="deleteBtn" class="btn btn-danger" style="display:none;">🗑️ 删除选中</button>
+                </div>
+                <div class="add-form">
+                    <h3>新增提示词</h3>
+                    <input type="text" id="newName" placeholder="名称" class="form-input">
+                    <input type="text" id="newNote" placeholder="备注（可选）" class="form-input">
+                    <textarea id="newText" placeholder="输入提示词文本..." class="form-textarea"></textarea>
+                    <button id="addBtn" class="btn btn-primary">✚ 添加</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：提示词生成 (50%) -->
+        <div class="right-panel">
+            <div class="generate-section">
+                <div class="section-header">
+                    <h2>🎨 生成器</h2>
+                </div>
+                <div class="generate-area">
+                    <div class="prompt-group">
+                        <h3>✅ 正向提示词</h3>
+                        <div id="positiveTags" class="tags-div"></div>
+                        <textarea id="positiveText" class="output-text" placeholder="正向提示词将显示在这里..."></textarea>
+                    </div>
+                    
+                    <div class="prompt-group">
+                        <h3>❌ 负向提示词</h3>
+                        <div id="negativeTags" class="tags-div"></div>
+                        <textarea id="negativeText" class="output-text" placeholder="负向提示词将显示在这里..."></textarea>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button id="addToPositive" class="btn btn-success">➕ 加入正向 (P)</button>
+                    <button id="addToNegative" class="btn btn-danger">➖ 加入负向 (N)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
