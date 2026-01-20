@@ -31,6 +31,8 @@
                         <option value="dark">🌙 黑夜</option>
                     </select>
                 </div>
+                <button id="llmGeneratorBtn" class="btn btn-primary" style="margin-left: 1rem;">🤖 LLM提示词生成</button>
+                <button id="videoBtn" class="btn btn-info" style="margin-left: 0.5rem;">📹 使用方法</button>
             </div>
         </div>
     </div>
@@ -48,6 +50,17 @@
                             <option value="fuzzy">模糊</option>
                             <option value="exact">精确</option>
                         </select>
+                        <select id="typeFilter" class="search-mode">
+                            <option value="">无筛选</option>
+                            <option value="质量">质量</option>
+                            <option value="风格">风格</option>
+                            <option value="质感">质感</option>
+                            <option value="环境">环境</option>
+                            <option value="动作">动作</option>
+                            <option value="表情">表情</option>
+                            <option value="着装">着装</option>
+                            <option value="其它">其它</option>
+                        </select>
                     </div>
                 </div>
                 <div id="promptList" class="prompt-list-container"></div>
@@ -62,6 +75,23 @@
                 <div class="add-form">
                     <h3 id="addFormTitle">新增提示词</h3>
                     <input type="text" id="newName" placeholder="名称" class="form-input">
+                    <div class="form-row">
+                        <select id="newDirection" class="form-select">
+                            <option value="无">方向：无</option>
+                            <option value="正向">方向：正向</option>
+                            <option value="反向">方向：反向</option>
+                        </select>
+                        <select id="newType" class="form-select">
+                            <option value="其它">类型：其它</option>
+                            <option value="质量">类型：质量</option>
+                            <option value="风格">类型：风格</option>
+                            <option value="质感">类型：质感</option>
+                            <option value="环境">类型：环境</option>
+                            <option value="动作">类型：动作</option>
+                            <option value="表情">类型：表情</option>
+                            <option value="着装">类型：着装</option>
+                        </select>
+                    </div>
                     <input type="text" id="newNote" placeholder="备注（可选）" class="form-input">
                     <textarea id="newText" placeholder="输入提示词文本..." class="form-textarea"></textarea>
                     <div class="form-buttons">
@@ -77,28 +107,72 @@
         <div class="right-panel">
             <div class="generate-section">
                 <div class="section-header">
-                    <h2>🎨 生成器</h2>
+                    <h2 id="generatorTitle">🎨 生成器</h2>
                 </div>
                 <div class="generate-area">
                     <div class="prompt-group">
-                        <h3>✅ 正向提示词</h3>
+                        <h3 id="positiveTitle">✅ 正向提示词</h3>
                         <div id="positiveTags" class="tags-div"></div>
                         <textarea id="positiveText" class="output-text" placeholder="正向提示词将显示在这里..."></textarea>
                     </div>
                     
                     <div class="prompt-group">
-                        <h3>❌ 负向提示词</h3>
+                        <h3 id="negativeTitle">❌ 负向提示词</h3>
                         <div id="negativeTags" class="tags-div"></div>
                         <textarea id="negativeText" class="output-text" placeholder="负向提示词将显示在这里..."></textarea>
                     </div>
                 </div>
                 <div class="action-buttons">
+                    <button id="addToGenerate" class="btn btn-info">➕ 加入</button>
                     <button id="addToPositive" class="btn btn-success">➕ 加入正向 (P)</button>
                     <button id="addToNegative" class="btn btn-danger">➖ 加入负向 (N)</button>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- LLM 提示词生成 Modal -->
+    <div id="llmGeneratorModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="llmModalTitle">🤖 LLM 大模型提示词生成器</h2>
+                <button class="modal-close-btn" id="modalCloseBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <label for="llmInput" id="llmInputLabel">需求输入（自然语言）:</label>
+                    <textarea id="llmInput" class="modal-textarea" placeholder="例如：一个穿着红色连衣裙的女性，微笑，在花园里，阳光照耀，柔和光线..."></textarea>
+                </div>
+                
+                <div class="modal-section">
+                    <label for="llmOutput" id="llmOutputLabel">生成的提示词模板:</label>
+                    <textarea id="llmOutput" class="modal-textarea" readonly></textarea>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button id="llmGenerateBtn" class="btn btn-success">⚡ 生成</button>
+                    <button id="llmCopyBtn" class="btn btn-info">📋 复制</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 使用方法 Modal -->
+    <div id="videoPlayerModal" class="modal-overlay hidden">
+        <div class="video-modal-content" onclick="event.stopPropagation()">
+            <div class="video-header">
+                <h2 id="videoModalTitle">📹 使用方法教程</h2>
+                <button id="videoCloseBtn" class="video-close-btn">&times;</button>
+            </div>
+            <div class="video-container">
+                <video id="videoPlayer" controls>
+                    <source src="Usage_example.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+    
     <script src="script.js"></script>
 </body>
 </html>

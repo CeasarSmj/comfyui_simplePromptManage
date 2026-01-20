@@ -32,6 +32,11 @@ async def save_prompts_api(request):
 
 async def add_prompt(request):
     item = await request.json()
+    # 确保新项目有完整的字段
+    if "direction" not in item:
+        item["direction"] = "无"
+    if "type" not in item:
+        item["type"] = "其它"
     prompts = load_prompts()
     prompts.append(item)
     save_prompts(prompts)
@@ -53,6 +58,8 @@ async def update_prompt(request):
     if 0 <= index < len(prompts):
         prompts[index] = {
             "name": data.get("name", prompts[index].get("name", "")),
+            "direction": data.get("direction", prompts[index].get("direction", "无")),
+            "type": data.get("type", prompts[index].get("type", "其它")),
             "note": data.get("note", prompts[index].get("note", "")),
             "text": data.get("text", prompts[index].get("text", ""))
         }
