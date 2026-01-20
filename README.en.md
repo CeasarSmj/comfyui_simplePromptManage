@@ -22,17 +22,19 @@ An elegant prompt management and generation system designed for ComfyUI.
 
 3. **Access the Plugin**
    - Open ComfyUI web interface
-   - Find "Prompt Manager" in the menu
+   - Find the button to launch beside the running button
    - Or directly visit `http://localhost:8188/prompt_manage_web/`
 
 ### Usage Video Tutorial
 
-Click the **"📹 Usage Video"** button in the top-right corner of the interface to watch a detailed feature demonstration and usage guide, or view the video directly below:
+📹 **[Click here to watch the usage tutorial video](asset/Usage_example.mp4)** or click the "📹 Usage Video" button in the top-right corner of the Web interface
 
-<video width="100%" controls>
-  <source src="web/Usage_example.mp4" type="video/mp4">
-  Your browser does not support the video tag. Please <a href="web/Usage_example.mp4">click here</a> to download and watch.
-</video>
+**Video Contents:**
+- ✅ Feature demonstration
+- ✅ Prompt management methods
+- ✅ Generator usage tips
+- ✅ LLM-assisted generation features
+- ✅ Keyboard shortcuts guide
 
 ## 💻 Usage Guide
 

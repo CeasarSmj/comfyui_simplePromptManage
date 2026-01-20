@@ -22,17 +22,19 @@
 
 3. **访问插件**
    - 打开 ComfyUI 网页界面
-   - 在菜单中找到 "Prompt Manager" 选项
+   - 在右上角运行按钮旁边可以找到入口按钮
    - 或直接访问 `http://localhost:8188/prompt_manage_web/`
 
 ### 使用方法教程
 
-点击界面右上角的 **"📹 使用方法"** 按钮观看详细的功能演示和使用指南，或直接在下方查看视频：
+📹 **[点击这里观看使用视频教程](asset/Usage_example.mp4)** 或在Web界面右上角点击"📹 使用方法"按钮
 
-<video width="100%" controls>
-  <source src="web/Usage_example.mp4" type="video/mp4">
-  您的浏览器不支持视频标签。请<a href="web/Usage_example.mp4">点击这里</a>下载观看。
-</video>
+**视频内容包括：**
+- ✅ 基本功能演示
+- ✅ 提示词管理方法
+- ✅ 生成器使用技巧
+- ✅ LLM辅助生成功能
+- ✅ 快捷键使用说明
 
 
 
