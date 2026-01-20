@@ -27,7 +27,7 @@ An elegant prompt management and generation system designed for ComfyUI.
 
 ### Usage Video Tutorial
 
-📹 **[Click here to watch the usage tutorial video](asset/Usage_example.mp4)** or click the "📹 Usage Video" button in the top-right corner of the Web interface
+📹 **[Click here to watch the usage tutorial video](web/Usage_example.mp4)** or click the "📹 Usage Video" button in the top-right corner of the Web interface
 
 **Video Contents:**
 - ✅ Feature demonstration
