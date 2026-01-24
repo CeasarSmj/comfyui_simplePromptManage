@@ -305,7 +305,7 @@
         "direction": "正向",
         "type": "表情",
         "note": "害羞、羞涩或害怕的表情，脸红、眼神躲闪",
-        "text": "shy expression, bashful face, blushing cheeks, embarrassed expression, flushed face, timid expression, nervous look, cute shy smile, adorable blush, shy glance"
+        "text": "shy expression, bashful face, blushing cheeks, embarrassed expression, flushed face, timid expression, nervous look, cute shy, adorable blush, shy glance"
     },
     {
         "name": "疑惑表情",
@@ -543,7 +543,7 @@
         "direction": "正向",
         "type": "环境",
         "note": "春季樱花飘落（花瓣、樱树），日式浪漫高频背景",
-        "text": "cherry blossoms, sakura petals falling, cherry blossom tree, spring sakura"
+        "text": "cherry blossoms, sakura petals falling, cherry blossom, spring sakura"
     },
     {
         "name": "复古风格",
