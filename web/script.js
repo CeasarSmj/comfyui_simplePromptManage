@@ -1,162 +1,20 @@
 // ===== 国际化翻译 =====
-const translations = {
-    zh: {
-        title: "✨ Prompt 管理系统",
-        subtitle: "优雅地管理和生成 AI 提示词",
-        library: "📚 提示词库",
-        search_placeholder: "🔍 搜索提示词...",
-        type_filter: "类型筛选",
-        fuzzy: "模糊",
-        exact: "精确",
-        add_title: "新增提示词",
-        edit_title: "编辑提示词",
-        name_placeholder: "名称",
-        note_placeholder: "备注（可选）",
-        text_placeholder: "输入提示词文本...",
-        add_btn: "✚ 添加",
-        confirm_edit_btn: "✓ 确认编辑",
-        edit_btn: "✏️ 编辑选中",
-        delete_btn: "🗑️ 删除选中",
-        cancel_edit_btn: "✕ 取消编辑",
-        alert_select: "请先选中一条提示词",
-        alert_required: "名称和提示词必填",
-        confirm_delete: "确认要删除提示词",
-        generator: "🎨 生成器",
-        positive: "✅ 正向提示词",
-        negative: "❌ 负向提示词",
-        positive_placeholder: "正向提示词将显示在这里...",
-        negative_placeholder: "负向提示词将显示在这里...",
-        add_positive: "➕ 加入正向 (P)",
-        add_negative: "➖ 加入负向 (N)",
-        add_auto: "➕ 加入",
-        llm_generator_btn: "🤖 LLM提示词生成",
-        llm_title: "🤖 LLM 大模型提示词生成器",
-        llm_input_label: "需求输入（自然语言）:",
-        llm_output_label: "生成的提示词模板:",
-        llm_input_placeholder: "例如：一个穿着红色连衣裙的女性，微笑，在花园里，阳光照耀，柔和光线...",
-        llm_generate_btn: "⚡ 生成",
-        llm_copy_btn: "📋 复制",
-        llm_copy_success: "✓ 已复制",
-        llm_no_input: "请输入需求说明",
-        llm_no_content: "没有内容可复制，请先点击生成",
-        llm_copy_failed: "复制失败，请手动复制",
-        llm_task_title: "【任务说明】",
-        llm_task_desc: "你是一个 Stable Diffusion 提示词生成专家。请根据以下规则生成高质量的 AI 绘画提示词：",
-        llm_rules_title: "生成规则：",
-        llm_rule_1: "1. 使用简短的英文短语，避免冗长句子",
-        llm_rule_2: "2. 用逗号分隔多个元素",
-        llm_rule_3: "3. 按以下顺序组织提示词：质量 > 人物/物体 > 着装 > 动作 > 环境 > 画风 > 其他细节",
-        llm_rule_4: "4. 优先使用质量相关的词汇（如 \"masterpiece\", \"best quality\", \"highly detailed\"）",
-        llm_rule_5: "5. 为每个重要特征提供多个同义词选项",
-        llm_rule_6: "6. 避免使用中文，全部使用英文",
-        llm_rule_7: "7. 正向提示词应该说明想要的内容",
-        llm_rule_8: "8. 负向提示词应该列举要避免的内容",
-        llm_format_title: "【输出格式】",
-        llm_format_desc: "请以以下格式输出：",
-        llm_positive_label: "正向提示词：",
-        llm_negative_label: "负向提示词：",
-        llm_available_title: "【可用的提示词模板（可选使用）】",
-        llm_demand_title: "【用户需求】",
-        search_mode_label: "搜索模式：",
-        no_filter: "无筛选",
-        direction_label: "方向：",
-        direction_none: "无",
-        direction_positive: "正向",
-        direction_negative: "反向",
-        type_label: "类型：",
-        quality: "质量",
-        style: "风格",
-        texture: "质感",
-        environment: "环境",
-        action: "动作",
-        expression: "表情",
-        clothing: "着装",
-        other: "其它",
-        detail_toggle: "显示细节",
-        light_mode: "☀️ 白天",
-        dark_mode: "🌙 黑夜",
-        usage_video_btn: "📹 使用方法",
-        usage_video_title: "📹 使用方法教程"
-    },
-    en: {
-        title: "✨ Prompt Manager",
-        subtitle: "Elegant AI prompt management and generation",
-        library: "📚 Prompt Library",
-        search_placeholder: "🔍 Search prompts...",
-        type_filter: "Type Filter",
-        fuzzy: "Fuzzy",
-        exact: "Exact",
-        add_title: "Add New Prompt",
-        edit_title: "Edit Prompt",
-        name_placeholder: "Name",
-        note_placeholder: "Note (Optional)",
-        text_placeholder: "Enter prompt text...",
-        add_btn: "✚ Add",
-        confirm_edit_btn: "✓ Confirm Edit",
-        edit_btn: "✏️ Edit Selected",
-        delete_btn: "🗑️ Delete Selected",
-        cancel_edit_btn: "✕ Cancel Edit",
-        alert_select: "Please select a prompt",
-        alert_required: "Name and prompt text are required",
-        confirm_delete: "Confirm to delete prompt",
-        generator: "🎨 Generator",
-        positive: "✅ Positive Prompts",
-        negative: "❌ Negative Prompts",
-        positive_placeholder: "Positive prompts will appear here...",
-        negative_placeholder: "Negative prompts will appear here...",
-        add_positive: "➕ Add Positive (P)",
-        add_negative: "➖ Add Negative (N)",
-        add_auto: "➕ Add",
-        llm_generator_btn: "🤖 LLM Prompt Generator",
-        llm_title: "🤖 LLM Prompt Generator",
-        llm_input_label: "Input Your Demand (Natural Language):",
-        llm_output_label: "Generated Prompt Template:",
-        llm_input_placeholder: "Example: A smiling woman in a red dress in a garden with warm sunlight and soft lighting...",
-        llm_generate_btn: "⚡ Generate",
-        llm_copy_btn: "📋 Copy",
-        llm_copy_success: "✓ Copied",
-        llm_no_input: "Please enter your demand",
-        llm_no_content: "No content to copy. Please click Generate first",
-        llm_copy_failed: "Copy failed. Please copy manually",
-        llm_task_title: "【Task Description】",
-        llm_task_desc: "You are a Stable Diffusion prompt generation expert. Please generate high-quality AI art prompts according to the following rules:",
-        llm_rules_title: "Generation Rules:",
-        llm_rule_1: "1. Use short English phrases, avoid long sentences",
-        llm_rule_2: "2. Separate multiple elements with commas",
-        llm_rule_3: "3. Organize prompts in order: Quality > Character/Object > Clothing > Action > Environment > Art Style > Other Details",
-        llm_rule_4: "4. Prioritize quality-related vocabulary (e.g., \"masterpiece\", \"best quality\", \"highly detailed\")",
-        llm_rule_5: "5. Provide multiple synonyms for each important feature",
-        llm_rule_6: "6. Avoid Chinese text, use English only",
-        llm_rule_7: "7. Positive prompts should describe what you want",
-        llm_rule_8: "8. Negative prompts should list what to avoid",
-        llm_format_title: "【Output Format】",
-        llm_format_desc: "Please output in the following format:",
-        llm_positive_label: "Positive Prompt:",
-        llm_negative_label: "Negative Prompt:",
-        llm_available_title: "【Available Prompt Templates (Optional)】",
-        llm_demand_title: "【User Demand】",
-        search_mode_label: "Search Mode:",
-        no_filter: "No Filter",
-        direction_label: "Direction:",
-        direction_none: "None",
-        direction_positive: "Positive",
-        direction_negative: "Negative",
-        type_label: "Type:",
-        quality: "Quality",
-        style: "Style",
-        texture: "Texture",
-        environment: "Environment",
-        action: "Action",
-        expression: "Expression",
-        clothing: "Clothing",
-        other: "Other",
-        detail_toggle: "Show Details",
-        light_mode: "☀️ Light",
-        dark_mode: "🌙 Dark",
-        usage_video_btn: "📹 Usage Video",
-        usage_video_title: "📹 Usage Video Tutorial"
-    }
-};
+// 从 translations.json 加载翻译数据
+let translations = {};
+
+// 加载翻译和LLM模板
+Promise.all([
+    fetch('translations.json').then(r => r.json()),
+    fetch('llm-templates.json').then(r => r.json())
+]).then(([trans, templates]) => {
+    translations = trans;
+    window.llmTemplates = templates;
+    // 初始化应用
+    initializeApp();
+    loadPrompts();
+}).catch(err => {
+    console.error('Failed to load configuration files:', err);
+});
 
 let currentLang = localStorage.getItem("promptLang") || "zh";
 let currentTheme = localStorage.getItem("promptTheme") || "light";
@@ -194,6 +52,8 @@ function updateUI() {
     document.getElementById("confirmEditBtn").textContent = t.confirm_edit_btn;
     document.getElementById("editBtn").textContent = t.edit_btn;
     document.getElementById("deleteBtn").textContent = t.delete_btn;
+    document.getElementById("deselectBtn").textContent = t.deselect_btn;
+    document.getElementById("clearGeneratorBtn").textContent = t.clear_generator_btn;
     document.getElementById("cancelEditBtn").textContent = t.cancel_edit_btn;
     
     // 更新左侧搜索和筛选
@@ -213,7 +73,8 @@ function updateUI() {
         typeFilter.options[5].textContent = t.action;
         typeFilter.options[6].textContent = t.expression;
         typeFilter.options[7].textContent = t.clothing;
-        typeFilter.options[8].textContent = t.other;
+        typeFilter.options[8].textContent = t.composition;
+        typeFilter.options[9].textContent = t.other;
     }
     
     // 更新显示细节标签
@@ -240,6 +101,7 @@ function updateUI() {
         newType.options[5].textContent = t.type_label + t.action;
         newType.options[6].textContent = t.type_label + t.expression;
         newType.options[7].textContent = t.type_label + t.clothing;
+        newType.options[8].textContent = t.type_label + t.composition;
     }
     
     // 更新主题选择
@@ -368,18 +230,22 @@ function renderList(filter = "") {
 function updateButtonVisibility() {
     const deleteBtn = document.getElementById("deleteBtn");
     const editBtn = document.getElementById("editBtn");
+    const deselectBtn = document.getElementById("deselectBtn");
     
     if (selectedIndexes.length === 0) {
         deleteBtn.style.display = "none";
         editBtn.style.display = "none";
+        deselectBtn.style.display = "none";
     } else if (selectedIndexes.length === 1) {
         // 只选中一个时，显示编辑和删除按钮
         deleteBtn.style.display = "block";
         editBtn.style.display = "block";
+        deselectBtn.style.display = "block";
     } else {
         // 多选时，只显示删除按钮
         deleteBtn.style.display = "block";
         editBtn.style.display = "none";
+        deselectBtn.style.display = "block";
     }
 }
 
@@ -544,6 +410,20 @@ function deleteSelected() {
 // 删除按钮事件
 document.getElementById("deleteBtn").onclick = deleteSelected;
 
+// 取消选择按钮事件
+document.getElementById("deselectBtn").onclick = () => {
+    selectedIndexes = [];
+    renderList(document.getElementById("searchInput").value);
+};
+
+// 清空生成器按钮事件
+document.getElementById("clearGeneratorBtn").onclick = () => {
+    document.getElementById("positiveTags").innerHTML = "";
+    document.getElementById("negativeTags").innerHTML = "";
+    document.getElementById("positiveText").value = "";
+    document.getElementById("negativeText").value = "";
+};
+
 // 键盘快捷键
 document.addEventListener("keydown", e => { 
     if (e.key === "Delete" && selectedIndexes.length > 0) deleteSelected(); 
@@ -553,11 +433,23 @@ document.addEventListener("keydown", e => {
 function updateText(isPositive) {
     const tagsDiv = document.getElementById(isPositive ? "positiveTags" : "negativeTags");
     const textArea = document.getElementById(isPositive ? "positiveText" : "negativeText");
-    const checked = Array.from(tagsDiv.querySelectorAll(".tag-item input:checked"))
+    
+    // 获取所有选中的text，保持每个tag的内容分离（用换行分隔）
+    let selectedPhrases = Array.from(tagsDiv.querySelectorAll(".tag-item input:checked"))
         .map(cb => prompts[cb.dataset.index].text);
-    textArea.value = checked.join(", ");
+    
+    // 不同tag之间用换行分隔
+    textArea.value = selectedPhrases.join("\n");
 }
 
+// 获取生成器中已添加的tag
+function getGeneratorTags() {
+    const positiveTags = Array.from(document.querySelectorAll("#positiveTags .tag-item input"))
+        .map(cb => parseInt(cb.dataset.index));
+    const negativeTags = Array.from(document.querySelectorAll("#negativeTags .tag-item input"))
+        .map(cb => parseInt(cb.dataset.index));
+    return new Set([...positiveTags, ...negativeTags]);
+}
 // 添加到生成区（支持批量添加）- 根据方向自动放入
 function addToGenerateAuto() {
     const t = translations[currentLang];
@@ -664,6 +556,7 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+
 // 生成提示词模板
 llmGenerateBtn.onclick = () => {
     const t = translations[currentLang];
@@ -673,75 +566,30 @@ llmGenerateBtn.onclick = () => {
         return;
     }
     
-    // 获取可用的提示词
-    const availablePrompts = prompts.map(p => `- ${p.name} (${p.type}${p.direction !== "无" ? ", " + p.direction : ""}): ${p.text}`).join("\n");
+    // 获取生成器中已添加的tags
+    const generatorTagIndices = getGeneratorTags();
     
-    // 生成模板
-    let template;
-    if (currentLang === "zh") {
-        template = `【任务说明】
-你是一个 Stable Diffusion 提示词生成专家。请根据以下规则生成高质量的 AI 绘画提示词：
-
-生成规则：
-1. 使用简短的英文短语，避免冗长句子
-2. 用逗号分隔多个元素
-3. 按以下顺序组织提示词：质量 > 人物/物体 > 着装 > 动作 > 环境 > 画风 > 其他细节
-4. 优先使用质量相关的词汇（如 "masterpiece", "best quality", "highly detailed"）
-5. 为每个重要特征提供多个同义词选项
-6. 避免使用中文，全部使用英文
-7. 正向提示词应该说明想要的内容
-8. 负向提示词应该列举要避免的内容
-
-【输出格式】
-请以以下格式输出：
-
-正向提示词：
-[你生成的正向提示词]
-
-负向提示词：
-[你生成的负向提示词]
-
-【可用的提示词模板（可选使用）】
-${availablePrompts}
-
-【用户需求】
-${userDemand}
-
-请根据上述需求生成完整的提示词组合。`;
+    // 如果生成器中已添加了tag，则只使用这些tag；否则使用所有提示词
+    let availablePrompts;
+    if (generatorTagIndices.size > 0) {
+        // 只使用生成器中已添加的tag
+        availablePrompts = prompts
+            .filter((p, idx) => generatorTagIndices.has(idx))
+            .map(p => `- ${p.name} (${p.type}${p.direction !== "无" ? ", " + p.direction : ""}): ${p.text}`)
+            .join("\n");
     } else {
-        template = `${t.llm_task_title}
-${t.llm_task_desc}
-
-${t.llm_rules_title}
-${t.llm_rule_1}
-${t.llm_rule_2}
-${t.llm_rule_3}
-${t.llm_rule_4}
-${t.llm_rule_5}
-${t.llm_rule_6}
-${t.llm_rule_7}
-${t.llm_rule_8}
-
-${t.llm_format_title}
-${t.llm_format_desc}
-
-${t.llm_positive_label}
-[Your generated positive prompt]
-
-${t.llm_negative_label}
-[Your generated negative prompt]
-
-${t.llm_available_title}
-${availablePrompts}
-
-${t.llm_demand_title}
-${userDemand}
-
-Please generate a complete prompt combination based on the above requirements.`;
+        // 使用所有可用的提示词
+        availablePrompts = prompts.map(p => `- ${p.name} (${p.type}${p.direction !== "无" ? ", " + p.direction : ""}): ${p.text}`).join("\n");
     }
+    
+    // 从加载的模板生成
+    const template = window.llmTemplates[currentLang]
+        .replace('${availablePrompts}', availablePrompts)
+        .replace('${userDemand}', userDemand);
     
     llmOutput.value = template;
 };
+
 
 // 复制到剪贴板
 llmCopyBtn.onclick = () => {
@@ -822,7 +670,3 @@ document.addEventListener("keydown", function(e) {
         if (videoPlayer) videoPlayer.pause();
     }
 });
-
-// 初始化应用
-initializeApp();
-loadPrompts();

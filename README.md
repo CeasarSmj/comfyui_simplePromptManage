@@ -4,6 +4,9 @@
 
 **[中文](README.md) | [English](README.en.md)**
 
+
+![](./asset/ui_pic_cn.png)
+
 ## 🚀 快速开始
 
 ### 安装步骤

@@ -59,6 +59,7 @@
                             <option value="动作">动作</option>
                             <option value="表情">表情</option>
                             <option value="着装">着装</option>
+                            <option value="构图">构图</option>
                             <option value="其它">其它</option>
                         </select>
                     </div>
@@ -67,6 +68,7 @@
                 <div class="manage-buttons">
                     <button id="editBtn" class="btn btn-info" style="display:none;">✏️ 编辑选中</button>
                     <button id="deleteBtn" class="btn btn-danger" style="display:none;">🗑️ 删除选中</button>
+                    <button id="deselectBtn" class="btn btn-secondary" style="display:none;">✕ 取消选择</button>
                     <label class="detail-checkbox">
                         <input type="checkbox" id="detailToggle">
                         <span>显示细节</span>
@@ -90,6 +92,7 @@
                             <option value="动作">类型：动作</option>
                             <option value="表情">类型：表情</option>
                             <option value="着装">类型：着装</option>
+                            <option value="构图">类型：构图</option>
                         </select>
                     </div>
                     <input type="text" id="newNote" placeholder="备注（可选）" class="form-input">
@@ -124,6 +127,7 @@
                 </div>
                 <div class="action-buttons">
                     <button id="addToGenerate" class="btn btn-info">➕ 加入</button>
+                    <button id="clearGeneratorBtn" class="btn btn-warning">🗑️ 全部清空</button>
                     <button id="addToPositive" class="btn btn-success">➕ 加入正向 (P)</button>
                     <button id="addToNegative" class="btn btn-danger">➖ 加入负向 (N)</button>
                 </div>

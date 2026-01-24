@@ -3,133 +3,623 @@
         "name": "通用高质量画面",
         "direction": "正向",
         "type": "质量",
-        "note": "",
+        "note": "最常用质量提升词，开头必备，用于提升整体画质、细节和美感，适合几乎所有场景",
         "text": "masterpiece, best quality, absurdres, ultra detailed, high resolution, newest, highly aesthetic, intricate details, professional artwork, trending on ArtStation"
     },
     {
         "name": "通用低质量",
         "direction": "反向",
         "type": "质量",
-        "note": "",
+        "note": "最常用负向质量词，用于避免低画质、模糊、畸形等常见缺陷，几乎所有生成都应加入",
         "text": "low quality, worst quality, lowres, blurry, pixelated, jpeg artifacts, bad art, poorly drawn, low detail, oversaturated, underexposed, bad composition, signature, watermark, text, error, cropped"
     },
     {
-        "name": "传统动漫风格",
-        "direction": "正向",
-        "type": "风格",
-        "note": "平面动漫风格，例如原神3渲2",
-        "text": "cel shaded, flat shading, flat colors, bold outlines, thick lines, hard shadows, simple shading, anime screencap style, genshin impact style, 2d anime, clean lineart, vibrant flat colors, sharp edges, no gradients, comic style"
-    },
-    {
-        "name": "传统动漫风格反向",
+        "name": "畸形人体",
         "direction": "反向",
-        "type": "风格",
-        "note": "避免传统动漫风格",
-        "text": "soft shading, gradient shading, painterly, airbrush, volumetric lighting, subsurface scattering, rim lighting, gentle highlights, smooth blending, depth of field, bokeh, cinematic lighting, realistic shading, 2.5d, semi-realistic, digital painting"
+        "type": "其它",
+        "note": "最常用负向人体修复词，避免手脚畸形、多指、比例失调等，几乎所有角色图必加",
+        "text": "bad anatomy, deformed, mutated, poorly drawn hands, poorly drawn feet, extra limbs, missing limbs, extra fingers, fused fingers, too many fingers, long neck, malformed limbs, extra arms, extra legs, disfigured, bad proportions, gross proportions, ugly, duplicate, morbid, mutilated, out of frame, cloned face, malformed hands, mutation, deformed face, cross-eyed, bad hands, bad feet, poorly drawn face"
     },
     {
         "name": "现代动漫插画风格",
         "direction": "正向",
         "type": "风格",
-        "note": "高端数字插画风格（ArtStation 风、WLOP/Ross Tran 式）",
+        "note": "当前最流行的高端数字插画风格（ArtStation、WLOP风），软渐变光影、半写实动漫，常用于高质量角色图",
         "text": "digital illustration, painterly style, soft gradient shading, gentle color transitions, airbrush rendering, soft cinematic lighting, volumetric lighting, rim lighting, subsurface scattering on skin, gentle highlights and shadows, depth of field, bokeh, dreamy atmosphere, highly detailed texture, semi-realistic anime illustration, professional digital painting, intricate soft shading, (soft shading:1.2), (gradient lighting:1.1)"
+    },
+    {
+        "name": "传统动漫风格",
+        "direction": "正向",
+        "type": "风格",
+        "note": "经典平面动漫风格（如原神3渲2），硬边、纯色、粗线条，适合卡通向作品",
+        "text": "cel shaded, flat shading, flat colors, bold outlines, thick lines, hard shadows, simple shading, anime screencap style, genshin impact style, 2d anime, clean lineart, vibrant flat colors, sharp edges, no gradients, comic style"
     },
     {
         "name": "现代动漫插画反向",
         "direction": "反向",
         "type": "风格",
-        "note": "避免扁平风格",
+        "note": "避免扁平硬边风格，与现代插画风格搭配使用",
         "text": "flat colors, cel shaded, flat shading, hard edges, bold outlines, thick lines, simple shading, no gradients, low contrast, 2d anime screencap, manga style, comic, lineart, hard shadows, (flat:1.4), (cel shaded:1.3)"
+    },
+    {
+        "name": "传统动漫风格反向",
+        "direction": "反向",
+        "type": "风格",
+        "note": "避免传统硬边动漫风格，与现代插画搭配使用",
+        "text": "soft shading, gradient shading, painterly, airbrush, volumetric lighting, subsurface scattering, rim lighting, gentle highlights, smooth blending, depth of field, bokeh, cinematic lighting, realistic shading, 2.5d, semi-realistic, digital painting"
     },
     {
         "name": "光影与照明",
         "direction": "正向",
         "type": "环境",
-        "note": "提升画面氛围、立体感",
+        "note": "高频光影提升词，增加画面立体感、氛围和戏剧性，几乎所有室内外场景都适用",
         "text": "soft cinematic lighting, dramatic lighting, volumetric god rays, rim lighting, backlighting, side lighting, golden hour lighting, moody lighting, ambient lighting, glowing, lens flare, depth of field, bokeh"
     },
     {
         "name": "糟糕光影",
         "direction": "反向",
         "type": "环境",
-        "note": "避免光影问题",
+        "note": "避免曝光、光影问题，常与高质量负向一起使用",
         "text": "overexposed, underexposed, harsh lighting, flat lighting, bad lighting, dark face, shadowed face, too bright, too dark"
-    },
-    {
-        "name": "相机角度构图",
-        "direction": "正向",
-        "type": "动作",
-        "note": "控制视角、动态感",
-        "text": "from below, low angle, from above, high angle, cowboy shot, upper body, full body, dynamic pose, dynamic angle, dutch angle, close-up portrait, extreme close-up, wide shot, fisheye"
-    },
-    {
-        "name": "糟糕构图",
-        "direction": "反向",
-        "type": "动作",
-        "note": "避免构图问题",
-        "text": "bad composition, off-center, cropped head, out of frame, tilted horizon, bad perspective, distorted perspective"
     },
     {
         "name": "人体细节增强",
         "direction": "正向",
-        "type": "质感",
-        "note": "针对头发、眼睛、皮肤、衣服等局部细节",
+        "type": "质量",
+        "note": "高频局部细节提升，针对眼睛、头发、皮肤、衣服纹理，常用于角色特写",
         "text": "highly detailed eyes, sparkling eyes, detailed face, intricate hair, flowing hair, shiny hair, detailed skin texture, pores, freckles, detailed clothing, fabric texture, lace details, jewelry details"
     },
     {
         "name": "人体细节缺失",
         "direction": "反向",
-        "type": "质感",
-        "note": "避免细节缺失",
+        "type": "质量",
+        "note": "避免面部、头发、纹理模糊或简化",
         "text": "blurry eyes, blurry face, low detail face, simplified face, no detail hair, bad texture"
+    },
+    {
+        "name": "全身构图",
+        "direction": "正向",
+        "type": "构图",
+        "note": "完整展示角色的全身，从头到脚，角色展示最常用",
+        "text": "full body shot, full body, standing, full height, (full body:1.2)"
+    },
+    {
+        "name": "半身构图",
+        "direction": "正向",
+        "type": "构图",
+        "note": "上半身的构图，通常从腰部以上，平衡细节与整体",
+        "text": "upper body, half body, cowboy shot, from waist up, (upper body:1.1)"
+    },
+    {
+        "name": "面部特写",
+        "direction": "正向",
+        "type": "构图",
+        "note": "近距离面部特写，聚焦表情和细节",
+        "text": "close-up portrait, face focus, beautiful face, head shot, (close up:1.2), face detail, looking at viewer"
+    },
+    {
+        "name": "仰视角度",
+        "direction": "正向",
+        "type": "构图",
+        "note": "低角度仰视，增强气场和压迫感",
+        "text": "low angle view, from below, looking up, low perspective, (low angle:1.15)"
+    },
+    {
+        "name": "俯视角度",
+        "direction": "正向",
+        "type": "构图",
+        "note": "高角度俯视，显得柔和或弱小",
+        "text": "high angle view, from above, looking down, high perspective, (high angle:1.15)"
+    },
+    {
+        "name": "平视角度",
+        "direction": "正向",
+        "type": "构图",
+        "note": "平视角度，最自然稳定的视角",
+        "text": "eye level, straight on view, neutral angle, (eye level:1.1)"
+    },
+    {
+        "name": "倾斜旋转角度",
+        "direction": "正向",
+        "type": "构图",
+        "note": "相机倾斜旋转，创造动感和不稳定感",
+        "text": "dutch angle, tilted camera, rotated perspective, (dutch angle:1.2), diagonal composition"
+    },
+    {
+        "name": "对称构图",
+        "direction": "正向",
+        "type": "构图",
+        "note": "左右或上下对称的构图方式，营造稳定感",
+        "text": "symmetrical composition, centered, balanced, mirror symmetry, (symmetrical:1.2)"
+    },
+    {
+        "name": "黄金分割构图",
+        "direction": "正向",
+        "type": "构图",
+        "note": "按照黄金比例安排主体位置，最自然的视觉美感",
+        "text": "golden ratio composition, fibonacci spiral, (golden ratio:1.15), off-center subject"
+    },
+    {
+        "name": "三分法构图",
+        "direction": "正向",
+        "type": "构图",
+        "note": "将画面横竖各分三等份，主体放在交点",
+        "text": "rule of thirds, dynamic composition, (rule of thirds:1.1), off-center placement"
+    },
+    {
+        "name": "广角镜头",
+        "direction": "正向",
+        "type": "构图",
+        "note": "广角视野，增强空间感和冲击力",
+        "text": "wide angle, wide angle lens, fisheye perspective, (wide angle:1.15)"
+    },
+    {
+        "name": "对角线构图",
+        "direction": "正向",
+        "type": "构图",
+        "note": "主体沿画面对角线排列，增加动感",
+        "text": "diagonal composition, dynamic angle, diagonal line, (diagonal:1.15)"
+    },
+    {
+        "name": "中心构图",
+        "direction": "正向",
+        "type": "构图",
+        "note": "主体位于画面正中央",
+        "text": "centered composition, central focus, main subject in center, (centered:1.1)"
+    },
+    {
+        "name": "极端特写",
+        "direction": "正向",
+        "type": "构图",
+        "note": "极近距离特写，如眼睛、嘴唇等细节",
+        "text": "extreme close-up, macro shot, detail focus, (extreme close-up:1.25)"
+    },
+    {
+        "name": "鸟瞰视角",
+        "direction": "正向",
+        "type": "构图",
+        "note": "正上方俯视，上帝视角",
+        "text": "bird's eye view, top down view, aerial view, (bird's eye view:1.2)"
+    },
+    {
+        "name": "虫视视角",
+        "direction": "正向",
+        "type": "构图",
+        "note": "极低角度仰视，地面视角",
+        "text": "worm's eye view, ground level view, ultra low angle, (worm's eye view:1.2)"
     },
     {
         "name": "动态与特效",
         "direction": "正向",
-        "type": "动作",
-        "note": "加动态感、水滴、粒子等",
+        "type": "构图",
+        "note": "增加动态感、粒子、水滴、风吹等特效，让画面更生动",
         "text": "motion blur, speed lines, floating particles, sparkles, glowing particles, water droplets, sweat, tears, wind effect, hair blowing in wind"
     },
     {
-        "name": "静态",
+        "name": "糟糕构图",
         "direction": "反向",
-        "type": "动作",
-        "note": "避免静态僵硬",
-        "text": "static pose, no motion, stiff pose"
-    },
-    {
-        "name": "畸形人体",
-        "direction": "反向",
-        "type": "其它",
-        "note": "避免人体畸形",
-        "text": "bad anatomy, deformed, mutated, poorly drawn hands, poorly drawn feet, extra limbs, missing limbs, extra fingers, fused fingers, too many fingers, long neck, malformed limbs, extra arms, extra legs, disfigured, bad proportions, gross proportions, ugly, duplicate, morbid, mutilated, out of frame, cloned face, malformed hands, mutation, deformed face, cross-eyed, bad hands, bad feet, poorly drawn face"
+        "type": "构图",
+        "note": "避免裁切、歪斜、视角畸形等构图问题",
+        "text": "bad composition, off-center, cropped head, out of frame, tilted horizon, bad perspective, distorted perspective"
     },
     {
         "name": "纯白色背景",
         "direction": "正向",
         "type": "环境",
-        "note": "常用于工作室肖像、产品图",
+        "note": "纯白工作室背景，常用于角色肖像、产品图，避免背景干扰",
         "text": "white background, plain white background, pure white background, solid white background, studio white backdrop, minimalist white, (white background:1.3)"
-    },
-    {
-        "name": "复杂背景避免",
-        "direction": "反向",
-        "type": "环境",
-        "note": "避免复杂背景",
-        "text": "detailed background, complex background, cluttered background, outdoor background, indoor background, scenery, landscape, objects in background, colored background, gradient background, textured background, pattern background, dark background, shadows on background"
     },
     {
         "name": "纯黑色背景",
         "direction": "正向",
         "type": "环境",
-        "note": "常用于神秘、戏剧性风格",
+        "note": "纯黑工作室背景，神秘或戏剧性角色常用",
         "text": "black background, plain black background, pure black background, solid black background, studio black backdrop, minimalist black, (black background:1.3)"
+    },
+    {
+        "name": "复杂背景避免",
+        "direction": "反向",
+        "type": "环境",
+        "note": "与纯白背景搭配，避免复杂背景干扰主体",
+        "text": "detailed background, complex background, cluttered background, outdoor background, indoor background, scenery, landscape, objects in background, colored background, gradient background, textured background, pattern background, dark background, shadows on background"
     },
     {
         "name": "不要亮色背景",
         "direction": "反向",
         "type": "环境",
-        "note": "与黑色背景相反",
+        "note": "与纯黑背景搭配，避免亮色或白背景干扰",
         "text": "detailed background, complex background, cluttered background, outdoor background, indoor background, scenery, landscape, objects in background, colored background, gradient background, textured background, pattern background, bright background, light background, white background"
+    },
+    {
+        "name": "卧室场景",
+        "direction": "正向",
+        "type": "环境",
+        "note": "温馨卧室内部（床、柔光），私密或日常休息场景",
+        "text": "bedroom, cozy bedroom, on bed, soft bed sheets, bedroom interior, warm lighting bedroom"
+    },
+    {
+        "name": "海滩",
+        "direction": "正向",
+        "type": "环境",
+        "note": "沙滩海边（海浪、热带），夏季泳装场景高频",
+        "text": "beach, sandy beach, ocean waves, seaside, tropical beach"
+    },
+    {
+        "name": "教室",
+        "direction": "正向",
+        "type": "环境",
+        "note": "学校教室（课桌、黑板），校园JK场景常用",
+        "text": "classroom, school classroom, desks and chairs, chalkboard"
+    },
+    {
+        "name": "运动场",
+        "direction": "正向",
+        "type": "环境",
+        "note": "户外操场或田径场，运动装场景",
+        "text": "sports field, track and field, stadium, running track, athletic field, outdoor sports ground"
+    },
+    {
+        "name": "树林森林",
+        "direction": "正向",
+        "type": "环境",
+        "note": "自然树林（阳光穿透、林间空地），户外冒险或治愈场景",
+        "text": "forest, woods, among trees, dense forest, sunlight through trees, forest clearing"
+    },
+    {
+        "name": "城市街头",
+        "direction": "正向",
+        "type": "环境",
+        "note": "都市街景（夜晚灯火或白天），现代日常背景",
+        "text": "city street, urban background, night city lights, street scene"
+    },
+    {
+        "name": "餐桌场景",
+        "direction": "正向",
+        "type": "环境",
+        "note": "餐厅或家中餐桌（食物、温馨灯光），生活场景",
+        "text": "dining table, at dinner table, restaurant table, food on table, cozy dining room"
+    },
+    {
+        "name": "雨天",
+        "direction": "正向",
+        "type": "环境",
+        "note": "下雨氛围（雨滴、湿表面、伞），忧郁或浪漫场景",
+        "text": "raining, rain drops, wet surface, umbrella, rainy day"
+    },
+    {
+        "name": "樱花飘落",
+        "direction": "正向",
+        "type": "环境",
+        "note": "春季樱花飘落（花瓣、樱树），日式浪漫高频背景",
+        "text": "cherry blossoms, sakura petals falling, cherry blossom tree, spring sakura"
+    },
+    {
+        "name": "JK学生服",
+        "direction": "正向",
+        "type": "着装",
+        "note": "最经典日本女高中生制服（水手服、百褶裙），校园场景高频服装",
+        "text": "school uniform, seifuku, sailor uniform, sailor collar, pleated skirt, ribbon, knee socks, loafers, japanese schoolgirl outfit"
+    },
+    {
+        "name": "女仆装",
+        "direction": "正向",
+        "type": "着装",
+        "note": "经典或哥特女仆装（围裙、头饰、蕾丝），幻想角色高频服装",
+        "text": "maid outfit, frilly maid dress, apron, headband, black and white maid, gothic maid, lace trim"
+    },
+    {
+        "name": "泳装",
+        "direction": "正向",
+        "type": "着装",
+        "note": "各种泳装（比基尼、学校泳装、竞技泳装），海滩、夏季场景常用",
+        "text": "swimsuit, bikini, one-piece swimsuit, school swimsuit, competitive swimsuit, wet swimsuit, beachwear"
+    },
+    {
+        "name": "兔女郎",
+        "direction": "正向",
+        "type": "着装",
+        "note": "经典兔女郎装（兔耳、鱼网袜），性感幻想高频服装",
+        "text": "bunny girl, bunny suit, fishnet stockings, bunny ears, bowtie, high heels, playboy bunny"
+    },
+    {
+        "name": "性感内衣",
+        "direction": "正向",
+        "type": "着装",
+        "note": "蕾丝内衣、文胸、吊带袜等，私密或诱惑场景常用",
+        "text": "lingerie, lace bra and panties, underwear, garter belt, stockings, seductive lingerie, sheer fabric, strapless bra"
+    },
+    {
+        "name": "旗袍",
+        "direction": "正向",
+        "type": "着装",
+        "note": "中国风旗袍（开叉、立领、绣花），优雅东方风格高频服装",
+        "text": "cheongsam, qipao, chinese dress, side slit dress, mandarin collar, embroidered silk"
+    },
+    {
+        "name": "婚纱",
+        "direction": "正向",
+        "type": "着装",
+        "note": "白色婚纱礼服（长裙、头纱），浪漫婚礼场景常用",
+        "text": "wedding dress, white gown, bridal veil, lace wedding dress, long train"
+    },
+    {
+        "name": "休闲连衣裙",
+        "direction": "正向",
+        "type": "着装",
+        "note": "日常夏季连衣裙（碎花、露肩、轻薄面料），休闲场景常用",
+        "text": "casual dress, sundress, floral dress, summer dress, maxi dress, off-shoulder dress, light fabric dress"
+    },
+    {
+        "name": "运动装",
+        "direction": "正向",
+        "type": "着装",
+        "note": "运动风服装（运动短裤、运动胸衣、跑鞋），健身或校园运动场景",
+        "text": "sportswear, tracksuit, athletic shorts, sports bra, tank top, running shoes, sweatpants, hoodie"
+    },
+    {
+        "name": "牛仔热裤",
+        "direction": "正向",
+        "type": "着装",
+        "note": "青春热裤搭配（牛仔短裤、露脐上衣），夏季街头风格",
+        "text": "denim shorts, crop top, jean shorts, casual summer outfit, belly exposed"
+    },
+    {
+        "name": "和服",
+        "direction": "正向",
+        "type": "着装",
+        "note": "日式传统和服或浴衣（腰带、花纹），节日或古风场景",
+        "text": "kimono, yukata, japanese traditional clothing, obi sash, floral pattern kimono"
+    },
+    {
+        "name": "高马尾",
+        "direction": "正向",
+        "type": "着装",
+        "note": "高位马尾发型，活力运动或校园风常见",
+        "text": "high ponytail, ponytail pulled high, long high ponytail, hair tied up high"
+    },
+    {
+        "name": "双马尾",
+        "direction": "正向",
+        "type": "着装",
+        "note": "经典双马尾（对称猪尾），可爱萝莉或元气少女高频",
+        "text": "twintails, twin ponytails, pigtails, two ponytails, symmetrical twintails"
+    },
+    {
+        "name": "低马尾",
+        "direction": "正向",
+        "type": "着装",
+        "note": "低位马尾（颈部位置），优雅或成熟风",
+        "text": "low ponytail, ponytail at nape, loose low ponytail"
+    },
+    {
+        "name": "散开长发",
+        "direction": "正向",
+        "type": "着装",
+        "note": "自然披散长发（风吹、过肩），最通用女性发型",
+        "text": "long loose hair, hair down, flowing hair, loose waves, hair over shoulders, windblown hair"
+    },
+    {
+        "name": "短发",
+        "direction": "正向",
+        "type": "着装",
+        "note": "短发或波波头，清爽帅气或知性风格",
+        "text": "short hair, bob cut, pixie cut, asymmetrical bob"
+    },
+    {
+        "name": "眼镜",
+        "direction": "正向",
+        "type": "着装",
+        "note": "各种眼镜（圆框、方框），增加知性或萌系属性",
+        "text": "glasses, round glasses, square glasses, rimless glasses, intellectual glasses"
+    },
+    {
+        "name": "头饰配件",
+        "direction": "正向",
+        "type": "着装",
+        "note": "猫耳、发带、贝雷帽、花冠等可爱配件",
+        "text": "cat ears, headband, beret, hair ribbon, animal ears, flower crown"
+    },
+    {
+        "name": "丰满身材",
+        "direction": "正向",
+        "type": "着装",
+        "note": "丰满曲线身材（大胸、沙漏形），常见性感角色描述",
+        "text": "large breasts, voluptuous, curvy body, hourglass figure"
+    },
+    {
+        "name": "苗条身材",
+        "direction": "正向",
+        "type": "着装",
+        "note": "纤细苗条身材（娇小、纤瘦），清纯或模特风",
+        "text": "slender, slim body, petite, delicate figure"
+    },
+    {
+        "name": "坐下姿势",
+        "direction": "正向",
+        "type": "动作",
+        "note": "自然坐姿（椅子、翘腿等），日常静态场景最常用",
+        "text": "sitting pose, seated, sitting on chair, relaxed sitting, legs crossed"
+    },
+    {
+        "name": "盘腿坐下",
+        "direction": "正向",
+        "type": "动作",
+        "note": "盘腿或印度式坐，休闲或地板场景",
+        "text": "sitting cross-legged, lotus position, indian style sitting, legs folded"
+    },
+    {
+        "name": "躺下姿势",
+        "direction": "正向",
+        "type": "动作",
+        "note": "躺在床上或沙发，休息或私密场景",
+        "text": "lying down, lying on bed, reclining, supine pose"
+    },
+    {
+        "name": "跑步姿势",
+        "direction": "正向",
+        "type": "动作",
+        "note": "动态跑步、冲刺姿势，运动或追逐场景",
+        "text": "running pose, sprinting, jogging, dynamic running motion, legs in stride, arms pumping"
+    },
+    {
+        "name": "跳跃姿势",
+        "direction": "正向",
+        "type": "动作",
+        "note": "跳起动态，活力或惊喜场景",
+        "text": "jumping, mid-jump, leaping, dynamic jump pose"
+    },
+    {
+        "name": "挥手姿势",
+        "direction": "正向",
+        "type": "动作",
+        "note": "打招呼挥手，友好互动常见",
+        "text": "waving hand, greeting wave, friendly wave"
+    },
+    {
+        "name": "比心姿势",
+        "direction": "正向",
+        "type": "动作",
+        "note": "手指比心，可爱卖萌高频动作",
+        "text": "finger heart, heart hands, making heart shape with hands"
+    },
+    {
+        "name": "两人拥抱",
+        "direction": "正向",
+        "type": "动作",
+        "note": "温暖或浪漫拥抱，双人互动常见",
+        "text": "hugging, embrace, arms wrapped around each other, tight hug, gentle embrace"
+    },
+    {
+        "name": "两人对峙",
+        "direction": "正向",
+        "type": "动作",
+        "note": "面对面紧张对峙，双人冲突场景",
+        "text": "facing each other confrontation, standoff pose, intense eye contact, arms crossed, tense posture"
+    },
+    {
+        "name": "手牵手",
+        "direction": "正向",
+        "type": "动作",
+        "note": "两人牵手，浪漫或友情互动",
+        "text": "holding hands, hand in hand, intertwined fingers"
+    },
+    {
+        "name": "开心表情",
+        "direction": "正向",
+        "type": "表情",
+        "note": "欢乐、愉快、满足的表情，嘴角上扬、眼睛眯起",
+        "text": "happy expression, cheerful face, joyful smile, delighted expression, radiant happiness, bright smile, glowing joy, contented face, pleased expression"
+    },
+    {
+        "name": "微笑表情",
+        "direction": "正向",
+        "type": "表情",
+        "note": "温和的微笑，嘴角轻轻上扬，眼神温暖",
+        "text": "smiling, smile, gentle smile, soft smile, warm smile, slight smile, subtle smile, faint smile, friendly expression, approachable smile"
+    },
+    {
+        "name": "生气表情",
+        "direction": "正向",
+        "type": "表情",
+        "note": "愤怒、恼怒或凶悍的表情，眉毛紧皱、嘴角下压",
+        "text": "angry expression, angry face, furious look, wrathful expression, fierce expression, scowling face, enraged expression, hostile look, aggressive expression, intimidating face"
+    },
+    {
+        "name": "害羞表情",
+        "direction": "正向",
+        "type": "表情",
+        "note": "害羞、羞涩或害怕的表情，脸红、眼神躲闪",
+        "text": "shy expression, bashful face, blushing cheeks, embarrassed expression, flushed face, timid expression, nervous look, cute shy smile, adorable blush, shy glance"
+    },
+    {
+        "name": "疑惑表情",
+        "direction": "正向",
+        "type": "表情",
+        "note": "困惑、疑问或思考的表情，歪头、眉头微皱",
+        "text": "confused expression, questioning look, puzzled face, bewildered expression, thoughtful expression, uncertain look, questioning eyes, skeptical expression, inquisitive face, intrigued look"
+    },
+    {
+        "name": "充满欲望",
+        "direction": "正向",
+        "type": "表情",
+        "note": "充满渴望、性感或诱惑的表情，眼神炽热、嘴唇水润",
+        "text": "lustful expression, seductive look, passionate eyes, sensual expression, sultry gaze, hungry look, intense desire in eyes, bedroom eyes, alluring expression, captivating smile, erotic expression, tempting look"
+    },
+    {
+        "name": "复古风格",
+        "direction": "正向",
+        "type": "质感",
+        "note": "复古、怀旧的画面效果，暖色调、泛黄、胶片感",
+        "text": "vintage style, retro, nostalgic, film grain, sepia tone, warm colors, faded colors, aged look, vintage photography, analog feel"
+    },
+    {
+        "name": "黑白风格",
+        "direction": "正向",
+        "type": "质感",
+        "note": "纯黑白，无彩色，高对比的单色画面",
+        "text": "black and white, monochrome, grayscale, bw, greyscale, no color, black and white photography, monochromatic"
+    },
+    {
+        "name": "灰度风格",
+        "direction": "正向",
+        "type": "质感",
+        "note": "灰度调，冷调单色，类似素描的感觉",
+        "text": "grayscale, grayscale image, grey tones, monochromatic gray, desaturated colors, black and white, greyscale"
+    },
+    {
+        "name": "高饱和度",
+        "direction": "正向",
+        "type": "质感",
+        "note": "色彩饱和度极高，色彩鲜艳浓郁，对比强烈",
+        "text": "high saturation, vibrant colors, saturated colors, vivid colors, intense colors, highly saturated, bright colors, colorful, oversaturated"
+    },
+    {
+        "name": "低饱和度",
+        "direction": "正向",
+        "type": "质感",
+        "note": "色彩饱和度低，苍白、褪色、低对比的画面",
+        "text": "low saturation, desaturated, muted colors, pale colors, washed out, faded colors, low contrast, subtle colors"
+    },
+    {
+        "name": "模糊效果",
+        "direction": "正向",
+        "type": "质感",
+        "note": "运动模糊、景深模糊、整体模糊效果",
+        "text": "blurry, motion blur, soft focus, bokeh, depth of field, out of focus, blur effect, soft image"
+    },
+    {
+        "name": "高度锐化",
+        "direction": "正向",
+        "type": "质感",
+        "note": "细节清晰锐利，边缘分明，高清晰度",
+        "text": "sharp, highly detailed, crisp, sharp focus, ultra sharp, extreme detail, razor sharp, crystal clear"
+    },
+    {
+        "name": "马赛克风格",
+        "direction": "正向",
+        "type": "质感",
+        "note": "像素风、8位风格、方块马赛克效果",
+        "text": "pixelated, pixel art, mosaic, pixelated style, blocky, 8-bit style, low resolution art style"
+    },
+    {
+        "name": "油画质感",
+        "direction": "正向",
+        "type": "质感",
+        "note": "厚重笔触、油画风、绘画感强烈",
+        "text": "oil painting, oil paint texture, thick brushstrokes, painting style, impasto, textured paint, hand-painted"
+    },
+    {
+        "name": "水彩质感",
+        "direction": "正向",
+        "type": "质感",
+        "note": "水彩画风、柔和透明、晕染效果",
+        "text": "watercolor, watercolor painting, watercolor style, soft edges, transparent washes, diffused colors, flowing watercolor"
+    },
+    {
+        "name": "铅笔素描",
+        "direction": "正向",
+        "type": "质感",
+        "note": "铅笔画风、素描感、线条清晰",
+        "text": "pencil sketch, pencil drawing, graphite, sketch style, hand-drawn, line art, pencil shading"
     }
 ]

@@ -3,7 +3,7 @@
 An elegant prompt management and generation system designed for ComfyUI.
 
 **中文版本 | [English](README.en.md)**
-
+![](./asset/ui_pic_en.png)
 ## 🚀 Quick Start
 
 ### Installation Steps
