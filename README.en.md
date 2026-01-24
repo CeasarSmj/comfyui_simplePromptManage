@@ -1,153 +1,254 @@
 # 🎨 ComfyUI Prompt Manager
 
-An elegant prompt management and generation system designed for ComfyUI.
+An elegant AI prompt management and generation system designed for ComfyUI. Efficiently manage, search, and generate Stable Diffusion prompts.
 
-**中文版本 | [English](README.en.md)**
+**[中文](README.md) | [English](README.en.md)**
+
 ![](./asset/ui_pic_en.png)
-## 🚀 Quick Start
 
-### Installation Steps
+---
 
-1. **Clone or download to ComfyUI custom nodes directory**
-   ```bash
-   cd path/to/ComfyUI/custom_nodes
-   git clone https://github.com/your-repo/comfyui_PromptManage.git
-   # Or download and extract directly to this directory
+## ⚡ Quick Installation & Usage
+
+### 1️⃣ Installation
+
+Clone or download the plugin to ComfyUI's custom nodes directory:
+
+```bash
+cd path/to/ComfyUI/custom_nodes
+git clone https://github.com/CeasarSmj/comfyui_PromptManage.git
+```
+
+Restart ComfyUI and visit `http://localhost:8188/prompt_manage_web/` or click the plugin button in the ComfyUI web interface.
+
+### 2️⃣ Core Concepts
+
+The plugin has two main sections:
+
+| Section | Purpose |
+|---------|---------|
+| **Left Panel** | Prompt Library - Add, edit, delete, search prompts |
+| **Right Panel** | Prompt Generator - Combine prompts to create positive/negative prompt pairs |
+
+Each prompt contains:
+- **Name**: Short identifier (e.g., "landscape", "beautiful woman")
+- **Direction**: Positive (what to generate) / Negative (what to avoid) / None
+- **Type**: Classification - Quality, Style, Texture, Environment, Action, Expression, Clothing, Composition, Other
+- **Prompt Text**: Complete prompt content
+- **Note** (optional): Usage tips and descriptions
+
+---
+
+## 🎯 Core Usage Methods
+
+### 📚 Manage Prompt Library
+
+#### Add a Prompt
+1. Fill in the "Add New Prompt" form on the left:
+   - **Name**: e.g., "high quality image", "beautiful girl"
+   - **Direction**: Select "Positive", "Negative", or "None"
+   - **Type**: Choose from the dropdown menu
+   - **Note** (optional): e.g., "for character generation"
+   - **Prompt Text**: Paste your prompt content
+2. Click "✚ Add" to save
+
+#### Search and Filter
+- **Search Box**: Type keywords to find prompts (supports both fuzzy and exact matching)
+- **Type Filter**: Filter by classification from dropdown
+- **Show Details**: Check to view complete information for each prompt
+
+#### Edit or Delete
+1. Click a prompt in the list to select it (button will highlight)
+2. Edit: Click "✏️ Edit Selected" → Modify information → Click "✓ Confirm Edit"
+3. Delete: Click "🗑️ Delete Selected" → Confirm deletion
+
+### 🎨 Generate Prompts
+
+#### Method 1: Manual Combination (Recommended for Beginners)
+1. Select a prompt from the library on the left
+2. Click a button to add to the right generator:
+   - **➕ Add**: System auto-detects direction and adds to appropriate area
+   - **➕ Add Positive (P)**: Force add to positive prompt area
+   - **➖ Add Negative (N)**: Force add to negative prompt area
+3. Prompt text automatically appends to the text box on the right
+4. Continue adding more prompts to create combinations
+5. Copy the final result to use in ComfyUI
+
+#### Method 2: Keyboard Shortcuts (Efficient)
+- Select a prompt then press **`P` key**: Quickly add to positive prompts
+- Select a prompt then press **`N` key**: Quickly add to negative prompts
+
+#### Method 3: LLM AI Generation (Professional)
+1. Click "🤖 LLM Prompt Generator" in the top-right
+2. Describe your needs in natural language:
    ```
-
-2. **Start ComfyUI**
-   ```bash
-   python main.py
+   A smiling woman in a red dress in a garden, sunlight, soft lighting
    ```
+3. Click "⚡ Generate" button
+4. System generates standardized prompt based on preset rules
+5. Click "📋 Copy" to copy the generated content
+6. Optional: Paste into text box for further fine-tuning
 
-3. **Access the Plugin**
-   - Open ComfyUI web interface
-   - Find the button to launch beside the running button
-   - Or directly visit `http://localhost:8188/prompt_manage_web/`
+### 🎛️ Interface Settings
 
-### Usage Video Tutorial
+- **Language**: Click "🌐" in top-left to switch between Chinese and English
+- **Theme**: Click "🎨" in top-left to toggle between light and dark modes
+- **Auto-Save**: Preferences automatically saved to browser local storage
 
-📹 **[Click here to watch the usage tutorial video](web/Usage_example.mp4)** or click the "📹 Usage Video" button in the top-right corner of the Web interface
+---
 
-**Video Contents:**
-- ✅ Feature demonstration
-- ✅ Prompt management methods
-- ✅ Generator usage tips
-- ✅ LLM-assisted generation features
-- ✅ Keyboard shortcuts guide
+## 📹 Video Tutorial
 
-## 💻 Usage Guide
+Click "📹 Usage Video" in the top-right to watch the complete usage tutorial (includes demonstrations and tips)
 
-### Managing Prompts
-
-1. **Add New Prompt**
-   - In the left "Add New Prompt" section, enter:
-     - **Name**: Brief identifier for the prompt (e.g., "landscape", "character")
-     - **Direction**: Select "Positive", "Negative", or "None" (used for auto-add)
-     - **Type**: Choose from 8 categories (Quality, Style, Texture, Environment, Action, Expression, Clothing, Other)
-     - **Note**: Optional description information
-     - **Prompt Text**: Complete prompt content
-   - Click "✚ Add" button to save
-
-2. **Search and Filter Prompts**
-   - **Search Box**: Type keywords to quickly find prompts
-   - **Search Mode**:
-     - Fuzzy: Matches prompt names containing the keyword
-     - Exact: Exact match of prompt names
-   - **Type Filter**: Filter display by prompt category
-
-3. **Edit Prompts**
-   - Select the prompt to edit from the list
-   - Click "✏️ Edit Selected" button
-   - Modify information in the form
-   - Click "✓ Confirm Edit" to save changes
-
-4. **Delete Prompts**
-   - Select the prompt to delete from the list
-   - Click "🗑️ Delete Selected" button
-   - Confirm the deletion
-
-5. **Show Details Mode**
-   - Check the "Show Details" checkbox
-   - View detailed information (direction, type, note) for each prompt in the list
-
-### Generating Prompts
-
-1. **Combine Prompts**
-   - Select a prompt from the left library
-   - Click the corresponding button to add to the generator:
-     - **➕ Add**: Auto-detect direction and add to the corresponding area
-     - **➕ Add Positive (P)**: Add to positive prompts area
-     - **➖ Add Negative (N)**: Add to negative prompts area
-   - Prompt text will be automatically appended to the right text box
-
-2. **Use Keyboard Shortcuts**
-   - Select a prompt, then press **`P` key**: Quickly add positive prompt
-   - Select a prompt, then press **`N` key**: Quickly add negative prompt
-
-3. **Manual Editing**
-   - Edit directly in positive/negative text boxes
-   - Support standard editing operations like copy and delete
-   - Can copy generated prompts to use in ComfyUI
-
-### LLM Prompt Generation
-
-1. **Click "🤖 LLM Prompt Generator" button**
-2. **Enter your demand** (natural language description)
-   - Example: "A smiling woman in a red dress in a garden"
-3. **Click "⚡ Generate" button**
-   - System generates a standardized prompt template
-   - Template includes 8 complete rules and available prompt references
-4. **Click "📋 Copy" button** to copy the generated content
-
-### Interface Settings
-
-- **Language Switching**: Click the "🌐" icon in the top-left to choose Chinese or English
-- **Theme Switching**: Click the "🎨" icon in the top-left to toggle between light and dark themes
-- **Settings Save**: Language and theme preferences are automatically saved to browser local storage
+---
 
 ## ✨ Features
 
-- **📚 Prompt Library Management**: Easily create, edit, delete, and search prompts
-- **🔍 Smart Search**: Support both fuzzy and exact search modes
-- **🎯 Multi-dimensional Classification**: Direction (Positive/Negative/None) and Type (8 categories)
-- **🤖 LLM Prompt Generation**: AI-assisted generation of high-quality prompts
-- **🌐 Multi-language Support**: Support for Chinese and English interfaces
-- **🎨 Theme Switching**: Toggle between light and dark themes
-- **💾 Real-time Save**: Prompts automatically saved to local JSON files
-- **⌨️ Keyboard Shortcuts**: Use P key to quickly add positive prompts, N key for negative prompts
-- **📹 Video Tutorial**: Built-in usage video for quick learning
+- ✅ **Prompt Library Management** - Easily create, edit, delete, and search
+- ✅ **Smart Search** - Fuzzy and exact search modes
+- ✅ **Multi-dimensional Classification** - Organize by direction and type
+- ✅ **AI-Assisted Generation** - LLM generates high-quality prompts
+- ✅ **Keyboard Shortcuts** - P and N keys for quick addition
+- ✅ **Bilingual Interface** - Full support for Chinese and English
+- ✅ **Theme Switching** - Light and dark modes
+- ✅ **Auto-Save** - Prompts automatically saved to local JSON
+- ✅ **Responsive Design** - Adapts to various screen sizes
 
-## 📦 Project Structure
+---
+
+## 🛠️ Technical Documentation
+
+### Project Architecture
 
 ```
 comfyui_PromptManage/
-├── __init__.py                 # Main plugin file with API route definitions
-├── prompts.json                # Default prompt configuration (example)
-├── web/
-│   └── Usage_example.mp4       # Usage video tutorial
+├── __init__.py                 # Backend: Python API server
 ├── data/
-│   └── prompts.json            # User saved prompt data
-└── web/
-    ├── index.html              # Web interface entry point
-    ├── script.js               # Main functionality script (800+ lines)
-    ├── style.css               # Interface styling (1100+ lines)
-    └── top_menu_extension.js   # ComfyUI menu integration
+│   └── prompts.json            # User prompt data storage
+├── web/                        # Frontend: Web interface
+│   ├── index.html              # HTML page structure
+│   ├── script.js               # JavaScript interaction logic
+│   ├── style.css               # Stylesheets
+│   ├── translations.json       # Multilingual translation config
+│   ├── llm-templates.json      # LLM generation rules template
+│   ├── top_menu_extension.js   # ComfyUI menu integration
+│   └── Usage_example.mp4       # Usage tutorial video
+└── asset/                      # Resources and images
 ```
 
-## 🔧 API Endpoints
+### API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
+| Method | Endpoint | Function |
+|--------|----------|----------|
 | POST | `/prompt_manage/get` | Get all prompts |
-| POST | `/prompt_manage/save` | Save all prompts |
 | POST | `/prompt_manage/add` | Add new prompt |
+| POST | `/prompt_manage/update` | Update specified prompt |
 | POST | `/prompt_manage/delete` | Delete specified prompt |
+| POST | `/prompt_manage/save` | Save all prompts |
 
-### Request/Response Examples
+#### API Usage Examples
 
 **Add Prompt**
+```bash
+POST /prompt_manage/add
+Content-Type: application/json
+
+{
+    "name": "landscape",
+    "direction": "None",
+    "type": "Environment",
+    "text": "beautiful landscape, mountains, clear sky",
+    "note": "natural landscape prompt"
+}
+```
+
+**Delete Prompt**
+```bash
+POST /prompt_manage/delete
+Content-Type: application/json
+
+{
+    "index": 0
+}
+```
+
+### Data Format
+
+Prompts are stored as JSON array in `data/prompts.json`
+
 ```json
+[
+    {
+        "name": "prompt name",
+        "direction": "positive|negative|none",
+        "type": "quality|style|texture|environment|action|expression|clothing|composition|other",
+        "text": "prompt content...",
+        "note": "optional notes"
+    }
+]
+```
+
+### Code Explanation
+
+#### Backend (__init__.py)
+- **load_prompts()** - Load prompts from JSON file
+- **save_prompts(data)** - Save prompts to JSON file
+- **API route handlers** - Process add, delete, update, get requests
+- **Web directory mounting** - Static file serving for web interface
+
+#### Frontend (script.js)
+- **Internationalization system** - Load multilingual config from translations.json
+- **Prompt library management** - Frontend CRUD operations
+- **Search and filtering** - Fuzzy search, exact search, and classification logic
+- **Keyboard shortcuts** - P/N key event handling
+- **LLM integration** - Call LLM API for prompt generation
+- **Theme and language** - Dynamic interface switching with localStorage persistence
+
+#### Styling (style.css)
+- **Responsive layout** - Two-column design (library + generator)
+- **Theme system** - CSS variables for light/dark theme switching
+- **Component styles** - Complete styling for buttons, forms, lists, etc.
+
+### LLM Prompt Generation Rules
+
+The LLM generator uses 8 preset rules to ensure generated prompts:
+1. English only, no Chinese
+2. Prioritize short phrases, avoid complete sentences
+3. Comma-separated elements with line breaks between categories
+4. Follow order: quality > subject > clothing > action > environment > style
+5. Group multiple characters by character
+6. Start with quality terms (masterpiece, best quality, etc.)
+7. Provide multiple synonyms for important features
+8. Support weight syntax: (keyword:1.2) to emphasize, [keyword] to de-emphasize
+
+See `web/llm-templates.json` for details
+
+---
+
+
+## 💡 Usage Tips
+
+- Regularly organize your prompt library, removing outdated or duplicate entries
+- Use the "Note" field to document usage context and generation results
+- Name prompts clearly based on use cases for easier searching
+- Create multiple variants of popular prompts (different styles, quality levels)
+- Save successful prompt combinations as reusable templates
+- Use type filtering to quickly locate prompts in specific categories
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+**Version**: 1.2.0  
+**Last Updated**: January 24, 2026  
+**GitHub**: [comfyui_PromptManage](https://github.com/CeasarSmj/comfyui_PromptManage)
+
+Welcome to submit Issues and Pull Requests!
 POST /prompt_manage/add
 {
     "name": "landscape",
@@ -216,27 +317,10 @@ A: Ensure ComfyUI service is running and check if you're accessing the correct U
 **Q: Where is the usage video?**
 A: Click the "📹 Usage Video" button in the top-right corner of the interface to watch it.
 
-**Q: How to import/export prompts?**
-A: Edit the `data/prompts.json` file directly or perform batch operations via API endpoints.
-
-## 💡 Tips
-
-- Regularly backup the `data/prompts.json` file to protect your data
-- Organize prompts by application scenarios with descriptive names
-- Take full advantage of the "Note" field to record prompt usage and effectiveness
-- Use the direction and type fields to effectively organize and manage your prompt library
-
-## 📄 License
-
-MIT License
-
-## 🤝 Contributing
-
-Issues and Pull Requests are welcome!
-
 ---
 
-**Version**: 1.1.0  
-**Last Updated**: January 2026
+**Version**: 1.2.0  
+**Last Updated**: January 24, 2026  
+**GitHub**: [comfyui_PromptManage](https://github.com/CeasarSmj/comfyui_PromptManage)
 
-If you have any questions or suggestions, feel free to open an issue!
+Welcome to submit Issues and Pull Requests!
