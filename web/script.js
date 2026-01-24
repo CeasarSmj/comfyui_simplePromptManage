@@ -19,8 +19,48 @@ Promise.all([
 let currentLang = localStorage.getItem("promptLang") || "zh";
 let currentTheme = localStorage.getItem("promptTheme") || "light";
 
+// 获取ComfyUI的语言设置
+function getComfyUILanguage() {
+    // 先尝试从app对象获取
+    if (window.app && window.app.settings) {
+        try {
+            const comfyLang = window.app.settings.getSettingValue("language");
+            if (comfyLang) return comfyLang;
+        } catch (e) {
+            // 如果失败，继续下一个方法
+        }
+    }
+    
+    // 从localStorage获取ComfyUI的语言设置
+    const storedLang = localStorage.getItem("Comfy.Settings.language");
+    if (storedLang) return storedLang;
+    
+    return null;
+}
+
+// 将ComfyUI语言转换为插件支持的语言
+function mapComfyLanguage(comfyLang) {
+    if (!comfyLang) return null;
+    
+    const langMap = {
+        "zh": "zh",
+        "zh_CN": "zh",
+        "zh-cn": "zh",
+        "zh-hans": "zh",
+        "en": "en",
+        "en_US": "en"
+    };
+    
+    return langMap[comfyLang] || null;
+}
+
 // 初始化主题和语言
 function initializeApp() {
+    // 优先使用ComfyUI的语言设置，如果没有则使用本地保存，最后降级为中文
+    const comfyLang = getComfyUILanguage();
+    const mappedLang = comfyLang ? mapComfyLanguage(comfyLang) : null;
+    currentLang = mappedLang || localStorage.getItem("promptLang") || "zh";
+    
     document.documentElement.setAttribute("data-theme", currentTheme);
     document.documentElement.setAttribute("data-lang", currentLang);
     document.getElementById("themeToggle").value = currentTheme;
