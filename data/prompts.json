@@ -189,6 +189,83 @@
         "text": "worm's eye view, ground level view, ultra low angle, (worm's eye view:1.2)"
     },
     {
+        "name": "萝莉",
+        "direction": "正向",
+        "type": "其它",
+        "note": "幼龄女性角色，年幼可爱的外观特征",
+        "text": "loli, lolita, young girl, child-like appearance, petite body, flat chest, innocent expression, cute child"
+    },
+    {
+        "name": "少女",
+        "direction": "正向",
+        "type": "其它",
+        "note": "青春期女性角色，青少年的特征",
+        "text": "young girl, teenage girl, adolescent girl, school girl, youthful appearance, teenage body, innocent beauty"
+    },
+    {
+        "name": "成年女性",
+        "direction": "正向",
+        "type": "其它",
+        "note": "成熟女性角色，完全发育的女性特征",
+        "text": "adult woman, mature woman, woman, grown woman, voluptuous woman, mature body, sensual woman"
+    },
+    {
+        "name": "老太太",
+        "direction": "正向",
+        "type": "其它",
+        "note": "年迈女性角色，老年的特征",
+        "text": "elderly woman, old woman, aged woman, grandmother, mature features, wrinkles, grey hair, silver hair"
+    },
+    {
+        "name": "少年",
+        "direction": "正向",
+        "type": "其它",
+        "note": "青春期男性角色，年轻男孩的特征",
+        "text": "young boy, teenage boy, adolescent boy, schoolboy, youthful boy, teenage appearance"
+    },
+    {
+        "name": "男青年",
+        "direction": "正向",
+        "type": "其它",
+        "note": "年轻成年男性角色，充满活力的男性特征",
+        "text": "young man, handsome man, young adult male, masculine beauty, athletic build, youthful man"
+    },
+    {
+        "name": "大叔",
+        "direction": "正向",
+        "type": "其它",
+        "note": "中年男性角色，成熟魅力的男性特征",
+        "text": "middle-aged man, mature man, middle-aged male, rugged man, bearded man, manly charm, muscular man"
+    },
+    {
+        "name": "老爷爷",
+        "direction": "正向",
+        "type": "其它",
+        "note": "年迈男性角色，老年的特征",
+        "text": "elderly man, old man, aged man, grandfather, senior man, white hair, grey beard, wrinkled face"
+    },
+    {
+        "name": "看向观察者",
+        "direction": "正向",
+        "type": "构图",
+        "note": "直视镜头、眼神接触观察者，亲近感和互动感强",
+        "text": "looking at viewer, direct gaze, eye contact with viewer, facing camera, looking directly at camera"
+    },
+    {
+        "name": "低头看向地面",
+        "direction": "正向",
+        "type": "构图",
+        "note": "低头俯视，温柔内敛或思考状态",
+        "text": "looking down, downward gaze, eyes cast down, head lowered, contemplative pose, shy downward glance"
+    },
+    {
+        "name": "扭头看向一边",
+        "direction": "正向",
+        "type": "构图",
+        "note": "转身侧视、眼神看向身体一侧，增加动感和神秘感",
+        "text": "looking to the side, side glance, looking away, turned head, profile view, sideways gaze, over-the-shoulder look"
+    },
+    {
         "name": "动态与特效",
         "direction": "正向",
         "type": "构图",

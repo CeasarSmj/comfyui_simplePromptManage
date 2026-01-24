@@ -439,7 +439,7 @@ function updateText(isPositive) {
         .map(cb => prompts[cb.dataset.index].text);
     
     // 不同tag之间用换行分隔
-    textArea.value = selectedPhrases.join("\n");
+    textArea.value = selectedPhrases.join(",\n");
 }
 
 // 获取生成器中已添加的tag
