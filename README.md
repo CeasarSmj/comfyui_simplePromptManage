@@ -1,10 +1,9 @@
 # 🎨 ComfyUI Prompt Manager
 
-为 ComfyUI 设计的优雅 AI 提示词管理和生成系统，帮助您高效地管理、搜索和生成 Stable Diffusion 提示词。
+为 ComfyUI 设计的优雅 AI 提示词和 Lora 库管理与生成系统，帮助您高效地管理、搜索和生成 Stable Diffusion 提示词，同时管理和组织 Lora 模型。
 
 **[中文](README.md) | [English](README.en.md)**
 
-![](./asset/ui_pic_cn.png)
 
 ---
 
@@ -21,14 +20,17 @@ git clone https://github.com/CeasarSmj/comfyui_PromptManage.git
 
 重启 ComfyUI，访问 `http://localhost:8188/prompt_manage_web/` 或在网页界面中点击插件入口按钮。
 
+![](./asset/entrance.png)
+
 ### 2️⃣ 基础概念
 
-插件包含两大核心功能：
+插件包含三大核心功能：
 
 | 功能 | 说明 |
 |------|------|
-| **左侧面板** | 提示词库管理 - 添加、编辑、删除、搜索提示词 |
-| **右侧面板** | 提示词生成器 - 组合提示词生成完整的正向/负向提示词 |
+| **提示词库**（选项卡） | 提示词库管理 - 添加、编辑、删除、搜索提示词 |
+| **Lora库**（选项卡） | Lora 模型管理 - 浏览、分类、组织本地 Lora 模型 |
+| **生成器**（右侧面板） | 提示词生成器 - 组合提示词和 Lora 生成完整的正向/负向提示词 |
 
 每条提示词包含：
 - **名称**：提示词的简短标识（如"风景"、"人物"）
@@ -43,6 +45,7 @@ git clone https://github.com/CeasarSmj/comfyui_PromptManage.git
 
 ### 📚 管理提示词库
 
+![](./asset/pic_promptlib_cn.png)
 #### 添加提示词
 1. 在左侧"新增提示词"表单中填写：
    - **名称**：例如 "高质量画面"、"美女角色"
@@ -89,6 +92,27 @@ git clone https://github.com/CeasarSmj/comfyui_PromptManage.git
 5. 点击"📋 复制"按钮复制生成结果
 6. 可选：粘贴到文本框继续微调
 
+### � 管理 Lora 库
+
+![](./asset/pic_loralib_cn.png)
+#### 浏览和分类
+1. 点击左侧选项卡切换到"🎨 Lora库"
+2. 从"全部"下拉菜单选择 Lora 分类（自动按目录生成）
+3. 勾选"显示细节"查看完整信息：
+   - Lora 名称和文件名
+   - 触发词（用于生成器中使用）
+   - 预览图片/视频
+
+#### 选中并添加到生成器
+1. 在 Lora 列表中点击要添加的 Lora（会高亮显示）
+2. 点击"➕ 加入"按钮将选中的 Lora 添加到正向提示词区域
+3. Lora 的触发词会自动追加到提示词文本中
+
+#### Lora 在生成器中的使用
+- 提示词和 Lora 会按照 **添加顺序** 拼接，而不是先提示词后 Lora
+- Lora 触发词会自动从元数据中提取
+- 支持同时添加多个 Lora，提示词会依次拼接
+
 ### 🎛️ 界面设置
 
 - **语言切换**：点击左上角"🌐"图标选择中文或英文
@@ -97,28 +121,30 @@ git clone https://github.com/CeasarSmj/comfyui_PromptManage.git
 
 ---
 
-## 📹 视频教程
-
-点击右上角"📹 使用方法"按钮观看完整使用教程（包含演示和技巧）
-
----
-
 ## ✨ 功能特性
 
 - ✅ **提示词库管理** - 轻松创建、编辑、删除和搜索
+- ✅ **Lora 库管理** - 浏览、分类和组织本地 Lora 模型
 - ✅ **智能搜索** - 支持模糊搜索和精确搜索
-- ✅ **多维度分类** - 按方向和类型组织提示词
-- ✅ **AI 辅助生成** - LLM 大模型生成高质量提示词
-- ✅ **快捷键支持** - P 和 N 键快速添加提示词
-- ✅ **双语界面** - 中文和英文完全支持
-- ✅ **主题切换** - 亮色和暗色主题
-- ✅ **实时保存** - 提示词自动保存到本地 JSON 文件
-- ✅ **响应式设计** - 适配各种屏幕尺寸
-
----
-
-## 🛠️ 技术文档
-
+- ✅ **多维度分类** - 按方向和类型组织提示词，按目录分类 Lora
+- ✅ **AI 辅助生成** - LLM 大模型生成高质量提示词（包括 Lora API）
+├── data/
+│   ├── prompts.json            # 用户提示词数据存储
+│   ├── prompts_default.json    # 默认提示词库（中文）
+│   └── prompts_default_en.json # 默认提示词库（英文）
+├── web/                        # 前端：Web 界面
+│   ├── index.html              # HTML 页面结构
+│   ├── script.js               # JavaScript 交互逻辑
+│   ├── style.css               # 样式表
+│   ├── translations.json       # 多语言翻译配置
+│   ├── llm-templates.json      # LLM 生成规则模板
+│   └── top_menu_extension.js   # ComfyUI 菜单集成
+└── asset/                      # 资源文件和图片
+    ├── pic_promptlib_cn.png    # 提示词库界面截图（中文）
+    ├── pic_promptlib_en.png    # 提示词库界面截图（英文）
+    ├── pic_loralib_cn.png      # Lora 库界面截图（中文）
+    ├── pic_llmgenerate_cn.png  # LLM 生成界面截图（中文）
+    └── pic_llmgenerate_en.png  # LLM 生成界面截图（英文）
 ### 项目架构
 
 ```
@@ -133,13 +159,21 @@ comfyui_PromptManage/
 │   ├── translations.json       # 多语言翻译配置
 │   ├── llm-templates.json      # LLM 生成规则模板
 │   ├── top_menu_extension.js   # ComfyUI 菜单集成
-│   └── Usage_example.mp4       # 使用方法视频教程
-└── asset/                      # 资源文件和图片
-```
-
-### API 端点
+#### 提示词管理 API
 
 | 方法 | 端点 | 功能 |
+|------|------|------|
+| POST | `/prompt_manage/get` | 获取所有提示词 |
+| POST | `/prompt_manage/add` | 添加新提示词 |
+| POST | `/prompt_manage/update` | 更新指定提示词 |
+| POST | `/prompt_manage/delete` | 删除指定提示词 |
+| POST | `/prompt_manage/save` | 保存所有提示词 |
+
+#### Lora 库管理 API
+
+| 方法 | 端点 | 功能 |
+|------|------|------|
+| GET | `/prompt_manage/lora/list` | 获取所有 Lora 模型列表
 |------|------|------|
 | POST | `/prompt_manage/get` | 获取所有提示词 |
 | POST | `/prompt_manage/add` | 添加新提示词 |
@@ -188,7 +222,11 @@ Content-Type: application/json
     }
 ]
 ```
-
+- **Lora 库管理** - 加载、分类、浏览、选择 Lora 模型
+- **搜索和筛选** - 模糊搜索、精确搜索和分类筛选逻辑
+- **快捷键处理** - P/N 键事件监听和处理
+- **LLM 集成** - 调用大模型 API 生成提示词
+- **按顺序拼接** - 根据用户添加顺序拼接提示词和 Lora
 ### 代码说明
 
 #### 后端 (__init__.py)
@@ -212,6 +250,7 @@ Content-Type: application/json
 
 ### LLM 提示词生成规则
 
+![](./asset/pic_llmgenerate_cn.png)
 LLM 生成器基于预设的 8 条规则，确保生成的提示词：
 1. 全英文，无中文
 2. 优先使用简短短语，非必要不写完整句子
@@ -244,8 +283,5 @@ MIT License
 ---
 
 **版本**：1.2.0  
-**最后更新**：2026 年 1 月 24 日  
-**GitHub**：[comfyui_PromptManage](https://github.com/CeasarSmj/comfyui_PromptManage)
-
-欢迎提交 Issue 和 Pull Request！
+**最后更新**：2026 年 1 月 29 日  
 

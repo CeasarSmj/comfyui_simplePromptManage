@@ -1,0 +1,779 @@
+[
+    {
+        "name": "Universal High Quality Image",
+        "direction": "正向",
+        "type": "质量",
+        "note": "Most commonly used quality enhancement keywords, essential at the beginning, used to improve overall image quality, details and aesthetics, suitable for almost all scenarios",
+        "text": "masterpiece, best quality, absurdres, ultra detailed, high resolution, newest, highly aesthetic, intricate details, professional artwork, trending on ArtStation"
+    },
+    {
+        "name": "Universal Low Quality",
+        "direction": "反向",
+        "type": "质量",
+        "note": "Most commonly used negative quality keywords, used to avoid low quality, blur, deformation and other common defects, should be added to almost all generations",
+        "text": "low quality, worst quality, lowres, blurry, pixelated, jpeg artifacts, bad art, poorly drawn, low detail, oversaturated, underexposed, bad composition, signature, watermark, text, error, cropped"
+    },
+    {
+        "name": "Human Detail Enhancement",
+        "direction": "正向",
+        "type": "质量",
+        "note": "High frequency local detail enhancement, targeting eyes, hair, skin, clothing texture, commonly used for character close-ups",
+        "text": "highly detailed eyes, detailed face, intricate hair, flowing hair, shiny hair, detailed skin texture, pores, freckles, detailed clothing, fabric texture, lace details, jewelry details"
+    },
+    {
+        "name": "Human Detail Missing",
+        "direction": "反向",
+        "type": "质量",
+        "note": "Avoid facial, hair, texture blur or simplification",
+        "text": "blurry eyes, blurry face, low detail face, simplified face, no detail hair, bad texture"
+    },
+    {
+        "name": "Modern Anime Illustration Style",
+        "direction": "正向",
+        "type": "风格",
+        "note": "Currently the most popular high-end digital illustration style (ArtStation, WLOP style), soft gradient lighting, semi-realistic anime, commonly used for high-quality character images",
+        "text": "digital illustration, painterly style, soft gradient shading, gentle color transitions, airbrush rendering, soft cinematic lighting, volumetric lighting, rim lighting, subsurface scattering on skin, gentle highlights and shadows, depth of field, bokeh, dreamy atmosphere, highly detailed texture, semi-realistic anime illustration, professional digital painting, intricate soft shading, (soft shading:1.2), (gradient lighting:1.1)"
+    },
+    {
+        "name": "Modern Anime Illustration Reverse",
+        "direction": "反向",
+        "type": "风格",
+        "note": "Avoid flat hard-edge style, used in combination with modern illustration style",
+        "text": "flat colors, cel shaded, flat shading, hard edges, bold outlines, thick lines, simple shading, no gradients, low contrast, 2d anime screencap, manga style, comic, lineart, hard shadows, (flat:1.4), (cel shaded:1.3)"
+    },
+    {
+        "name": "Traditional Anime Style",
+        "direction": "正向",
+        "type": "风格",
+        "note": "Classic flat anime style (like Genshin Impact 3D rendered 2D), hard edges, solid colors, thick lines, suitable for cartoon-oriented works",
+        "text": "cel shaded, flat shading, flat colors, bold outlines, thick lines, hard shadows, simple shading, anime screencap style, genshin impact style, 2d anime, clean lineart, vibrant flat colors, sharp edges, no gradients, comic style"
+    },
+    {
+        "name": "Traditional Anime Style Reverse",
+        "direction": "反向",
+        "type": "风格",
+        "note": "Avoid traditional hard-edge anime style, used in combination with modern illustration",
+        "text": "soft shading, gradient shading, painterly, airbrush, volumetric lighting, subsurface scattering, rim lighting, gentle highlights, smooth blending, depth of field, bokeh, cinematic lighting, realistic shading, 2.5d, semi-realistic, digital painting"
+    },
+    {
+        "name": "Solo Girl",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Emphasize only one character in the frame, avoid multi-character scenes",
+        "text": "1girl, solo, single girl, one girl, alone"
+    },
+    {
+        "name": "Solo Person (Reverse)",
+        "direction": "反向",
+        "type": "其它",
+        "note": "Avoid multi-character scenes, emphasize single character",
+        "text": "multiple girls, 2girls, two girls, group, multiple people, crowd, 3girls"
+    },
+    {
+        "name": "Loli",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Young female character, young and cute appearance traits",
+        "text": "loli, young girl, child-like appearance, petite body, flat chest, innocent expression, cute child"
+    },
+    {
+        "name": "Young Girl",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Teenage female character, adolescent traits",
+        "text": "1girl, youthful appearance, teenage body, innocent beauty"
+    },
+    {
+        "name": "Adult Woman",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Mature female character, fully developed female traits",
+        "text": "adult woman, mature woman, woman, grown woman, voluptuous woman, mature body, sensual woman"
+    },
+    {
+        "name": "Elderly Woman",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Elderly female character, aged traits",
+        "text": "elderly woman, old woman, aged woman, grandmother, mature features, wrinkles, grey hair, silver hair"
+    },
+    {
+        "name": "Young Boy",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Teenage male character, young boy traits",
+        "text": "young boy, teenage boy, adolescent boy, schoolboy, youthful boy, teenage appearance"
+    },
+    {
+        "name": "Young Man",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Young adult male character, energetic male traits",
+        "text": "young man, handsome man, young adult male, masculine beauty, athletic build, youthful man"
+    },
+    {
+        "name": "Uncle",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Middle-aged male character, mature charm male traits",
+        "text": "middle-aged man, mature man, middle-aged male, rugged man, bearded man, manly charm, muscular man"
+    },
+    {
+        "name": "Elderly Man",
+        "direction": "正向",
+        "type": "其它",
+        "note": "Elderly male character, aged traits",
+        "text": "elderly man, old man, aged man, grandfather, senior man, white hair, grey beard, wrinkled face"
+    },
+    {
+        "name": "Naked",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Naked (no clothes, no attire), no clothing scene",
+        "text": "naked, unclothed, no clothes, no attire,bare,NSFW"
+    },
+    {
+        "name": "Naked (Reverse)",
+        "direction": "反向",
+        "type": "着装",
+        "note": "Clothed (with clothes, with attire), with clothing scene",
+        "text": "clothes,cloth, wear clothes,"
+    },
+    {
+        "name": "JK School Uniform",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Most classic Japanese female high school uniform (sailor suit, pleated skirt), high frequency campus outfit",
+        "text": "school uniform, seifuku, sailor uniform, sailor collar, pleated skirt, ribbon, knee socks, loafers, japanese schoolgirl outfit"
+    },
+    {
+        "name": "Maid Outfit",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Classic or gothic maid outfit (apron, headpiece, lace), high frequency fantasy character outfit",
+        "text": "maid outfit, frilly maid dress, apron, headband, black and white maid, gothic maid, lace trim"
+    },
+    {
+        "name": "Swimsuit",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Various swimsuits (bikini, school swimsuit, competitive swimsuit), frequently used in beach and summer scenes",
+        "text": "swimsuit, bikini, one-piece swimsuit, school swimsuit, competitive swimsuit, wet swimsuit, beachwear"
+    },
+    {
+        "name": "Bunny Girl",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Classic bunny girl outfit (bunny ears, fishnet stockings), high frequency sexy fantasy outfit",
+        "text": "bunny girl, bunny suit, fishnet stockings, bunny ears, bowtie, high heels, playboy bunny"
+    },
+    {
+        "name": "Sexy Lingerie",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Lace lingerie, bra, garter belt, etc., frequently used in intimate or seductive scenes",
+        "text": "lingerie, lace bra and panties, underwear, garter belt, stockings, seductive lingerie, sheer fabric, strapless bra"
+    },
+    {
+        "name": "Cheongsam",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Chinese cheongsam (side slit, mandarin collar, embroidery), elegant oriental style high frequency outfit",
+        "text": "cheongsam, qipao, chinese dress, side slit dress, mandarin collar, embroidered silk"
+    },
+    {
+        "name": "Wedding Dress",
+        "direction": "正向",
+        "type": "着装",
+        "note": "White wedding gown (long dress, veil), frequently used in romantic wedding scenes",
+        "text": "wedding dress, white gown, bridal veil, lace wedding dress, long train"
+    },
+    {
+        "name": "Casual Dress",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Summer casual dress (floral, off-shoulder, light fabric), frequently used in casual scenes",
+        "text": "casual dress, sundress, floral dress, summer dress, maxi dress, off-shoulder dress, light fabric dress"
+    },
+    {
+        "name": "Sportswear",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Sports outfit (athletic shorts, sports bra, running shoes), fitness or campus sports scenes",
+        "text": "sportswear, tracksuit, athletic shorts, sports bra, tank top, running shoes, sweatpants, hoodie"
+    },
+    {
+        "name": "Denim Shorts",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Youthful hot pants pairing (denim shorts, crop top), summer street style",
+        "text": "denim shorts, crop top, jean shorts, casual summer outfit, belly exposed"
+    },
+    {
+        "name": "Kimono",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Japanese traditional kimono or yukata (sash, pattern), festival or traditional scenes",
+        "text": "kimono, yukata, japanese traditional clothing, obi sash, floral pattern kimono"
+    },
+    {
+        "name": "High Ponytail",
+        "direction": "正向",
+        "type": "着装",
+        "note": "High ponytail hairstyle, energetic sports or campus style common",
+        "text": "high ponytail, ponytail pulled high, long high ponytail, hair tied up high"
+    },
+    {
+        "name": "Twin Tails",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Classic twin tails (symmetrical pigtails), high frequency for cute loli or energetic girls",
+        "text": "twintails, twin ponytails, pigtails, two ponytails, symmetrical twintails"
+    },
+    {
+        "name": "Low Ponytail",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Low ponytail (at neck position), elegant or mature style",
+        "text": "low ponytail, ponytail at nape, loose low ponytail"
+    },
+    {
+        "name": "Loose Long Hair",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Naturally loose long hair (wind-blown, over shoulders), most versatile female hairstyle",
+        "text": "long loose hair, hair down, flowing hair, loose waves, hair over shoulders, windblown hair"
+    },
+    {
+        "name": "Short Hair",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Short hair or bob cut, fresh energetic or intellectual style",
+        "text": "short hair, bob cut, pixie cut, asymmetrical bob"
+    },
+    {
+        "name": "Glasses",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Various glasses (round, square), adds intellectual or cute traits",
+        "text": "glasses, round glasses, square glasses, rimless glasses, intellectual glasses"
+    },
+    {
+        "name": "Hair Accessories",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Cat ears, headbands, berets, flower crowns and other cute accessories",
+        "text": "cat ears, headband, beret, hair ribbon, animal ears, flower crown"
+    },
+    {
+        "name": "Voluptuous Figure",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Voluptuous curvy figure (large breasts, hourglass shape), common description for sexy characters",
+        "text": "large breasts, voluptuous, curvy body,"
+    },
+    {
+        "name": "Slender Figure",
+        "direction": "正向",
+        "type": "着装",
+        "note": "Slender slim figure (petite, skinny), pure or model style",
+        "text": "slender, slim body, petite, delicate figure"
+    },
+    {
+        "name": "Happy Expression",
+        "direction": "正向",
+        "type": "表情",
+        "note": "Joyful, happy, satisfied expression, corners of mouth upturned, eyes narrowed",
+        "text": "happy expression, cheerful face, joyful smile, delighted expression, radiant happiness, bright smile, glowing joy, contented face, pleased expression"
+    },
+    {
+        "name": "Smiling Expression",
+        "direction": "正向",
+        "type": "表情",
+        "note": "Gentle smile, corners of mouth slightly upturned, warm eyes",
+        "text": "smiling, smile, gentle smile, soft smile, warm smile, slight smile, subtle smile, faint smile, friendly expression, approachable smile"
+    },
+    {
+        "name": "Angry Expression",
+        "direction": "正向",
+        "type": "表情",
+        "note": "Angry, annoyed or fierce expression, furrowed eyebrows, corners of mouth downturned",
+        "text": "angry expression, angry face, furious look, wrathful expression, fierce expression, scowling face, enraged expression, hostile look, aggressive expression, intimidating face"
+    },
+    {
+        "name": "Shy Expression",
+        "direction": "正向",
+        "type": "表情",
+        "note": "Shy, bashful or scared expression, blushing, eyes avoiding contact",
+        "text": "shy expression, bashful face, blushing cheeks, embarrassed expression, flushed face, timid expression, nervous look, cute shy, adorable blush, shy glance"
+    },
+    {
+        "name": "Confused Expression",
+        "direction": "正向",
+        "type": "表情",
+        "note": "Confused, questioning or thinking expression, tilted head, slightly furrowed brow",
+        "text": "confused expression, questioning look, puzzled face, bewildered expression, thoughtful expression, uncertain look, questioning eyes, skeptical expression, inquisitive face, intrigued look"
+    },
+    {
+        "name": "Lustful Expression",
+        "direction": "正向",
+        "type": "表情",
+        "note": "Passionate, seductive or desiring expression, fiery eyes, moist lips",
+        "text": "lustful expression, seductive look, passionate eyes, sensual expression, sultry gaze, hungry look, intense desire in eyes, bedroom eyes, alluring expression, erotic expression, tempting look"
+    },
+    {
+        "name": "Sitting Pose",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Natural sitting pose (on chair, legs crossed, etc.), most commonly used in daily static scenes",
+        "text": "sitting pose, seated, sitting on chair, relaxed sitting, legs crossed"
+    },
+    {
+        "name": "Sitting Cross-legged",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Cross-legged or lotus sitting, casual or floor scenes",
+        "text": "sitting cross-legged, lotus position, indian style sitting, legs folded"
+    },
+    {
+        "name": "Lying on Back",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Supine lying down, back against surface, resting or intimate scenes",
+        "text": "lying on back, supine pose, back against surface, reclining on back"
+    },
+    {
+        "name": "Lying Face Down",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Lying face down on bed or ground, belly down, resting or playing scenes",
+        "text": "lying face down, prone pose, lying on stomach, belly down"
+    },
+    {
+        "name": "Lying on Side",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Side-lying position, intimate or resting scenes",
+        "text": "lying on side, side-lying pose, reclining on side, curled up on side"
+    },
+    {
+        "name": "Running Pose",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Dynamic running, sprinting pose, sports or chase scenes",
+        "text": "running pose, sprinting, jogging, dynamic running motion, legs in stride, arms pumping"
+    },
+    {
+        "name": "Jumping Pose",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Jumping dynamic pose, energetic or surprised scenes",
+        "text": "jumping, mid-jump, leaping, dynamic jump pose"
+    },
+    {
+        "name": "Waving Pose",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Waving greeting, commonly seen in friendly interactions",
+        "text": "waving hand, greeting wave, friendly wave"
+    },
+    {
+        "name": "Heart Hands Pose",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Making heart shape with hands, cute and flirty high frequency action",
+        "text": "finger heart, heart hands, making heart shape with hands"
+    },
+    {
+        "name": "Two People Hugging",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Warm or romantic embrace, commonly seen in two-person interactions",
+        "text": "hugging, embrace, arms wrapped around each other, tight hug, gentle embrace"
+    },
+    {
+        "name": "Two People Facing Off",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Face to face tense confrontation, two-person conflict scenes",
+        "text": "facing each other confrontation, standoff pose, intense eye contact, arms crossed, tense posture"
+    },
+    {
+        "name": "Holding Hands",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Two people holding hands, romantic or friendly interaction",
+        "text": "holding hands, hand in hand, intertwined fingers"
+    },
+    {
+        "name": "Arms Bondage",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Arms tied behind the back, recommend using with lora",
+        "text": "shibari, arm bondaged behind back"
+    },
+    {
+        "name": "Legs Bondage",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Knees and ankles bound, recommend using with lora",
+        "text": "shibari, leg bondage, knee bondaged, ankle bondaged"
+    },
+    {
+        "name": "Crotch Rope",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Crotch rope bondage, recommend using with lora",
+        "text": "shibari,  Crotchtie"
+    },
+    {
+        "name": "Gagged",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Mouth stuffed, recommend using with lora",
+        "text": "gagged,otn gag"
+    },
+    {
+        "name": "Cleave Gag",
+        "direction": "正向",
+        "type": "动作",
+        "note": "Mouth bound with cloth, recommend using with lora",
+        "text": "clv_gag,cleave gag"
+    },
+    {
+        "name": "Lighting and Shadow",
+        "direction": "正向",
+        "type": "环境",
+        "note": "High frequency lighting enhancement keywords, adds dimensionality, atmosphere and drama to images, suitable for almost all indoor and outdoor scenes",
+        "text": "soft cinematic lighting, dramatic lighting, volumetric god rays, rim lighting, backlighting, side lighting, golden hour lighting, moody lighting, ambient lighting, glowing, lens flare, depth of field, bokeh"
+    },
+    {
+        "name": "Bad Lighting",
+        "direction": "反向",
+        "type": "环境",
+        "note": "Avoid overexposure, lighting issues, often used with high quality negative keywords",
+        "text": "overexposed, underexposed, harsh lighting, flat lighting, bad lighting, dark face, shadowed face, too bright, too dark"
+    },
+    {
+        "name": "Pure White Background",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Pure white studio background, commonly used for character portraits, product images, avoids background distraction",
+        "text": "white background, plain white background, pure white background, solid white background, studio white backdrop, minimalist white, (white background:1.3)"
+    },
+    {
+        "name": "Pure Black Background",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Pure black studio background, commonly used for mysterious or dramatic characters",
+        "text": "black background, plain black background, pure black background, solid black background, studio black backdrop, minimalist black, (black background:1.3)"
+    },
+    {
+        "name": "Avoid Complex Background",
+        "direction": "反向",
+        "type": "环境",
+        "note": "Used with pure white background to avoid complex backgrounds distracting from subject",
+        "text": "detailed background, complex background, cluttered background, outdoor background, indoor background, scenery, landscape, objects in background, colored background, gradient background, textured background, pattern background, dark background, shadows on background"
+    },
+    {
+        "name": "No Bright Background",
+        "direction": "反向",
+        "type": "环境",
+        "note": "Used with pure black background to avoid bright or white backgrounds distracting",
+        "text": "detailed background, complex background, cluttered background, outdoor background, indoor background, scenery, landscape, objects in background, colored background, gradient background, textured background, pattern background, bright background, light background, white background"
+    },
+    {
+        "name": "Bedroom Scene",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Cozy bedroom interior (bed, soft lighting), intimate or daily rest scenes",
+        "text": "bedroom, cozy bedroom, on bed, soft bed sheets, bedroom interior, warm lighting bedroom"
+    },
+    {
+        "name": "Beach",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Sandy beach by the sea (ocean waves, tropical), frequently used in summer swimsuit scenes",
+        "text": "beach, sandy beach, ocean waves, seaside, tropical beach"
+    },
+    {
+        "name": "Classroom",
+        "direction": "正向",
+        "type": "环境",
+        "note": "School classroom (desks, blackboard), commonly used in campus JK scenes",
+        "text": "classroom, school classroom, desks and chairs, chalkboard"
+    },
+    {
+        "name": "Sports Field",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Outdoor track or athletic field, sports outfit scenes",
+        "text": "sports field, track and field, stadium, running track, athletic field, outdoor sports ground"
+    },
+    {
+        "name": "Forest and Woods",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Natural forest (sunlight filtering through, forest clearing), outdoor adventure or healing scenes",
+        "text": "forest, woods, among trees, dense forest, sunlight through trees, forest clearing"
+    },
+    {
+        "name": "City Street",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Urban street scene (night lights or daytime), modern everyday background",
+        "text": "city street, urban background, night city lights, street scene"
+    },
+    {
+        "name": "Dining Table Scene",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Restaurant or home dining table (food, cozy lighting), life scenes",
+        "text": "dining table, at dinner table, restaurant table, food on table, cozy dining room"
+    },
+    {
+        "name": "Rainy Day",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Raining atmosphere (raindrops, wet surfaces, umbrella), melancholic or romantic scenes",
+        "text": "raining, rain drops, wet surface, umbrella, rainy day"
+    },
+    {
+        "name": "Falling Cherry Blossoms",
+        "direction": "正向",
+        "type": "环境",
+        "note": "Spring cherry blossoms falling (petals, cherry trees), high frequency Japanese romantic background",
+        "text": "cherry blossoms, sakura petals falling, cherry blossom, spring sakura"
+    },
+    {
+        "name": "Vintage Style",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Vintage, nostalgic image effects, warm tones, yellowing, film grain",
+        "text": "vintage style, retro, nostalgic, film grain, sepia tone, warm colors, faded colors, aged look, vintage photography, analog feel"
+    },
+    {
+        "name": "Black and White Style",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Pure black and white, no color, high contrast monochrome image",
+        "text": "black and white, monochrome, grayscale, bw, greyscale, no color, black and white photography, monochromatic"
+    },
+    {
+        "name": "Grayscale Style",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Grayscale tone, cool monochrome, sketch-like feeling",
+        "text": "grayscale, grayscale image, grey tones, monochromatic gray, desaturated colors, black and white, greyscale"
+    },
+    {
+        "name": "High Saturation",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Extremely high color saturation, vibrant intense colors, strong contrast",
+        "text": "high saturation, vibrant colors, saturated colors, vivid colors, intense colors, highly saturated, bright colors, colorful, oversaturated"
+    },
+    {
+        "name": "Low Saturation",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Low color saturation, pale, faded, low contrast image",
+        "text": "low saturation, desaturated, muted colors, pale colors, washed out, faded colors, low contrast, subtle colors"
+    },
+    {
+        "name": "Blur Effect",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Motion blur, depth of field blur, overall blur effect",
+        "text": "blurry, motion blur, soft focus, bokeh, depth of field, out of focus, blur effect, soft image"
+    },
+    {
+        "name": "High Sharpness",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Details are sharp and clear, distinct edges, high clarity",
+        "text": "sharp, highly detailed, crisp, sharp focus, ultra sharp, extreme detail, razor sharp, crystal clear"
+    },
+    {
+        "name": "Pixel Art Style",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Pixel art, 8-bit style, blocky mosaic effect",
+        "text": "pixelated, pixel art, mosaic, pixelated style, blocky, 8-bit style, low resolution art style"
+    },
+    {
+        "name": "Oil Painting Texture",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Thick brushstrokes, oil painting style, strong painting feel",
+        "text": "oil painting, oil paint texture, thick brushstrokes, painting style, impasto, textured paint, hand-painted"
+    },
+    {
+        "name": "Watercolor Texture",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Watercolor style, soft transparent, diffused effect",
+        "text": "watercolor, watercolor painting, watercolor style, soft edges, transparent washes, diffused colors, flowing watercolor"
+    },
+    {
+        "name": "Pencil Sketch",
+        "direction": "正向",
+        "type": "质感",
+        "note": "Pencil drawing style, sketch feel, clear lines",
+        "text": "pencil sketch, pencil drawing, graphite, sketch style, hand-drawn, line art, pencil shading"
+    },
+    {
+        "name": "Full Body Composition",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Complete full body display of character, from head to toe, most commonly used for character showcase",
+        "text": "full body shot, full body,  full height, (full body:1.2)"
+    },
+    {
+        "name": "Half Body Composition",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Upper body composition, usually from waist up, balances detail with overall",
+        "text": "upper body, half body, cowboy shot, from waist up, (upper body:1.1)"
+    },
+    {
+        "name": "Face Close-up",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Close-up portrait, focus on expression and details",
+        "text": "close-up portrait, face focus, beautiful face, head shot, (close up:1.2), face detail, looking at viewer"
+    },
+    {
+        "name": "Low Angle View",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Low angle looking up, enhances presence and sense of pressure",
+        "text": "low angle view, from below, looking up, low perspective, (low angle:1.15)"
+    },
+    {
+        "name": "High Angle View",
+        "direction": "正向",
+        "type": "构图",
+        "note": "High angle looking down, appears soft or weak",
+        "text": "high angle view, from above, looking down, high perspective, (high angle:1.15)"
+    },
+    {
+        "name": "Eye Level View",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Eye level angle, most natural stable viewpoint",
+        "text": "eye level, straight on view, neutral angle, (eye level:1.1)"
+    },
+    {
+        "name": "Dutch Angle",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Camera tilted and rotated, creates dynamic and unstable feeling",
+        "text": "dutch angle, tilted view, rotated perspective, (dutch angle:1.2), diagonal composition"
+    },
+    {
+        "name": "Symmetrical Composition",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Left-right or top-bottom symmetrical composition, creates sense of stability",
+        "text": "symmetrical composition, centered, balanced, mirror symmetry, (symmetrical:1.2)"
+    },
+    {
+        "name": "Golden Ratio Composition",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Arranges subject according to golden ratio, most natural visual beauty",
+        "text": "golden ratio composition, fibonacci spiral, (golden ratio:1.15), off-center subject"
+    },
+    {
+        "name": "Rule of Thirds",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Divides frame horizontally and vertically into thirds, subject at intersections",
+        "text": "rule of thirds, dynamic composition, (rule of thirds:1.1), off-center placement"
+    },
+    {
+        "name": "Wide Angle Lens",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Wide angle view, enhances sense of space and impact",
+        "text": "wide angle, wide angle lens, fisheye perspective, (wide angle:1.15)"
+    },
+    {
+        "name": "Diagonal Composition",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Subject arranged along diagonal line of frame, increases dynamism",
+        "text": "diagonal composition, dynamic angle, diagonal line, (diagonal:1.15)"
+    },
+    {
+        "name": "Centered Composition",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Subject positioned in center of frame",
+        "text": "centered composition, central focus, main subject in center, (centered:1.1)"
+    },
+    {
+        "name": "Extreme Close-up",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Extreme close-up shot, such as eyes, lips and other details",
+        "text": "extreme close-up, macro shot, detail focus, (extreme close-up:1.25)"
+    },
+    {
+        "name": "Bird's Eye View",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Directly overhead looking down, god's eye perspective",
+        "text": "bird's eye view, top down view, aerial view, (bird's eye view:1.2)"
+    },
+    {
+        "name": "Worm's Eye View",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Extreme low angle looking up, ground level perspective",
+        "text": "worm's eye view, ground level view, ultra low angle, (worm's eye view:1.2)"
+    },
+    {
+        "name": "Looking at Viewer",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Direct eye contact with viewer, creates intimacy and interaction",
+        "text": "looking at viewer, direct gaze, eye contact with viewer"
+    },
+    {
+        "name": "Looking Down",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Looking downward at ground, gentle introspective or thinking state",
+        "text": "looking down, downward gaze, eyes cast down, head lowered, contemplative pose"
+    },
+    {
+        "name": "Looking to the Side",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Turning to look to side, sidelong glance, increases dynamics and mystery",
+        "text": "looking to the side, side glance, looking away, turned head, profile view, sideways gaze, over-the-shoulder look"
+    },
+    {
+        "name": "Motion and Effects",
+        "direction": "正向",
+        "type": "构图",
+        "note": "Adds dynamism, particles, water droplets, wind effects, makes image more lively",
+        "text": "motion blur, speed lines, floating particles, sparkles, glowing particles, water droplets, sweat, tears, wind effect, hair blowing in wind"
+    },
+    {
+        "name": "Bad Composition",
+        "direction": "反向",
+        "type": "构图",
+        "note": "Avoid cropping, tilting, perspective distortion and other composition issues",
+        "text": "bad composition, off-center, cropped head, out of frame, tilted horizon, bad perspective, distorted perspective"
+    },
+    {
+        "name": "Deformed Human Body",
+        "direction": "反向",
+        "type": "其它",
+        "note": "Most commonly used negative body keywords, avoids hand/foot deformities, extra fingers, proportion issues, should be added to almost all character images",
+        "text": "bad anatomy, deformed, mutated, poorly drawn hands, poorly drawn feet, extra limbs, missing limbs, extra fingers, fused fingers, too many fingers, long neck, malformed limbs, extra arms, extra legs, disfigured, bad proportions, gross proportions, ugly, duplicate, morbid, mutilated, out of frame, cloned face, malformed hands, mutation, deformed face, cross-eyed, bad hands, bad feet, poorly drawn face"
+    }
+]

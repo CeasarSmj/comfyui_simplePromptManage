@@ -78,7 +78,21 @@
         "light_mode": "☀️ 白天",
         "dark_mode": "🌙 黑夜",
         "usage_video_btn": "📹 使用方法",
-        "usage_video_title": "📹 使用方法教程"
+        "usage_video_title": "📹 使用方法教程",
+        "prompt_library_tab": "📚 提示词库",
+        "lora_library_tab": "🎨 Lora库",
+        "lora_refresh_btn": "🔄 更新",
+        "lora_refresh_success": "Lora库已从CivitAI更新成功",
+        "lora_refresh_failed": "Lora库更新失败",
+        "lora_refresh_error": "更新过程中出错，请检查浏览器控制台获取详细信息",
+        "lora_category_all": "全部",
+        "lora_category_label": "类别：",
+        "lora_detail_toggle": "显示细节",
+        "llm_generator_info": "💡 说明：生成器部分的提示词和选中的 Lora 都会被加入到 LLM 的提示词中，确保生成的内容与当前选择保持一致。",
+        "llm_usage_title": "📝 使用说明：",
+        "llm_usage_step_1": "将上面生成的提示词模板复制",
+        "llm_usage_step_2": "放入任何一个 LLM 大模型（如 ChatGPT、Claude、deepseek等）",
+        "llm_usage_step_3": "大模型会根据你的需求生成优化后的 Stable Diffusion 提示词"
     },
     "en": {
         "title": "✨ Prompt Manager",
@@ -159,6 +173,20 @@
         "light_mode": "☀️ Light",
         "dark_mode": "🌙 Dark",
         "usage_video_btn": "📹 Usage Video",
-        "usage_video_title": "📹 Usage Video Tutorial"
+        "usage_video_title": "📹 Usage Video Tutorial",
+        "prompt_library_tab": "📚 Prompt Library",
+        "lora_library_tab": "🎨 Lora Library",
+        "lora_refresh_btn": "🔄 Refresh",
+        "lora_refresh_success": "Lora library updated from CivitAI successfully",
+        "lora_refresh_failed": "Failed to update Lora library",
+        "lora_refresh_error": "An error occurred during update. Check browser console for details",
+        "lora_category_all": "All",
+        "lora_category_label": "Category:",
+        "lora_detail_toggle": "Show Details",
+        "llm_generator_info": "💡 Note: Prompts and selected Loras from the Generator section will be included in the LLM prompt to ensure the generated content is consistent with your current selections.",
+        "llm_usage_title": "📝 How to Use:",
+        "llm_usage_step_1": "Copy the generated prompt template above",
+        "llm_usage_step_2": "Paste it into any LLM model (ChatGPT, Claude, deepseek etc.)",
+        "llm_usage_step_3": "The LLM will generate optimized Stable Diffusion prompts based on your requirements"
     }
 }

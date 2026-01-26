@@ -1,10 +1,15 @@
 # 🎨 ComfyUI Prompt Manager
 
-An elegant AI prompt management and generation system designed for ComfyUI. Efficiently manage, search, and generate Stable Diffusion prompts.
+An elegant AI prompt and Lora library management and generation system designed for ComfyUI. Efficiently manage, search, and generate Stable Diffusion prompts while organizing Lora models.
+
+***
+NOTICE: English version of default prompts is available in `data/prompts_default_en.json`, just replace the context of `data/prompts.json` with `data/prompts_default_en.json` to use for English users.
+***
 
 **[中文](README.md) | [English](README.en.md)**
 
-![](./asset/ui_pic_en.png)
+
+
 
 ---
 
@@ -21,14 +26,17 @@ git clone https://github.com/CeasarSmj/comfyui_PromptManage.git
 
 Restart ComfyUI and visit `http://localhost:8188/prompt_manage_web/` or click the plugin button in the ComfyUI web interface.
 
+![](./asset/entrance.png)
+
 ### 2️⃣ Core Concepts
 
-The plugin has two main sections:
+The plugin has three main sections:
 
 | Section | Purpose |
 |---------|---------|
-| **Left Panel** | Prompt Library - Add, edit, delete, search prompts |
-| **Right Panel** | Prompt Generator - Combine prompts to create positive/negative prompt pairs |
+| **Prompt Library** (Tab) | Manage prompts - Add, edit, delete, search prompts |
+| **Lora Library** (Tab) | Manage Lora models - Browse, categorize, organize local Lora models |
+| **Generator** (Right Panel) | Combine prompts and Lora to create positive/negative prompt pairs |
 
 Each prompt contains:
 - **Name**: Short identifier (e.g., "landscape", "beautiful woman")
@@ -43,6 +51,7 @@ Each prompt contains:
 
 ### 📚 Manage Prompt Library
 
+![](./asset/pic_promptlib_en.png)
 #### Add a Prompt
 1. Fill in the "Add New Prompt" form on the left:
    - **Name**: e.g., "high quality image", "beautiful girl"
@@ -89,6 +98,27 @@ Each prompt contains:
 5. Click "📋 Copy" to copy the generated content
 6. Optional: Paste into text box for further fine-tuning
 
+### � Manage Lora Library
+
+![](./asset/pic_loralib_en.png)
+#### Browse and Filter
+1. Click the left tab to switch to "🎨 Lora Library"
+2. Select a Lora category from the "All" dropdown (auto-generated from directories)
+3. Check "Show Details" to view complete information:
+   - Lora name and filename
+   - Trigger words (for use in generator)
+   - Preview images/videos
+
+#### Select and Add to Generator
+1. Click a Lora in the list to select it (highlighted)
+2. Click "➕ Add" button to add selected Lora to positive prompt area
+3. Lora trigger words automatically append to the prompt text
+
+#### Using Lora in Generator
+- Prompts and Lora are concatenated **in the order they were added**, not prompts-then-lora
+- Lora trigger words automatically extracted from metadata
+- Support adding multiple Lora at once, prompts concatenate in sequence
+
 ### 🎛️ Interface Settings
 
 - **Language**: Click "🌐" in top-left to switch between Chinese and English
@@ -97,18 +127,14 @@ Each prompt contains:
 
 ---
 
-## 📹 Video Tutorial
-
-Click "📹 Usage Video" in the top-right to watch the complete usage tutorial (includes demonstrations and tips)
-
----
-
 ## ✨ Features
 
 - ✅ **Prompt Library Management** - Easily create, edit, delete, and search
+- ✅ **Lora Library Management** - Browse, categorize, organize local Lora models
 - ✅ **Smart Search** - Fuzzy and exact search modes
-- ✅ **Multi-dimensional Classification** - Organize by direction and type
+- ✅ **Multi-dimensional Classification** - Organize by direction and type for prompts, by directory for Lora
 - ✅ **AI-Assisted Generation** - LLM generates high-quality prompts
+- ✅ **Flexible Combination** - Concatenate prompts and Lora by add order, support free combination
 - ✅ **Keyboard Shortcuts** - P and N keys for quick addition
 - ✅ **Bilingual Interface** - Full support for Chinese and English
 - ✅ **Theme Switching** - Light and dark modes
@@ -123,23 +149,37 @@ Click "📹 Usage Video" in the top-right to watch the complete usage tutorial (
 
 ```
 comfyui_PromptManage/
-├── __init__.py                 # Backend: Python API server
+├── __init__.py                 # Backend: Python API server (includes Lora API)
 ├── data/
-│   └── prompts.json            # User prompt data storage
+│   ├── prompts.json            # User prompt data storage
+│   ├── prompts_default.json    # Default prompt library (Chinese)
+│   └── prompts_default_en.json # Default prompt library (English)
 ├── web/                        # Frontend: Web interface
 │   ├── index.html              # HTML page structure
 │   ├── script.js               # JavaScript interaction logic
 │   ├── style.css               # Stylesheets
 │   ├── translations.json       # Multilingual translation config
 │   ├── llm-templates.json      # LLM generation rules template
-│   ├── top_menu_extension.js   # ComfyUI menu integration
-│   └── Usage_example.mp4       # Usage tutorial video
+│   └── top_menu_extension.js   # ComfyUI menu integration
 └── asset/                      # Resources and images
-```
-
-### API Endpoints
+    ├── pic_promptlib_cn.png    # Prompt library screenshot (Chinese)
+    ├── pic_promptlib_en.png    # Prompt library screenshot (English)
+    ├── pic_loralib_cn.png      # Lora library screenshot (Chinese)
+#### Prompt Management API
 
 | Method | Endpoint | Function |
+|--------|----------|----------|
+| POST | `/prompt_manage/get` | Get all prompts |
+| POST | `/prompt_manage/add` | Add new prompt |
+| POST | `/prompt_manage/update` | Update specified prompt |
+| POST | `/prompt_manage/delete` | Delete specified prompt |
+| POST | `/prompt_manage/save` | Save all prompts |
+
+#### Lora Library API
+
+| Method | Endpoint | Function |
+|--------|----------|----------|
+| GET | `/prompt_manage/lora/list` | Get all Lora models list
 |--------|----------|----------|
 | POST | `/prompt_manage/get` | Get all prompts |
 | POST | `/prompt_manage/add` | Add new prompt |
@@ -192,9 +232,11 @@ Prompts are stored as JSON array in `data/prompts.json`
 ### Code Explanation
 
 #### Backend (__init__.py)
-- **load_prompts()** - Load prompts from JSON file
-- **save_prompts(data)** - Save prompts to JSON file
-- **API route handlers** - Process add, delete, update, get requests
+- **Lora library management** - Load, categorize, browse, select Lora models
+- **Search and filtering** - Fuzzy search, exact search, and classification logic
+- **Keyboard shortcuts** - P/N key event handling
+- **LLM integration** - Call LLM API for prompt generation
+- **Sequential concatenation** - Concatenate prompts and Lora by user add ordert requests
 - **Web directory mounting** - Static file serving for web interface
 
 #### Frontend (script.js)
@@ -212,6 +254,7 @@ Prompts are stored as JSON array in `data/prompts.json`
 
 ### LLM Prompt Generation Rules
 
+![](./asset/pic_llmgenerate_en.png)
 The LLM generator uses 8 preset rules to ensure generated prompts:
 1. English only, no Chinese
 2. Prioritize short phrases, avoid complete sentences
@@ -245,82 +288,10 @@ MIT License
 ---
 
 **Version**: 1.2.0  
-**Last Updated**: January 24, 2026  
+**Last Updated**: January 29, 2026  
 **GitHub**: [comfyui_PromptManage](https://github.com/CeasarSmj/comfyui_PromptManage)
 
 Welcome to submit Issues and Pull Requests!
-POST /prompt_manage/add
-{
-    "name": "landscape",
-    "direction": "None",
-    "type": "Environment",
-    "text": "beautiful landscape, mountains, clear sky",
-    "note": "Natural landscape prompts"
-}
-```
-
-**Delete Prompt**
-```json
-POST /prompt_manage/delete
-{
-    "index": 0
-}
-```
-
-## 📁 Data Format
-
-Prompts are saved in JSON array format:
-
-```json
-[
-    {
-        "name": "Prompt Name",
-        "direction": "Positive|Negative|None",
-        "type": "Quality|Style|Texture|Environment|Action|Expression|Clothing|Other",
-        "text": "Prompt content...",
-        "note": "Note information (optional)"
-    }
-]
-```
-
-## 🎯 Technology Stack
-
-- **Backend**: Python + aiohttp
-- **Frontend**: HTML5 + CSS3 + JavaScript
-- **Integration**: ComfyUI PromptServer
-
-## 🌍 Browser Compatibility
-
-- ✅ Chrome/Chromium 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ Edge 90+
-
-## 📝 Configuration Files
-
-### data/prompts.json
-
-Auto-generated user prompt data file. Created automatically on first startup.
-
-### prompts.json (root directory)
-
-Preset prompt example file (if needed).
-
-## 🐛 FAQ
-
-**Q: Prompts not saving?**
-A: Check if the `data` folder exists and has write permissions. The plugin will create it automatically.
-
-**Q: Getting 404 when accessing?**
-A: Ensure ComfyUI service is running and check if you're accessing the correct URL `http://localhost:8188/prompt_manage_web/`
-
-**Q: Where is the usage video?**
-A: Click the "📹 Usage Video" button in the top-right corner of the interface to watch it.
-
----
-
-**Version**: 1.2.0  
-**Last Updated**: January 24, 2026  
 **GitHub**: [comfyui_PromptManage](https://github.com/CeasarSmj/comfyui_PromptManage)
 
 Welcome to submit Issues and Pull Requests!

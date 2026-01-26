@@ -2,6 +2,31 @@
 // 从 translations.json 加载翻译数据
 let translations = {};
 
+// ===== API 和全局常量 =====
+const API_BASE = "/prompt_manage";
+const LORA_API_BASE = "/prompt_manage/lora";
+
+// ===== 全局变量 =====
+let currentLang = localStorage.getItem("promptLang") || "zh";
+let currentTheme = localStorage.getItem("promptTheme") || "light";
+let currentTab = "prompt";
+let currentLang_inner = currentLang;
+
+// 提示词库变量
+let prompts = [];
+let selectedIndexes = [];
+let editingIndex = -1;
+let detailMode = false;
+let savedTypeFilterValue;
+
+// Lora库变量
+let loraData = [];
+let loraCategories = [];
+let loraSelectedIndexes = [];
+let loraDetailMode = false;
+let loraSearchText = "";
+let loraDataLoaded = false;  // 标志Lora数据是否已加载
+
 // 加载翻译和LLM模板
 Promise.all([
     fetch('translations.json').then(r => r.json()),
@@ -15,9 +40,6 @@ Promise.all([
 }).catch(err => {
     console.error('Failed to load configuration files:', err);
 });
-
-let currentLang = localStorage.getItem("promptLang") || "zh";
-let currentTheme = localStorage.getItem("promptTheme") || "light";
 
 // 获取ComfyUI的语言设置
 function getComfyUILanguage() {
@@ -162,9 +184,6 @@ function updateUI() {
     document.getElementById("addToGenerate").textContent = t.add_auto;
     document.getElementById("addToPositive").textContent = t.add_positive;
     document.getElementById("addToNegative").textContent = t.add_negative;    
-    // 更新视频按钮和标题
-    document.getElementById("videoBtn").textContent = t.usage_video_btn;
-    document.getElementById("videoModalTitle").textContent = t.usage_video_title;    
     // 更新 LLM 生成器
     document.getElementById("llmGeneratorBtn").textContent = t.llm_generator_btn;
     document.getElementById("llmModalTitle").textContent = t.llm_title;
@@ -173,6 +192,33 @@ function updateUI() {
     document.getElementById("llmInput").placeholder = t.llm_input_placeholder;
     document.getElementById("llmGenerateBtn").textContent = t.llm_generate_btn;
     document.getElementById("llmCopyBtn").textContent = t.llm_copy_btn;
+    
+    // 更新 LLM 说明文本
+    document.getElementById("llmGeneratorInfo").textContent = t.llm_generator_info;
+    document.getElementById("llmUsageTitle").textContent = t.llm_usage_title;
+    document.getElementById("llmUsageStep1").textContent = t.llm_usage_step_1;
+    document.getElementById("llmUsageStep2").textContent = t.llm_usage_step_2;
+    document.getElementById("llmUsageStep3").textContent = t.llm_usage_step_3;
+    
+    // 更新选项卡按钮
+    document.getElementById("promptTabBtn").textContent = t.prompt_library_tab || "📚 提示词库";
+    document.getElementById("loraTabBtn").textContent = t.lora_library_tab || "🎨 Lora库";
+    
+    // 更新Lora库控制按钮
+    const loraDeselectBtn = document.getElementById("loraDeselectBtn");
+    if (loraDeselectBtn) {
+        loraDeselectBtn.textContent = t.deselect_btn;
+    }
+    
+    const loraRefreshBtn = document.getElementById("loraRefreshBtn");
+    if (loraRefreshBtn) {
+        loraRefreshBtn.textContent = t.lora_refresh_btn || "🔄 更新";
+    }
+    
+    const loraDetailLabel = document.querySelectorAll(".lora-section .detail-checkbox span")[0];
+    if (loraDetailLabel) {
+        loraDetailLabel.textContent = t.detail_toggle;
+    }
 }
 
 // 语言切换
@@ -190,12 +236,58 @@ document.getElementById("themeToggle").addEventListener("change", (e) => {
     document.documentElement.setAttribute("data-theme", currentTheme);
 });
 
-let prompts = [];
-let selectedIndexes = [];
-let editingIndex = -1;
-let detailMode = false;
+// ===== 选项卡切换逻辑 =====
+const promptTabBtn = document.getElementById("promptTabBtn");
+const loraTabBtn = document.getElementById("loraTabBtn");
+const promptPanel = document.getElementById("promptPanel");
+const loraPanel = document.getElementById("loraPanel");
 
-const API_BASE = "/prompt_manage";
+function switchTab(tab) {
+    currentTab = tab;
+    if (tab === "prompt") {
+        promptTabBtn.classList.add("active");
+        loraTabBtn.classList.remove("active");
+        promptPanel.style.display = "flex";
+        loraPanel.style.display = "none";
+        localStorage.setItem("promptActiveTab", "prompt");
+    } else if (tab === "lora") {
+        // 在切换到lora前，保存typeFilter的值
+        savedTypeFilterValue = document.getElementById("typeFilter").value;
+        
+        promptTabBtn.classList.remove("active");
+        loraTabBtn.classList.add("active");
+        promptPanel.style.display = "none";
+        loraPanel.style.display = "flex";
+        localStorage.setItem("promptActiveTab", "lora");
+        // 进入Lora选项卡时加载Lora数据
+        loadLoraData();
+    }
+}
+
+// 选项卡按钮点击事件
+promptTabBtn.addEventListener("click", () => switchTab("prompt"));
+loraTabBtn.addEventListener("click", () => switchTab("lora"));
+
+// 恢复之前的选项卡状态（仅恢复UI，不加载数据）
+const activeTab = localStorage.getItem("promptActiveTab") || "prompt";
+if (activeTab === "prompt") {
+    currentTab = "prompt";
+    promptTabBtn.classList.add("active");
+    loraTabBtn.classList.remove("active");
+    promptPanel.style.display = "flex";
+    loraPanel.style.display = "none";
+} else if (activeTab === "lora") {
+    currentTab = "lora";
+    promptTabBtn.classList.remove("active");
+    loraTabBtn.classList.add("active");
+    promptPanel.style.display = "none";
+    loraPanel.style.display = "flex";
+    
+    // 如果还没有加载Lora数据，则加载
+    if (!loraDataLoaded) {
+        loadLoraData();
+    }
+}
 
 // 加载数据
 async function loadPrompts() {
@@ -474,12 +566,18 @@ function updateText(isPositive) {
     const tagsDiv = document.getElementById(isPositive ? "positiveTags" : "negativeTags");
     const textArea = document.getElementById(isPositive ? "positiveText" : "negativeText");
     
+    // 如果是正向提示词且有Lora数据，使用按顺序拼接的逻辑
+    if (isPositive && loraData && loraData.length > 0) {
+        updateLoraText();
+        return;
+    }
+    
     // 获取所有选中的text，保持每个tag的内容分离（用换行分隔）
     let selectedPhrases = Array.from(tagsDiv.querySelectorAll(".tag-item input:checked"))
         .map(cb => prompts[cb.dataset.index].text);
     
-    // 不同tag之间用换行分隔
-    textArea.value = selectedPhrases.join(",\n");
+    // 不同tag之间用换行分隔，最后以逗号结尾
+    textArea.value = selectedPhrases.length > 0 ? selectedPhrases.join(",\n") + "," : "";
 }
 
 // 获取生成器中已添加的tag
@@ -556,7 +654,14 @@ function addToGenerate(isPositive) {
     updateText(isPositive);
 }
 
-document.getElementById("addToGenerate").onclick = () => addToGenerateAuto();
+document.getElementById("addToGenerate").onclick = () => {
+    // 检查当前选中的是提示词还是Lora
+    if (currentTab === "lora" && loraSelectedIndexes.length > 0) {
+        addLoraToGenerator();
+    } else if (currentTab === "prompt") {
+        addToGenerateAuto();
+    }
+};
 document.getElementById("addToPositive").onclick = () => addToGenerate(true);
 document.getElementById("addToNegative").onclick = () => addToGenerate(false);
 
@@ -610,7 +715,7 @@ llmGenerateBtn.onclick = () => {
     const generatorTagIndices = getGeneratorTags();
     
     // 如果生成器中已添加了tag，则只使用这些tag；否则使用所有提示词
-    let availablePrompts;
+    let availablePrompts = "";
     if (generatorTagIndices.size > 0) {
         // 只使用生成器中已添加的tag
         availablePrompts = prompts
@@ -620,6 +725,23 @@ llmGenerateBtn.onclick = () => {
     } else {
         // 使用所有可用的提示词
         availablePrompts = prompts.map(p => `- ${p.name} (${p.type}${p.direction !== "无" ? ", " + p.direction : ""}): ${p.text}`).join("\n");
+    }
+    
+    // 获取生成器中的Lora信息
+    const positiveLoraTags = document.getElementById("positiveTags");
+    const loraInfo = Array.from(positiveLoraTags.querySelectorAll(".tag-item.type-lora input:checked"))
+        .map(cb => {
+            const item = loraData[cb.dataset.loraIndex];
+            if (item.trigger_words && item.trigger_words.length > 0) {
+                return `- ${item.name}: ${item.trigger_words.join(", ")}`;
+            }
+            return `- ${item.name}`;
+        })
+        .join("\n");
+    
+    // 添加Lora信息到提示词
+    if (loraInfo) {
+        availablePrompts += "\n【已选择的Lora】\n" + loraInfo;
     }
     
     // 从加载的模板生成
@@ -650,63 +772,320 @@ llmCopyBtn.onclick = () => {
     });
 };
 
-// ===== 视频播放器功能 =====
-const videoPlayerModal = document.getElementById("videoPlayerModal");
-const videoBtn = document.getElementById("videoBtn");
-const videoCloseBtn = document.getElementById("videoCloseBtn");
-const videoPlayer = document.getElementById("videoPlayer");
-const videoModalContent = document.querySelector(".video-modal-content");
+// ===== Lora库功能 =====
 
-console.log("Video Button:", videoBtn);
-console.log("Video Modal:", videoPlayerModal);
-
-// 打开视频播放器
-if (videoBtn) {
-    videoBtn.addEventListener("click", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("Opening video modal");
-        videoPlayerModal.classList.remove("hidden");
-        setTimeout(() => {
-            if (videoPlayer) videoPlayer.play();
-        }, 100);
-    });
-}
-
-// 关闭视频播放器
-if (videoCloseBtn) {
-    videoCloseBtn.addEventListener("click", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log("Closing video modal via button");
-        videoPlayerModal.classList.add("hidden");
-        if (videoPlayer) videoPlayer.pause();
-    });
-}
-
-// 点击模态框背景关闭视频播放器
-if (videoPlayerModal) {
-    videoPlayerModal.addEventListener("click", function(e) {
-        if (e.target === videoPlayerModal) {
-            console.log("Closing video modal via background");
-            videoPlayerModal.classList.add("hidden");
-            if (videoPlayer) videoPlayer.pause();
+// 加载Lora数据
+async function loadLoraData() {
+    try {
+        console.log("[PromptManage] Starting to load Lora data from:", LORA_API_BASE + "/list");
+        const res = await fetch(LORA_API_BASE + "/list", { method: "GET" });
+        console.log("[PromptManage] Fetch response status:", res.status, res.statusText);
+        
+        if (!res.ok) {
+            console.error(`[PromptManage] Failed to load lora data: HTTP ${res.status}`);
+            const errorText = await res.text();
+            console.error("[PromptManage] Response:", errorText);
+            return;
         }
+        
+        const data = await res.json();
+        console.log("[PromptManage] Received data:", data);
+        
+        loraData = data.loras || [];
+        loraCategories = data.categories || [];
+        
+        console.log(`[PromptManage] Loaded ${loraData.length} Loras in ${loraCategories.length} categories:`, loraCategories);
+        
+        // 更新类别下拉框
+        updateLoraCategories();
+        
+        // 设置默认类别为第一个子目录（如果有多个类别）
+        const categorySelect = document.getElementById("loraCategory");
+        if (loraCategories.length > 0) {
+            // 使用第一个子目录作为默认值
+            categorySelect.value = loraCategories[0];
+            console.log("[PromptManage] Set default category to:", loraCategories[0]);
+        } else {
+            // 如果没有子目录，显示全部
+            categorySelect.value = "";
+            console.log("[PromptManage] No categories found, showing all");
+        }
+        
+        // 渲染Lora列表（使用当前选中的类别）
+        renderLoraList(categorySelect.value);
+        
+        // 恢复之前保存的typeFilter值（如果有的话）
+        if (savedTypeFilterValue !== undefined) {
+            const typeFilter = document.getElementById("typeFilter");
+            if (typeFilter) {
+                typeFilter.value = savedTypeFilterValue;
+            }
+        }
+        
+        // 标记Lora数据已加载
+        loraDataLoaded = true;
+    } catch (err) {
+        console.error("[PromptManage] Error loading lora data:", err);
+        console.error("[PromptManage] Stack:", err.stack);
+    }
+}
+
+// 更新Lora类别下拉框
+function updateLoraCategories() {
+    const categorySelect = document.getElementById("loraCategory");
+    categorySelect.innerHTML = '<option value="">全部</option>';
+    loraCategories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
     });
 }
 
-// 阻止模态框内容的点击事件冒泡
-if (videoModalContent) {
-    videoModalContent.addEventListener("click", function(e) {
-        e.stopPropagation();
+// 渲染Lora列表
+function renderLoraList(category = "") {
+    const list = document.getElementById("loraList");
+    list.innerHTML = "";
+    
+    // 根据详细模式更新容器类
+    if (loraDetailMode) {
+        list.classList.add("detail-mode");
+    } else {
+        list.classList.remove("detail-mode");
+    }
+    
+    loraData.forEach((item) => {
+        // 获取原始索引
+        const idx = loraData.indexOf(item);
+        // 检查类别筛选
+        if (category && item.category !== category) return;
+        // 检查搜索（模糊搜索）
+        if (loraSearchText) {
+            const searchLower = loraSearchText.toLowerCase();
+            const matchName = item.name.toLowerCase().includes(searchLower);
+            const matchFilename = item.filename.toLowerCase().includes(searchLower);
+            const matchBase = item.base_model && item.base_model.toLowerCase().includes(searchLower);
+            if (!matchName && !matchFilename && !matchBase) return;
+        }
+        
+        const div = document.createElement("div");
+        const viewClass = loraDetailMode ? "detail-view" : "compact-view";
+        const isSelected = loraSelectedIndexes.includes(idx);
+        div.className = "lora-item " + viewClass + (isSelected ? " selected" : "");
+        
+        // 创建名称和base_model的容器（两者都显示）
+        let nameWithBase = `<div class="lora-name-row"><strong>${item.name}</strong>`;
+        if (item.base_model) {
+            nameWithBase += `<span class="base-model">${item.base_model}</span>`;
+        }
+        nameWithBase += `</div>`;
+        
+        let innerHTML = nameWithBase;
+        
+        if (loraDetailMode) {
+            let textContent = `<div class="text-content">`;
+            textContent += nameWithBase;
+            textContent += `<small class="filename">${item.filename || ""}</small>`;
+            if (item.trigger_words && item.trigger_words.length > 0) {
+                textContent += `<small class="trigger-words">触发词: ${item.trigger_words.join(", ")}</small>`;
+            }
+            if (item.notes) {
+                textContent += `<pre>${item.notes.substring(0, 100)}${item.notes.length > 100 ? "..." : ""}</pre>`;
+            }
+            textContent += `</div>`;
+            
+            if (item.preview_url) {
+                // 检测文件类型
+                const url = new URL(item.preview_url, window.location.origin);
+                const pathParam = url.searchParams.get('path') || '';
+                const fileExt = pathParam.split('.').pop().toLowerCase();
+                const videoExts = ['mp4', 'avi', 'mov', 'mkv', 'webm'];
+                
+                if (videoExts.includes(fileExt)) {
+                    // 视频文件：显示第一帧作为预览
+                    innerHTML = `<video src="${item.preview_url}" 
+                                alt="${item.name}" muted preload="metadata"></video>` + textContent;
+                } else {
+                    // 图片文件
+                    innerHTML = `<img src="${item.preview_url}" alt="${item.name}">` + textContent;
+                }
+            } else {
+                innerHTML = textContent;
+            }
+        }
+        
+        div.innerHTML = innerHTML;
+        
+        div.onclick = () => {
+            // 多选逻辑
+            if (loraSelectedIndexes.includes(idx)) {
+                loraSelectedIndexes = loraSelectedIndexes.filter(i => i !== idx);
+            } else {
+                loraSelectedIndexes.push(idx);
+            }
+            renderLoraList(category);
+        };
+        list.appendChild(div);
     });
 }
 
-// ESC键关闭视频播放器
-document.addEventListener("keydown", function(e) {
-    if (e.key === "Escape" && videoPlayerModal && !videoPlayerModal.classList.contains("hidden")) {
-        console.log("Closing video modal via ESC");
-        videoPlayerModal.classList.add("hidden");
-        if (videoPlayer) videoPlayer.pause();
+// Lora类别变化事件
+document.getElementById("loraCategory").addEventListener("change", (e) => {
+    // 保存选中的类别
+    localStorage.setItem("loraCategory", e.target.value);
+    // 只重新渲染列表，不重新加载数据
+    renderLoraList(e.target.value);
+});
+
+// Lora详细模式切换
+document.getElementById("loraDetailToggle").addEventListener("change", (e) => {
+    loraDetailMode = e.target.checked;
+    localStorage.setItem("loraDetailMode", loraDetailMode);
+    renderLoraList(document.getElementById("loraCategory").value);
+});
+
+// 初始化Lora详细模式
+const savedLoraDetailMode = localStorage.getItem("loraDetailMode");
+if (savedLoraDetailMode !== null) {
+    loraDetailMode = savedLoraDetailMode === "true";
+    document.getElementById("loraDetailToggle").checked = loraDetailMode;
+}
+
+// Lora取消选择按钮
+document.getElementById("loraDeselectBtn").addEventListener("click", () => {
+    loraSelectedIndexes = [];
+    renderLoraList(document.getElementById("loraCategory").value);
+});
+
+// Lora联网更新按钮 - 现在支持从CivitAI获取模型
+document.getElementById("loraRefreshBtn").addEventListener("click", async () => {
+    const t = translations[currentLang];
+    const btn = document.getElementById("loraRefreshBtn");
+    
+    // 禁用按钮并显示加载状态
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = "⏳ 更新中...";
+    
+    try {
+        // 调用后端API进行更新
+        const response = await fetch("/prompt_manage/lora/refresh?mode=all");
+        const result = await response.json();
+        
+        if (result.success) {
+            // 更新成功，重新加载Lora数据
+            alert(t.lora_refresh_success || result.message);
+            await loadLoraData();
+            // 恢复之前选中的类别
+            const categorySelect = document.getElementById("loraCategory");
+            const savedCategory = localStorage.getItem("loraCategory") || "";
+            categorySelect.value = savedCategory;
+            renderLoraList(savedCategory);
+        } else {
+            alert(t.lora_refresh_failed || `更新失败: ${result.message}`);
+        }
+    } catch (err) {
+        console.error("[PromptManage] Lora refresh error:", err);
+        alert(t.lora_refresh_error || "更新过程中出错，请检查浏览器控制台");
+    } finally {
+        // 恢复按钮状态
+        btn.disabled = false;
+        btn.textContent = originalText;
     }
 });
+
+// 启用Lora联网更新按钮
+const loraRefreshBtn = document.getElementById("loraRefreshBtn");
+loraRefreshBtn.disabled = false;
+loraRefreshBtn.style.opacity = "1";
+loraRefreshBtn.style.cursor = "pointer";
+
+// Lora搜索框事件
+document.getElementById("loraSearchInput").addEventListener("input", (e) => {
+    loraSearchText = e.target.value;
+    const category = document.getElementById("loraCategory").value;
+    renderLoraList(category);
+});
+loraRefreshBtn.title = "从CivitAI更新Lora模型的metadata和预览图像";
+
+// 添加Lora到生成器
+function addLoraToGenerator() {
+    const t = translations[currentLang];
+    if (loraSelectedIndexes.length === 0) return alert(t.alert_select);
+    
+    loraSelectedIndexes.forEach(idx => {
+        const item = loraData[idx];
+        const tagsDiv = document.getElementById("positiveTags");
+        
+        // 检查是否已经添加
+        const existing = Array.from(tagsDiv.querySelectorAll(".tag-item")).find(tag => 
+            tag.dataset.loraIndex == idx
+        );
+        if (existing) return;
+        
+        const tag = document.createElement("div");
+        tag.className = "tag-item type-lora";
+        tag.dataset.loraIndex = idx;
+        
+        let triggerWords = "";
+        if (item.trigger_words && item.trigger_words.length > 0) {
+            triggerWords = item.trigger_words[0];
+        }
+        
+        tag.innerHTML = `
+            <input type="checkbox" checked data-lora-index="${idx}">
+            <span>${item.name}${triggerWords ? " (" + triggerWords + ")" : ""}</span>
+            <button class="del-tag">×</button>
+        `;
+        
+        tag.querySelector("input").onchange = () => updateLoraText();
+        tag.querySelector(".del-tag").onclick = () => {
+            tag.remove();
+            updateLoraText();
+        };
+        
+        tagsDiv.appendChild(tag);
+    });
+    
+    updateLoraText();
+}
+
+// 更新包含Lora信息的文本
+function updateLoraText() {
+    const textArea = document.getElementById("positiveText");
+    const positiveTags = document.getElementById("positiveTags");
+    
+    // 获取所有标签（按DOM顺序，保持添加顺序）
+    const allTags = Array.from(positiveTags.querySelectorAll(".tag-item"));
+    
+    let textParts = [];
+    
+    allTags.forEach(tag => {
+        const checkbox = tag.querySelector("input:checked");
+        if (!checkbox) return;
+        
+        if (tag.classList.contains("type-lora")) {
+            // 这是一个Lora标签
+            const loraIndex = checkbox.dataset.loraIndex;
+            const item = loraData[loraIndex];
+            if (item.trigger_words && item.trigger_words.length > 0) {
+                textParts.push(item.trigger_words.join(", "));
+            }
+        } else {
+            // 这是一个提示词标签
+            const promptIndex = checkbox.dataset.index;
+            const item = prompts[promptIndex];
+            if (item && item.text) {
+                textParts.push(item.text);
+            }
+        }
+    });
+    
+    // 拼接所有部分，每个部分之间用换行分隔，最后以逗号结尾
+    let text = "";
+    if (textParts.length > 0) {
+        text = textParts.join(",\n") + ",";
+    }
+    
+    textArea.value = text;
+}

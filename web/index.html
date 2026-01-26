@@ -32,17 +32,20 @@
                     </select>
                 </div>
                 <button id="llmGeneratorBtn" class="btn btn-primary" style="margin-left: 1rem;">🤖 LLM提示词生成</button>
-                <button id="videoBtn" class="btn btn-info" style="margin-left: 0.5rem;">📹 使用方法</button>
             </div>
         </div>
     </div>
     <div class="container">
         <!-- 左侧：提示词管理 (50%) -->
         <div class="left-panel">
-            <div class="manage-section">
-                <div class="section-header">
-                    <h2>📚 提示词库</h2>
-                </div>
+            <!-- 选项卡导航 -->
+            <div class="tabs-nav">
+                <button class="tab-btn active" id="promptTabBtn" data-tab="prompt">📚 提示词库</button>
+                <button class="tab-btn" id="loraTabBtn" data-tab="lora">🎨 Lora库</button>
+            </div>
+            
+            <!-- 提示词库面板 -->
+            <div class="manage-section" id="promptPanel" style="display: flex; flex-direction: column;">
                 <div class="manage-controls">
                     <div class="search-wrapper">
                         <input type="text" id="searchInput" placeholder="🔍 搜索提示词..." class="search-input">
@@ -62,17 +65,20 @@
                             <option value="构图">构图</option>
                             <option value="其它">其它</option>
                         </select>
+                        <button id="deselectBtn" class="btn btn-secondary" style="display:none;">✕ 取消选择</button>
+                        <label class="detail-checkbox">
+                            <input type="checkbox" id="detailToggle">
+                            <span>显示细节</span>
+                        </label>
                     </div>
                 </div>
                 <div id="promptList" class="prompt-list-container"></div>
                 <div class="manage-buttons">
                     <button id="editBtn" class="btn btn-info" style="display:none;">✏️ 编辑选中</button>
                     <button id="deleteBtn" class="btn btn-danger" style="display:none;">🗑️ 删除选中</button>
-                    <button id="deselectBtn" class="btn btn-secondary" style="display:none;">✕ 取消选择</button>
-                    <label class="detail-checkbox">
-                        <input type="checkbox" id="detailToggle">
-                        <span>显示细节</span>
-                    </label>
+                    <button id="addBtn" class="btn btn-primary">✚ 添加</button>
+                    <button id="confirmEditBtn" class="btn btn-success" style="display:none;">✓ 确认编辑</button>
+                    <button id="cancelEditBtn" class="btn btn-secondary" style="display:none;">✕ 取消编辑</button>
                 </div>
                 <div class="add-form">
                     <h3 id="addFormTitle">新增提示词</h3>
@@ -97,12 +103,26 @@
                     </div>
                     <input type="text" id="newNote" placeholder="备注（可选）" class="form-input">
                     <textarea id="newText" placeholder="输入提示词文本..." class="form-textarea"></textarea>
-                    <div class="form-buttons">
-                        <button id="addBtn" class="btn btn-primary">✚ 添加</button>
-                        <button id="confirmEditBtn" class="btn btn-success" style="display:none;">✓ 确认编辑</button>
-                        <button id="cancelEditBtn" class="btn btn-secondary" style="display:none;">✕ 取消编辑</button>
+                </div>
+            </div>
+            
+            <!-- Lora库面板 -->
+            <div class="lora-section" id="loraPanel" style="display: none; flex-direction: column;">
+                <div class="lora-controls">
+                    <div class="lora-control-bar">
+                        <input type="text" id="loraSearchInput" placeholder="🔍 搜索 Lora..." class="search-input lora-search">
+                        <select id="loraCategory" class="search-mode">
+                            <option value="">全部</option>
+                        </select>
+                        <button id="loraDeselectBtn" class="btn btn-secondary">✕ 取消选择</button>
+                        <button id="loraRefreshBtn" class="btn btn-primary">🌐 联网更新</button>
+                        <label class="detail-checkbox">
+                            <input type="checkbox" id="loraDetailToggle">
+                            <span>显示细节</span>
+                        </label>
                     </div>
                 </div>
+                <div id="loraList" class="lora-list-container"></div>
             </div>
         </div>
         
@@ -143,6 +163,11 @@
                 <button class="modal-close-btn" id="modalCloseBtn">✕</button>
             </div>
             <div class="modal-body">
+                <!-- 说明信息 -->
+                <div class="modal-section llm-info-box">
+                    <p id="llmGeneratorInfo"></p>
+                </div>
+
                 <div class="modal-section">
                     <label for="llmInput" id="llmInputLabel">需求输入（自然语言）:</label>
                     <textarea id="llmInput" class="modal-textarea" placeholder="例如：一个穿着红色连衣裙的女性，微笑，在花园里，阳光照耀，柔和光线..."></textarea>
@@ -151,6 +176,14 @@
                 <div class="modal-section">
                     <label for="llmOutput" id="llmOutputLabel">生成的提示词模板:</label>
                     <textarea id="llmOutput" class="modal-textarea" readonly></textarea>
+                    <div class="llm-usage-box">
+                        <p id="llmUsageTitle"></p>
+                        <ul id="llmUsageList">
+                            <li id="llmUsageStep1"></li>
+                            <li id="llmUsageStep2"></li>
+                            <li id="llmUsageStep3"></li>
+                        </ul>
+                    </div>
                 </div>
                 
                 <div class="modal-buttons">
@@ -160,22 +193,7 @@
             </div>
         </div>
     </div>
-    
-    <!-- 使用方法 Modal -->
-    <div id="videoPlayerModal" class="modal-overlay hidden">
-        <div class="video-modal-content" onclick="event.stopPropagation()">
-            <div class="video-header">
-                <h2 id="videoModalTitle">📹 使用方法教程</h2>
-                <button id="videoCloseBtn" class="video-close-btn">&times;</button>
-            </div>
-            <div class="video-container">
-                <video id="videoPlayer" controls>
-                    <source src="Usage_example.mp4" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            </div>
-        </div>
-    </div>
+
     
     <script src="script.js"></script>
 </body>

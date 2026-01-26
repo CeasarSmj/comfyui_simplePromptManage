@@ -18,7 +18,7 @@
         "direction": "正向",
         "type": "质量",
         "note": "高频局部细节提升，针对眼睛、头发、皮肤、衣服纹理，常用于角色特写",
-        "text": "highly detailed eyes, sparkling eyes, detailed face, intricate hair, flowing hair, shiny hair, detailed skin texture, pores, freckles, detailed clothing, fabric texture, lace details, jewelry details"
+        "text": "highly detailed eyes, detailed face, intricate hair, flowing hair, shiny hair, detailed skin texture, pores, freckles, detailed clothing, fabric texture, lace details, jewelry details"
     },
     {
         "name": "人体细节缺失",
@@ -305,7 +305,7 @@
         "direction": "正向",
         "type": "表情",
         "note": "害羞、羞涩或害怕的表情，脸红、眼神躲闪",
-        "text": "shy expression, bashful face, blushing cheeks, embarrassed expression, flushed face, timid expression, nervous look, cute shy, adorable blush, shy glance"
+        "text": "shy expression, bashful face, blushing cheeks, embarrassed expression, flushed face, timid expression, nervous look, cute shy, adorable blush, "
     },
     {
         "name": "疑惑表情",
@@ -319,7 +319,7 @@
         "direction": "正向",
         "type": "表情",
         "note": "充满渴望、性感或诱惑的表情，眼神炽热、嘴唇水润",
-        "text": "lustful expression, seductive look, passionate eyes, sensual expression, sultry gaze, hungry look, intense desire in eyes, bedroom eyes, alluring expression, captivating smile, erotic expression, tempting look"
+        "text": "lustful expression, seductive look, passionate eyes, sensual expression, sultry gaze, hungry look, intense desire in eyes, bedroom eyes, alluring expression, erotic expression, tempting look"
     },
     {
         "name": "坐下姿势",
@@ -627,7 +627,7 @@
         "direction": "正向",
         "type": "构图",
         "note": "完整展示角色的全身，从头到脚，角色展示最常用",
-        "text": "full body shot, full body, standing, full height, (full body:1.2)"
+        "text": "full body shot, full body,  full height, (full body:1.2)"
     },
     {
         "name": "半身构图",
