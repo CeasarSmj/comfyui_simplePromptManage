@@ -2,6 +2,10 @@
 
 An elegant AI prompt management and generation system designed for ComfyUI. Efficiently manage, search, and generate Stable Diffusion prompts.
 
+***
+NOTICE: English version of default prompts re available in `datas/prompts_default.en.json`, just replace the context of `datas/prompts.json` with `datas/prompts_default_en.json` to use for English users.
+***
+
 **[中文](README.md) | [English](README.en.md)**
 
 ![](./asset/ui_pic_en.png)

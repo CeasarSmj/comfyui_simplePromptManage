@@ -627,7 +627,7 @@
         "direction": "正向",
         "type": "构图",
         "note": "完整展示角色的全身，从头到脚，角色展示最常用",
-        "text": "full body shot, full body, standing, full height, (full body:1.2)"
+        "text": "full body shot, full body,  full height, (full body:1.2)"
     },
     {
         "name": "半身构图",
