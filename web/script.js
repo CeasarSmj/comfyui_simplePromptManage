@@ -210,10 +210,10 @@ function updateUI() {
         loraDeselectBtn.textContent = t.deselect_btn;
     }
     
-    const loraRefreshBtn = document.getElementById("loraRefreshBtn");
-    if (loraRefreshBtn) {
-        loraRefreshBtn.textContent = t.lora_refresh_btn || "🔄 更新";
-    }
+    // const loraRefreshBtn = document.getElementById("loraRefreshBtn");
+    // if (loraRefreshBtn) {
+    //     loraRefreshBtn.textContent = t.lora_refresh_btn || "🔄 更新";
+    // }
     
     const loraDetailLabel = document.querySelectorAll(".lora-section .detail-checkbox span")[0];
     if (loraDetailLabel) {
@@ -958,47 +958,47 @@ document.getElementById("loraDeselectBtn").addEventListener("click", () => {
 });
 
 // Lora联网更新按钮 - 现在支持从CivitAI获取模型
-document.getElementById("loraRefreshBtn").addEventListener("click", async () => {
-    const t = translations[currentLang];
-    const btn = document.getElementById("loraRefreshBtn");
+// document.getElementById("loraRefreshBtn").addEventListener("click", async () => {
+//     const t = translations[currentLang];
+//     const btn = document.getElementById("loraRefreshBtn");
     
-    // 禁用按钮并显示加载状态
-    btn.disabled = true;
-    const originalText = btn.textContent;
-    btn.textContent = "⏳ 更新中...";
+//     // 禁用按钮并显示加载状态
+//     btn.disabled = true;
+//     const originalText = btn.textContent;
+//     btn.textContent = "⏳ 更新中...";
     
-    try {
-        // 调用后端API进行更新
-        const response = await fetch("/prompt_manage/lora/refresh?mode=all");
-        const result = await response.json();
+//     try {
+//         // 调用后端API进行更新
+//         const response = await fetch("/prompt_manage/lora/refresh?mode=all");
+//         const result = await response.json();
         
-        if (result.success) {
-            // 更新成功，重新加载Lora数据
-            alert(t.lora_refresh_success || result.message);
-            await loadLoraData();
-            // 恢复之前选中的类别
-            const categorySelect = document.getElementById("loraCategory");
-            const savedCategory = localStorage.getItem("loraCategory") || "";
-            categorySelect.value = savedCategory;
-            renderLoraList(savedCategory);
-        } else {
-            alert(t.lora_refresh_failed || `更新失败: ${result.message}`);
-        }
-    } catch (err) {
-        console.error("[PromptManage] Lora refresh error:", err);
-        alert(t.lora_refresh_error || "更新过程中出错，请检查浏览器控制台");
-    } finally {
-        // 恢复按钮状态
-        btn.disabled = false;
-        btn.textContent = originalText;
-    }
-});
+//         if (result.success) {
+//             // 更新成功，重新加载Lora数据
+//             alert(t.lora_refresh_success || result.message);
+//             await loadLoraData();
+//             // 恢复之前选中的类别
+//             const categorySelect = document.getElementById("loraCategory");
+//             const savedCategory = localStorage.getItem("loraCategory") || "";
+//             categorySelect.value = savedCategory;
+//             renderLoraList(savedCategory);
+//         } else {
+//             alert(t.lora_refresh_failed || `更新失败: ${result.message}`);
+//         }
+//     } catch (err) {
+//         console.error("[PromptManage] Lora refresh error:", err);
+//         alert(t.lora_refresh_error || "更新过程中出错，请检查浏览器控制台");
+//     } finally {
+//         // 恢复按钮状态
+//         btn.disabled = true;
+//         btn.textContent = originalText;
+//     }
+// });
 
 // 启用Lora联网更新按钮
-const loraRefreshBtn = document.getElementById("loraRefreshBtn");
-loraRefreshBtn.disabled = false;
-loraRefreshBtn.style.opacity = "1";
-loraRefreshBtn.style.cursor = "pointer";
+// const loraRefreshBtn = document.getElementById("loraRefreshBtn");
+// loraRefreshBtn.disabled = true;
+// loraRefreshBtn.style.opacity = "1";
+// loraRefreshBtn.style.cursor = "pointer";
 
 // Lora搜索框事件
 document.getElementById("loraSearchInput").addEventListener("input", (e) => {
@@ -1006,7 +1006,7 @@ document.getElementById("loraSearchInput").addEventListener("input", (e) => {
     const category = document.getElementById("loraCategory").value;
     renderLoraList(category);
 });
-loraRefreshBtn.title = "从CivitAI更新Lora模型的metadata和预览图像";
+// loraRefreshBtn.title = "从CivitAI更新Lora模型的metadata和预览图像";
 
 // 添加Lora到生成器
 function addLoraToGenerator() {
