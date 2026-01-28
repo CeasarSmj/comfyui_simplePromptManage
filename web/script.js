@@ -242,6 +242,7 @@ const loraTabBtn = document.getElementById("loraTabBtn");
 const promptPanel = document.getElementById("promptPanel");
 const loraPanel = document.getElementById("loraPanel");
 
+
 function switchTab(tab) {
     currentTab = tab;
     if (tab === "prompt") {
@@ -259,10 +260,13 @@ function switchTab(tab) {
         promptPanel.style.display = "none";
         loraPanel.style.display = "flex";
         localStorage.setItem("promptActiveTab", "lora");
-        // 进入Lora选项卡时加载Lora数据
-        loadLoraData();
+        // 进入Lora选项卡时，只有在数据未加载时才加载Lora数据
+        if (!loraDataLoaded) {
+            loadLoraData();
+        }
     }
 }
+
 
 // 选项卡按钮点击事件
 promptTabBtn.addEventListener("click", () => switchTab("prompt"));
