@@ -18,7 +18,11 @@
         "direction": "正向",
         "type": "质量",
         "note": "High frequency local detail enhancement, targeting eyes, hair, skin, clothing texture, commonly used for character close-ups",
+<<<<<<< HEAD
         "text": "highly detailed eyes, detailed face, intricate hair, flowing hair, shiny hair, detailed skin texture, pores, freckles, detailed clothing, fabric texture, lace details, jewelry details"
+=======
+        "text": "highly detailed eyes, sparkling eyes, detailed face, intricate hair, flowing hair, shiny hair, detailed skin texture, pores, freckles, detailed clothing, fabric texture, lace details, jewelry details"
+>>>>>>> cfd4a221aee0ade484b8b9283b5a0ccb0a81da47
     },
     {
         "name": "Human Detail Missing",
@@ -319,7 +323,11 @@
         "direction": "正向",
         "type": "表情",
         "note": "Passionate, seductive or desiring expression, fiery eyes, moist lips",
+<<<<<<< HEAD
         "text": "lustful expression, seductive look, passionate eyes, sensual expression, sultry gaze, hungry look, intense desire in eyes, bedroom eyes, alluring expression, erotic expression, tempting look"
+=======
+        "text": "lustful expression, seductive look, passionate eyes, sensual expression, sultry gaze, hungry look, intense desire in eyes, bedroom eyes, alluring expression, captivating smile, erotic expression, tempting look"
+>>>>>>> cfd4a221aee0ade484b8b9283b5a0ccb0a81da47
     },
     {
         "name": "Sitting Pose",
@@ -746,7 +754,11 @@
         "direction": "正向",
         "type": "构图",
         "note": "Looking downward at ground, gentle introspective or thinking state",
+<<<<<<< HEAD
         "text": "looking down, downward gaze, eyes cast down, head lowered, contemplative pose"
+=======
+        "text": "looking down, downward gaze, eyes cast down, head lowered, contemplative pose, shy downward glance"
+>>>>>>> cfd4a221aee0ade484b8b9283b5a0ccb0a81da47
     },
     {
         "name": "Looking to the Side",

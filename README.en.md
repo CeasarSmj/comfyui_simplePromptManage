@@ -6,6 +6,10 @@ An elegant AI prompt and Lora library management and generation system designed 
 NOTICE: English version of default prompts is available in `data/prompts_default_en.json`, just replace the context of `data/prompts.json` with `data/prompts_default_en.json` to use for English users.
 ***
 
+***
+NOTICE: English version of default prompts re available in `datas/prompts_default.en.json`, just replace the context of `datas/prompts.json` with `datas/prompts_default_en.json` to use for English users.
+***
+
 **[中文](README.md) | [English](README.en.md)**
 
 
