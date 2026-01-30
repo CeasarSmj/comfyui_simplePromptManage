@@ -25,7 +25,7 @@ Clone or download the plugin to ComfyUI's custom nodes directory:
 
 ```bash
 cd path/to/ComfyUI/custom_nodes
-git clone https://github.com/CeasarSmj/comfyui_PromptManage.git
+git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
 ```
 
 Restart ComfyUI and visit `http://localhost:8188/prompt_manage_web/` or click the plugin button in the ComfyUI web interface.

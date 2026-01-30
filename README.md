@@ -15,7 +15,7 @@
 
 ```bash
 cd path/to/ComfyUI/custom_nodes
-git clone https://github.com/CeasarSmj/comfyui_PromptManage.git
+git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
 ```
 
 重启 ComfyUI，访问 `http://localhost:8188/prompt_manage_web/` 或在网页界面中点击插件入口按钮。
