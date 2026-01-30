@@ -1,180 +1,254 @@
-# 🎨 ComfyUI Prompt Manager
+# 🎨 ComfyUI Prompt Manager: Make Prompting as Easy as Grocery Shopping!
 
-An elegant AI prompt and Lora library management and generation system designed for ComfyUI. Efficiently manage, search, and generate Stable Diffusion prompts while organizing Lora models.
+An elegant AI prompt and Lora library management and generation system designed for ComfyUI, helping you efficiently manage, search, and generate Stable Diffusion prompts while organizing your Lora models.
 
-
-Recommand to use together with comfyui-lora-manager.
-
-***
-NOTICE: English version of default prompts is available in `data/prompts_default_en.json`, just replace the context of `data/prompts.json` with `data/prompts_default_en.json` to use for English users.
-***
-
-***
-NOTICE: English version of default prompts re available in `datas/prompts_default.en.json`, just replace the context of `datas/prompts.json` with `datas/prompts_default_en.json` to use for English users.
-***
+Recommended to use with comfyui-lora-manager.
 
 **[中文](README.md) | [English](README.en.md)**
 
-
-
-
 ---
 
-## ⚡ Quick Installation & Usage
+## ⚡ Quick Install & Usage
 
 ### 1️⃣ Installation
 
-Clone or download the plugin to ComfyUI's custom nodes directory:
+Clone or download the plugin to ComfyUI custom nodes directory:
 
 ```bash
 cd path/to/ComfyUI/custom_nodes
 git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
+cd comfyui_simplePromptManage
+pip install -r requirements.txt
 ```
 
-Restart ComfyUI and visit `http://localhost:8188/prompt_manage_web/` or click the plugin button in the ComfyUI web interface.
+Restart ComfyUI, visit `http://localhost:8188/prompt_manage_web/` or click the plugin entry button in the web interface.
 
-![](./asset/entrance.png)
+![](./asset/pic_entrance.png)
 
-### 2️⃣ Core Concepts
+### 2️⃣ Basic Concepts
 
-The plugin has three main sections:
+The plugin includes four core features:
 
-| Section                     | Purpose                                                                  |
-| --------------------------- | ------------------------------------------------------------------------ |
-| **Prompt Library** (Tab)    | Manage prompts - Add, edit, delete, search prompts                       |
-| **Lora Library** (Tab)      | Manage Lora models - Browse, categorize, organize local Lora models      |
-| **Prompt Reference** (Tab)  | View and manage example images and prompts downloaded from Lora metadata |
-| **Generator** (Right Panel) | Combine prompts and Lora to create positive/negative prompt pairs        |
+| Feature | Description |
+| ------------------------ | ------------------------------------------------------------ |
+| **Prompt Library** (Tab) | Prompt Library Management - Add, Edit, Delete, Search prompts |
+| **Lora Library** (Tab) | Lora Model Management - Browse, categorize, organize local Lora models |
+| **Reference** (Tab) | Prompt Reference - View and manage sample images and prompts downloaded from Lora metadata |
+| **Generator** (Right Panel) | Prompt Generator - Combine prompts and Loras to generate complete positive/negative prompts |
+| **Lora Prompts Viewer** | Standalone Tool - View prompt information from local Lora images |
 
 Each prompt contains:
-- **Name**: Short identifier (e.g., "landscape", "beautiful woman")
+- **Name**: Short identifier (e.g., "Landscape", "Character")
 - **Direction**: Positive (what to generate) / Negative (what to avoid) / None
-- **Type**: Classification - Quality, Style, Texture, Environment, Action, Expression, Clothing, Composition, Other
+- **Type**: Category tag - Quality, Style, Texture, Environment, Action, Expression, Clothing, Composition, Other
 - **Prompt Text**: Complete prompt content
-- **Note** (optional): Usage tips and descriptions
+- **Note** (Optional): Usage instructions and suggestions
 
 ---
 
-### 💡 Manage Prompt Reference
-
-#### Download Example Images
-1. Click the "💡 Prompt Reference" tab on the left
-2. Click the "📥 Download Examples" button
-3. The system will automatically download example images and prompts from CivitAI for Lora models
-4. Download progress for each directory will be displayed during the process
-5. After download, example images will appear in the list
-
-#### View and Use Prompts
-1. Browse example images in the prompt reference list
-2. Each example image displays:
-   - Thumbnail
-   - Positive prompt (scrollable to view full content)
-   - Negative prompt (if available)
-   - Generation parameters (steps, sampler, CFG, seed, etc.)
-3. Click any reference item to copy its prompt to the generator
-4. Use the search box to filter by Lora name or prompt content
-5. Use the category dropdown to filter by directory
-
-#### Download Features
-- **Smart Skip**: Existing files won't be downloaded again
-- **Empty Prompt Skip**: Images without prompts are skipped
-- **Cancellable**: Click the button again during download to cancel
-- **Progress Display**: Real-time download progress for each directory
-- **Parameter Saving**: All generation parameters saved to PNG metadata
-
-## 🎯 Core Usage Methods
+## 🎯 Core Usage
 
 ### 📚 Manage Prompt Library
 
-![](./asset/pic_promptlib_en.png)
-#### Add a Prompt
+![](./asset/pic_en_promptlib.png)
+
+#### Add Prompt
 1. Fill in the "Add New Prompt" form on the left:
-   - **Name**: e.g., "high quality image", "beautiful girl"
+   - **Name**: e.g., "High Quality", "Beautiful Character"
    - **Direction**: Select "Positive", "Negative", or "None"
-   - **Type**: Choose from the dropdown menu
-   - **Note** (optional): e.g., "for character generation"
-   - **Prompt Text**: Paste your prompt content
+   - **Type**: Choose category from dropdown menu
+   - **Note** (Optional): e.g., "Suitable for character generation"
+   - **Prompt Text**: Copy and paste prompt content
 2. Click "✚ Add" to save
 
 #### Search and Filter
-- **Search Box**: Type keywords to find prompts (supports both fuzzy and exact matching)
-- **Type Filter**: Filter by classification from dropdown
-- **Show Details**: Check to view complete information for each prompt
+- **Search Box**: Enter keywords to search prompt names (supports fuzzy and exact modes)
+- **Type Filter**: Filter by category from dropdown menu
+- **Show Details**: Check the box to view complete information for each prompt
 
 #### Edit or Delete
-1. Click a prompt in the list to select it (button will highlight)
+1. Click to select the prompt you want to modify from the list (button will change color to indicate selection)
 2. Edit: Click "✏️ Edit Selected" → Modify information → Click "✓ Confirm Edit"
 3. Delete: Click "🗑️ Delete Selected" → Confirm deletion
 
 ### 🎨 Generate Prompts
 
+![](./asset/pic_en_generator.png)
+
 #### Method 1: Manual Combination (Recommended for Beginners)
-1. Select a prompt from the library on the left
-2. Click a button to add to the right generator:
-   - **➕ Add**: System auto-detects direction and adds to appropriate area
+1. Select a prompt from the left prompt library
+2. Click buttons to add to the right generator:
+   - **➕ Add**: System automatically determines direction and adds to corresponding area
    - **➕ Add Positive (P)**: Force add to positive prompt area
    - **➖ Add Negative (N)**: Force add to negative prompt area
-3. Prompt text automatically appends to the text box on the right
-4. Continue adding more prompts to create combinations
-5. Copy the final result to use in ComfyUI
+3. Prompt text is automatically appended to the text box on the right
+4. Continue adding more prompts to combine
+5. Copy the generated prompt to use in ComfyUI
 
 #### Method 2: Keyboard Shortcuts (Efficient)
-- Select a prompt then press **`P` key**: Quickly add to positive prompts
-- Select a prompt then press **`N` key**: Quickly add to negative prompts
+- Select a prompt and press **`P` key**: Quickly add to positive prompts
+- Select a prompt and press **`N` key**: Quickly add to negative prompts
 
 #### Method 3: LLM AI Generation (Professional)
-1. Click "🤖 LLM Prompt Generator" in the top-right
-2. Describe your needs in natural language:
+1. Click the "🤖 LLM Generator" button in the top right
+2. Describe your requirements in natural language, e.g.:
    ```
-   A smiling woman in a red dress in a garden, sunlight, soft lighting
+   A woman wearing a red dress, smiling, in a garden, with sunshine and soft lighting
    ```
-3. Click "⚡ Generate" button
-4. System generates standardized prompt based on preset rules
-5. Click "📋 Copy" to copy the generated content
-6. Optional: Paste into text box for further fine-tuning
+3. Click the "⚡ Generate" button
+4. System generates standardized prompt templates based on preset rules (including complete positive and negative prompts)
+5. Click the "📋 Copy" button to copy the generated result
+6. Optional: Paste to text box for further fine-tuning
 
-### � Manage Lora Library
+![](./asset/pic_en_llmgenerate.png)
 
-![](./asset/pic_loralib_en.png)
-#### Browse and Filter
+### 🎨 Manage Lora Library
+
+![](./asset/pic_en_loralib.png)
+
+#### Browse and Categorize
 1. Click the left tab to switch to "🎨 Lora Library"
-2. Select a Lora category from the "All" dropdown (auto-generated from directories)
+2. Select Lora category from "All" dropdown menu (automatically generated by directory)
 3. Check "Show Details" to view complete information:
    - Lora name and filename
    - Trigger words (for use in generator)
    - Preview images/videos
 
 #### Select and Add to Generator
-1. Click a Lora in the list to select it (highlighted)
+1. Click the Lora you want to add from the Lora list (it will be highlighted)
 2. Click "➕ Add" button to add selected Lora to positive prompt area
-3. Lora trigger words automatically append to the prompt text
+3. Lora trigger words will be automatically appended to the prompt text
 
-#### Using Lora in Generator
-- Prompts and Lora are concatenated **in the order they were added**, not prompts-then-lora
-- Lora trigger words automatically extracted from metadata
-- Support adding multiple Lora at once, prompts concatenate in sequence
+#### Lora Usage in Generator
+- Prompts and Loras are concatenated in **addition order**, not prompts first then Loras
+- Lora trigger words are automatically extracted from metadata
+- Supports adding multiple Loras simultaneously, prompts are concatenated sequentially
+
+### 💡 Manage Prompt Reference
+
+![](./asset/pic_en_reference.png)
+
+#### ⚠️ Preparation Before Use
+Before using the prompt reference feature, you need to download sample images and data:
+
+1. **Download Sample Images**
+   - Click the "📥 Download Examples" button in the title bar
+   - System will download sample images and prompts from CivitAI for Lora models
+   - Image ID list is located in `prompt_example/selected_img_list.txt`
+   - Download process runs in a new window, please wait patiently
+   - Downloaded images are saved to `prompt_example/selected/` directory
+
+2. **Lora Directory Structure Requirements**
+   - Ensure your `ComfyUI/models/lora/` directory is organized into subdirectories by category
+   - Example:
+     ```
+     ComfyUI/models/lora/
+     ├── Characters/
+     ├── Styles/
+     ├── Clothing/
+     └── Backgrounds/
+     ```
+
+#### Download Sample Images
+1. Click the left tab to switch to "💡 Reference"
+2. Click the "📥 Download Examples" button
+3. System will automatically download sample images and prompts from CivitAI for Lora models
+4. Download progress for each directory will be displayed
+5. After download completes, sample images will be displayed in the list
+
+#### View and Use Prompts
+1. Browse sample images in the prompt reference list (supports pagination, 200 images per page)
+2. Each sample image displays:
+   - Thumbnail
+   - Positive prompt (scrollable to view complete content)
+   - Negative prompt (if available)
+   - Generation parameters (steps, sampler, CFG, seed, etc.)
+3. Click any reference item to copy its prompt to the generator
+4. Use search box to filter by Lora name or prompt content
+5. Use category dropdown to filter by directory
+6. Scroll to bottom to automatically load more content
+
+#### Download Features
+- **Smart Skip**: Existing files are not re-downloaded
+- **Empty Prompt Skip**: Skip images without prompts
+- **Interruptible**: Click button again during download to cancel
+- **Progress Display**: Real-time download progress for each directory
+- **Parameter Save**: All generation parameters saved to PNG metadata
+
+### 🖼️ Lora Prompts Viewer
+
+![](./asset/pic_loraPromptsViewer_entrance_and_download.png)
+
+#### ⚠️ Preparation Before Use
+Lora Prompts Viewer is a standalone tool that requires data preparation:
+
+**Use DownloadLoraImages Button for One-Click Data Preparation**
+
+1. Click the "DownloadLoraImages" button in the title bar
+2. System will automatically perform the following operations:
+   - Scan the `ComfyUI/models/lora/` directory
+   - Download all Lora model sample images
+   - Automatically extract metadata from each image
+   - Save as `.json` file with the same name (for fast reading)
+3. All images are saved to the `lora_prompts/` directory
+
+**Lora Directory Structure Requirements**
+- Ensure your `ComfyUI/models/lora/` directory is organized into subdirectories by category
+- Example:
+  ```
+  ComfyUI/models/lora/
+  ├── Characters/
+  ├── Styles/
+  ├── Clothing/
+  └── Backgrounds/
+  ```
+
+#### Start Prompt Reader
+1. After data preparation is complete, click the "LoraPromptsView" button in the title bar
+2. System will start the Prompt Reader service in a new terminal
+3. Service address: `http://127.0.0.1:8765`
+4. New tab will open automatically
+
+#### Use Features
+- **Browse Images**: Browse all Lora sample images by category
+- **View Prompts**: Click image to view detailed prompt information
+- **Copy Prompts**: One-click copy prompt to clipboard
+- **Search Filter**: Search by keywords in prompt or Lora name
+- **Category Filter**: Filter images by category directory
+- **View Parameters**: Display steps, sampler, CFG, seed, and other generation parameters
+
+#### Performance Optimization
+- **Automatic JSON Cache**: JSON files are generated during download, 15-70x faster reading speed
+- **Smart Cache**: Millisecond response after first scan
+- **orjson Support**: Optional orjson installation for further performance improvement
+
+![](./asset/pic_promptReader.png)
 
 ### 🎛️ Interface Settings
 
-- **Language**: Click "🌐" in top-left to switch between Chinese and English
-- **Theme**: Click "🎨" in top-left to toggle between light and dark modes
-- **Auto-Save**: Preferences automatically saved to browser local storage
+- **Language Switch**: Click the "🌐" icon in the top left to select Chinese or English
+- **Theme Switch**: Click the "🎨" icon in the top left to switch between light/dark themes
+- **Settings Auto-save**: Language and theme preferences saved to browser local storage
 
 ---
 
 ## ✨ Features
 
-- ✅ **Prompt Library Management** - Easily create, edit, delete, and search
-- ✅ **Lora Library Management** - Browse, categorize, organize local Lora models
-- ✅ **Smart Search** - Fuzzy and exact search modes
-- ✅ **Multi-dimensional Classification** - Organize by direction and type for prompts, by directory for Lora
-- ✅ **AI-Assisted Generation** - LLM generates high-quality prompts
-- ✅ **Flexible Combination** - Concatenate prompts and Lora by add order, support free combination
+- ✅ **Prompt Library Management** - Easy create, edit, delete, and search
+- ✅ **Lora Library Management** - Browse, categorize, and organize local Lora models
+- ✅ **Prompt Reference** - Download and manage sample images and prompts from CivitAI
+- ✅ **Lora Prompts Viewer** - Standalone tool to view prompt information from local Lora images
+- ✅ **Smart Search** - Supports fuzzy search and exact search
+- ✅ **Multi-dimensional Classification** - Organize prompts by direction and type, Loras by directory
+- ✅ **AI Assisted Generation** - LLM generates high-quality prompts
+- ✅ **Flexible Combination** - Concatenate prompts and Loras in addition order, supports free combination
 - ✅ **Keyboard Shortcuts** - P and N keys for quick addition
-- ✅ **Bilingual Interface** - Full support for Chinese and English
+- ✅ **Bilingual Interface** - Full Chinese and English support
 - ✅ **Theme Switching** - Light and dark modes
-- ✅ **Auto-Save** - Prompts automatically saved to local JSON
+- ✅ **Auto-save** - Prompts automatically saved to local JSON
 - ✅ **Responsive Design** - Adapts to various screen sizes
+- ✅ **Pagination** - Prompt reference supports large data pagination
+- ✅ **High Performance** - Uses orjson and JSON cache technology, significantly improves read speed
 
 ---
 
@@ -184,43 +258,87 @@ Each prompt contains:
 
 ```
 comfyui_PromptManage/
-├── __init__.py                 # Backend: Python API server (includes Lora API)
+├── __init__.py                      # Backend: Python API server
+├── requirements.txt                 # Python dependencies list
 ├── data/
-│   ├── prompts.json            # User prompt data storage
-│   ├── prompts_default.json    # Default prompt library (Chinese)
-│   └── prompts_default_en.json # Default prompt library (English)
-├── web/                        # Frontend: Web interface
-│   ├── index.html              # HTML page structure
-│   ├── script.js               # JavaScript interaction logic
-│   ├── style.css               # Stylesheets
-│   ├── translations.json       # Multilingual translation config
-│   ├── llm-templates.json      # LLM generation rules template
-│   └── top_menu_extension.js   # ComfyUI menu integration
-└── asset/                      # Resources and images
-    ├── pic_promptlib_cn.png    # Prompt library screenshot (Chinese)
-    ├── pic_promptlib_en.png    # Prompt library screenshot (English)
-    ├── pic_loralib_cn.png      # Lora library screenshot (Chinese)
+│   ├── prompts.json                 # User prompt data storage
+│   ├── prompts_default.json         # Default prompt library (Chinese)
+│   └── prompts_default_en.json      # Default prompt library (English)
+├── web/                             # Frontend: Web interface
+│   ├── index.html                   # HTML page structure
+│   ├── script.js                    # JavaScript interaction logic
+│   ├── style.css                    # Stylesheet
+│   ├── translations.json            # Multilingual translation configuration
+│   ├── llm-templates.json           # LLM generation rules template
+│   └── top_menu_extension.js        # ComfyUI menu integration
+├── downloadScripts/                 # Download scripts directory
+│   ├── __init__.py                  # Package initialization file
+│   ├── civitai_client.py            # CivitAI API client
+│   ├── download_by_civitaiwebnum.py # Download images from CivitAI Web
+│   ├── download_lora_images.py      # Download Lora images
+│   └── lora_update_service.py       # Lora metadata update service
+├── prompt_reader/                   # Prompt Reader standalone tool
+│   ├── app.py                       # Web server
+│   ├── app_ultra.py                 # Performance optimized version
+│   ├── extract_metadata.py          # Extract image metadata
+│   ├── static/                      # Static files
+│   │   ├── index.html
+│   │   ├── app.js
+│   │   └── style.css
+│   ├── start.bat                    # Windows startup script
+│   ├── start.sh                     # Linux/Mac startup script
+│   └── cache/                       # Cache directory
+├── prompt_example/                  # Prompt example related
+│   ├── LLM_analyze_prompt.md        # LLM prompt analysis rules
+│   ├── selected_img_list.txt        # Download image ID list
+│   └── selected/                    # Downloaded sample images
+├── lora_prompts/                    # Lora sample images directory
+│   ├── Characters/
+│   ├── Styles/
+│   └── ...
+└── asset/                           # Asset files and images
+    ├── pic_entrance.png             # Entrance screenshot
+    ├── pic_cn_overview.png          # Chinese version overview
+    ├── pic_en_overview.png          # English version overview
+    ├── pic_cn_promptlib.png         # Chinese version prompt library
+    ├── pic_en_promptlib.png         # English version prompt library
+    ├── pic_cn_generator.png         # Chinese version generator
+    ├── pic_en_generator.png         # English version generator
+    ├── pic_cn_loralib.png           # Chinese version Lora library
+    ├── pic_en_loralib.png           # English version Lora library
+    ├── pic_cn_llmgenerate.png       # Chinese version LLM generation
+    ├── pic_en_llmgenerate.png       # English version LLM generation
+    ├── pic_cn_reference.png         # Chinese version prompt reference
+    ├── pic_en_reference.png         # English version prompt reference
+    ├── pic_loraPromptsViewer_entrance_and_download.png
+    └── pic_promptReader.png         # Prompt Reader tool
+```
+
+### API Endpoints
+
 #### Prompt Management API
 
-| Method | Endpoint                | Function                |
-| ------ | ----------------------- | ----------------------- |
-| POST   | `/prompt_manage/get`    | Get all prompts         |
-| POST   | `/prompt_manage/add`    | Add new prompt          |
-| POST   | `/prompt_manage/update` | Update specified prompt |
-| POST   | `/prompt_manage/delete` | Delete specified prompt |
-| POST   | `/prompt_manage/save`   | Save all prompts        |
+| Method | Endpoint | Function |
+| ---- | ----------------------- | -------------- |
+| POST | `/prompt_manage/get` | Get all prompts |
+| POST | `/prompt_manage/add` | Add new prompt |
+| POST | `/prompt_manage/update` | Update specified prompt |
+| POST | `/prompt_manage/delete` | Delete specified prompt |
+| POST | `/prompt_manage/save` | Save all prompts |
 
-#### Lora Library API
+#### Lora Library Management API
 
-| Method   | Endpoint                   | Function                 |
-| -------- | -------------------------- | ------------------------ |
-| GET      | `/prompt_manage/lora/list` | Get all Lora models list |
-| -------- | ----------                 | ----------               |
-| POST     | `/prompt_manage/get`       | Get all prompts          |
-| POST     | `/prompt_manage/add`       | Add new prompt           |
-| POST     | `/prompt_manage/update`    | Update specified prompt  |
-| POST     | `/prompt_manage/delete`    | Delete specified prompt  |
-| POST     | `/prompt_manage/save`      | Save all prompts         |
+| Method | Endpoint | Function |
+| ------ | -------------------------- | ---------------------- |
+| GET | `/prompt_manage/lora/list` | Get all Lora model list |
+
+#### Download Scripts API
+
+| Method | Endpoint | Function |
+| ------ | ------------------------------------- | ------------------------ |
+| POST | `/prompt_manage/download_by_civitaiwebnum` | Start CivitAI Web download |
+| POST | `/prompt_manage/download_lora_images` | Start Lora image download |
+| POST | `/prompt_manage/start_prompt_reader` | Start Prompt Reader |
 
 #### API Usage Examples
 
@@ -230,11 +348,11 @@ POST /prompt_manage/add
 Content-Type: application/json
 
 {
-    "name": "landscape",
+    "name": "Landscape",
     "direction": "None",
     "type": "Environment",
     "text": "beautiful landscape, mountains, clear sky",
-    "note": "natural landscape prompt"
+    "note": "Natural landscape prompts"
 }
 ```
 
@@ -250,69 +368,83 @@ Content-Type: application/json
 
 ### Data Format
 
-Prompts are stored as JSON array in `data/prompts.json`
+Prompt data is stored as a JSON array, location: `data/prompts.json`
+
+**Important: name and note fields must use bilingual format**
 
 ```json
 [
     {
-        "name": "prompt name",
-        "direction": "positive|negative|none",
-        "type": "quality|style|texture|environment|action|expression|clothing|composition|other",
-        "text": "prompt content...",
-        "note": "optional notes"
+        "name": "Chinese Name | English Name",
+        "direction": "Positive|Negative|None",
+        "type": "Quality|Style|Texture|Environment|Action|Expression|Clothing|Composition|Other",
+        "text": "Prompt content...",
+        "note": "Chinese note | English note"
     }
 ]
 ```
 
-### Code Explanation
+**Bilingual Format Rules:**
+- Format: `Chinese | English`
+- Separator: ` | ` (space + pipe + space)
+- Order: Chinese first, English second
+- name field: Must use bilingual format
+- note field: Recommended to use bilingual format
+
+### Code Documentation
 
 #### Backend (__init__.py)
-- **Lora library management** - Load, categorize, browse, select Lora models
-- **Search and filtering** - Fuzzy search, exact search, and classification logic
-- **Keyboard shortcuts** - P/N key event handling
-- **LLM integration** - Call LLM API for prompt generation
-- **Sequential concatenation** - Concatenate prompts and Lora by user add ordert requests
-- **Web directory mounting** - Static file serving for web interface
+- **load_prompts()** - Load prompts from JSON file
+- **save_prompts(data)** - Save prompts to JSON file
+- **API Route Handling** - Handle add, delete, update, get prompt requests
+- **web Directory Mounting** - Static file service, providing Web interface
+- **Lora Library Management** - Load, categorize, browse, select Lora models
+- **Download Scripts Management** - Start various download scripts
+- **Prompt Reader Startup** - Start standalone tool in new window
+- **orjson Optimization** - Use orjson for performance improvement
 
 #### Frontend (script.js)
-- **Internationalization system** - Load multilingual config from translations.json
-- **Prompt library management** - Frontend CRUD operations
-- **Search and filtering** - Fuzzy search, exact search, and classification logic
-- **Keyboard shortcuts** - P/N key event handling
-- **LLM integration** - Call LLM API for prompt generation
-- **Theme and language** - Dynamic interface switching with localStorage persistence
+- **Internationalization System** - Load multilingual configuration from translations.json
+- **Prompt Library Management** - Frontend implementation of CRUD operations
+- **Search and Filter** - Fuzzy search, exact search, and category filtering logic
+- **Keyboard Shortcut Handling** - P/N key event listening and processing
+- **LLM Integration** - Call LLM API to generate prompts
+- **Theme and Language** - Dynamic interface theme and language switching, persisted with localStorage
+- **Pagination** - Scroll pagination for prompt reference
+- **Prompt Reader Integration** - Call API to start standalone tool
 
-#### Styling (style.css)
-- **Responsive layout** - Two-column design (library + generator)
-- **Theme system** - CSS variables for light/dark theme switching
-- **Component styles** - Complete styling for buttons, forms, lists, etc.
+#### Styles (style.css)
+- **Responsive Layout** - Two-column design (left library, right generator)
+- **Theme System** - CSS variables for light/dark theme switching
+- **Component Styles** - Complete styles for buttons, forms, lists, and other UI components
 
 ### LLM Prompt Generation Rules
 
-![](./asset/pic_llmgenerate_en.png)
-The LLM generator uses 8 preset rules to ensure generated prompts:
-1. English only, no Chinese
-2. Prioritize short phrases, avoid complete sentences
-3. Comma-separated elements with line breaks between categories
-4. Follow order: quality > subject > clothing > action > environment > style
-5. Group multiple characters by character
-6. Start with quality terms (masterpiece, best quality, etc.)
+The LLM generator is based on 8 preset rules to ensure generated prompts:
+1. All English, no Chinese
+2. Prioritize short phrases, avoid unnecessary complete sentences
+3. Comma-separated, consecutive elements of same type, line breaks for different categories
+4. Follow priority order: Quality > Subject > Clothing > Action > Environment > Art Style
+5. Group descriptions by character for multiple characters
+6. Must include quality words at the beginning (masterpiece, best quality, etc.)
 7. Provide multiple synonyms for important features
-8. Support weight syntax: (keyword:1.2) to emphasize, [keyword] to de-emphasize
+8. Support weight syntax: (keyword:1.2) strengthen, [keyword] weaken
 
-See `web/llm-templates.json` for details
+See `web/llm-templates.json` and `prompt_example/LLM_analyze_prompt.md` for details
 
 ---
 
-
 ## 💡 Usage Tips
 
-- Regularly organize your prompt library, removing outdated or duplicate entries
-- Use the "Note" field to document usage context and generation results
-- Name prompts clearly based on use cases for easier searching
-- Create multiple variants of popular prompts (different styles, quality levels)
+- Regularly organize your prompt library, delete outdated or duplicate entries
+- Make full use of the "Note" field to record prompt usage and effects (use bilingual format)
+- Name prompts according to application scenarios for easy searching
+- Create multiple variants for common prompts (e.g., different styles, quality levels)
 - Save successful prompt combinations as reusable templates
-- Use type filtering to quickly locate prompts in specific categories
+- Use type filtering to quickly locate specific category prompts
+- Use Prompt Reader tool to view and manage prompt information from local Lora images
+- Use "DownloadLoraImages" button to download and extract metadata from all Lora images at once
+- Regularly run download scripts to update your Lora image library
 
 ---
 
@@ -322,11 +454,8 @@ MIT License
 
 ---
 
-**Version**: 1.2.0  
-**Last Updated**: January 29, 2026  
-**GitHub**: [comfyui_PromptManage](https://github.com/CeasarSmj/comfyui_PromptManage)
-
-Welcome to submit Issues and Pull Requests!
+**Version**: 2.0.0  
+**Last Updated**: January 30, 2026  
 **GitHub**: [comfyui_PromptManage](https://github.com/CeasarSmj/comfyui_PromptManage)
 
 Welcome to submit Issues and Pull Requests!

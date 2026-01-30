@@ -35,7 +35,11 @@
                         </select>
                     </div>
                     <button id="llmGeneratorBtn" class="btn btn-primary"
-                        style="margin-left: 1rem;">🤖 LLM提示词生成</button>
+                        style="margin-left: 1rem;">🤖 LLM生成</button>
+                    <button id="promptReaderBtn" class="btn btn-success"
+                        style="margin-left: 0.5rem;">LoraPromptsView</button>
+                    <button id="downloadLoraImagesBtn" class="btn btn-warning"
+                        style="margin-left: 0.5rem;">DownloadLoraImages</button>
                 </div>
             </div>
         </div>
@@ -136,7 +140,7 @@
                             </select>
                             <button id="loraDeselectBtn"
                                 class="btn btn-secondary">✕ 取消选择</button>
-                            <!-- <button id="loraRefreshBtn" class="btn btn-primary" disabled="true">🌐 更新</button> -->
+                            <button id="loraRefreshBtn" class="btn btn-primary" disabled="true">🌐 CivitAI更新</button>
                             <label class="detail-checkbox">
                                 <input type="checkbox" id="loraDetailToggle">
                                 <span>显示细节</span>
@@ -201,6 +205,8 @@
                             <select id="referenceCategory" class="search-mode">
                                 <option value>All Categories</option>
                             </select>
+                            <button id="referenceDeselectBtn"
+                                class="btn btn-secondary" style="display:none;">✕ 取消选择</button>
                             <button id="downloadExamplesBtn"
                                 class="btn btn-primary">📥 Download Examples</button>
                         </div>

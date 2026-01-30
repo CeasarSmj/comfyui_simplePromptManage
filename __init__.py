@@ -1,21 +1,52 @@
 import os
 import json
+import subprocess
+import sys
 import asyncio
 import logging
 import hashlib
+import time
 import aiohttp
 from aiohttp import web
 from server import PromptServer
-from .lora_update_service import LoraUpdateService
+
+from PIL import Image, PngImagePlugin
+
+from .downloadScripts.lora_update_service import LoraUpdateService
+
+# 尝试使用 orjson（比标准 json 快 2-3 倍）
+try:
+    import orjson
+    JSON_DUMP = orjson.dumps
+    JSON_LOAD = orjson.loads
+    JSON_ENSURE_ASCII = False
+    ORJSON_AVAILABLE = True
+except ImportError:
+    JSON_DUMP = json.dumps
+    JSON_LOAD = json.loads
+    JSON_ENSURE_ASCII = False
+    ORJSON_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
+
+
+def is_port_in_use(port: int) -> bool:
+    """检查指定端口是否被占用"""
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)
+            result = s.connect_ex(('127.0.0.1', port))
+            return result == 0
+    except Exception:
+        return False
 
 # 数据文件路径
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 DATA_FILE = os.path.join(DATA_DIR, "prompts.json")
 DEFAULT_FILE = os.path.join(DATA_DIR, "prompts_default.json")
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "cache", "reference_images")
-EXAMPLE_DIR = os.path.join(os.path.dirname(__file__), "lora_prompt_examples")
+EXAMPLE_DIR = os.path.join(os.path.dirname(__file__), "prompt_example")
 
 # 确保目录和文件存在
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -60,6 +91,69 @@ def write_png_metadata(image_path, metadata):
         return False
     except Exception as e:
         logger.error(f"Error writing PNG metadata: {e}")
+        return False
+
+
+def save_json_metadata(image_path, metadata):
+    """将 metadata 保存为同名的 JSON 文件"""
+    try:
+        json_path = os.path.splitext(image_path)[0] + ".json"
+
+        # 添加提取时间戳
+        json_metadata = metadata.copy()
+        json_metadata["extracted_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+
+        # 使用优化的 JSON 写入
+        if ORJSON_AVAILABLE:
+            # orjson 返回 bytes，使用 option 参数格式化
+            json_bytes = JSON_DUMP(json_metadata, option=orjson.OPT_INDENT_2)
+            with open(json_path, "wb") as f:
+                f.write(json_bytes)
+        else:
+            # 标准库回退
+            with open(json_path, "w", encoding="utf-8") as f:
+                JSON_DUMP(json_metadata, f, ensure_ascii=JSON_ENSURE_ASCII, indent=2)
+
+        return True
+    except Exception as e:
+        logger.warning(f"Error saving JSON metadata: {e}")
+        return False
+
+
+def load_json_file(file_path, default=None):
+    """优化的 JSON 文件读取函数"""
+    try:
+        if ORJSON_AVAILABLE:
+            # orjson 读取二进制模式
+            with open(file_path, "rb") as f:
+                return JSON_LOAD(f.read())
+        else:
+            # 标准库回退
+            with open(file_path, "r", encoding="utf-8") as f:
+                return JSON_LOAD(f)
+    except FileNotFoundError:
+        return default
+    except Exception as e:
+        logger.warning(f"Error loading JSON file {file_path}: {e}")
+        return default
+
+
+def save_json_file(file_path, data, indent=2):
+    """优化的 JSON 文件写入函数"""
+    try:
+        if ORJSON_AVAILABLE:
+            # orjson 使用 option 参数控制缩进
+            option_map = {2: orjson.OPT_INDENT_2, 4: orjson.OPT_INDENT_4}
+            json_bytes = JSON_DUMP(data, option=option_map.get(indent, orjson.OPT_INDENT_2))
+            with open(file_path, "wb") as f:
+                f.write(json_bytes)
+        else:
+            # 标准库回退
+            with open(file_path, "w", encoding="utf-8") as f:
+                JSON_DUMP(data, f, ensure_ascii=JSON_ENSURE_ASCII, indent=indent)
+        return True
+    except Exception as e:
+        logger.warning(f"Error saving JSON file {file_path}: {e}")
         return False
 
 
@@ -130,40 +224,33 @@ def sync_prompts():
     """
     # 确保default文件存在
     if not os.path.exists(DEFAULT_FILE):
-        with open(DEFAULT_FILE, "w", encoding="utf-8") as f:
-            json.dump([], f, ensure_ascii=False, indent=4)
+        save_json_file(DEFAULT_FILE, [], indent=4)
 
     # 读取default数据
-    with open(DEFAULT_FILE, "r", encoding="utf-8") as f:
-        default_data = json.load(f)
+    default_data = load_json_file(DEFAULT_FILE, [])
 
     # 如果user文件不存在，创建为default的副本
     if not os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(default_data, f, ensure_ascii=False, indent=4)
+        save_json_file(DATA_FILE, default_data, indent=4)
         return
 
     # 读取user数据
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        user_data = json.load(f)
+    user_data = load_json_file(DATA_FILE, [])
 
     # 检查user_data是否是default_data的子集
     if is_subset(user_data, default_data):
         # 如果是子集，同步为最新的default
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(default_data, f, ensure_ascii=False, indent=4)
+        save_json_file(DATA_FILE, default_data, indent=4)
 
 
 def load_prompts():
     # 启动时同步一次
     sync_prompts()
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    return load_json_file(DATA_FILE, [])
 
 
 def save_prompts(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+    save_json_file(DATA_FILE, data, indent=4)
 
 
 # API 路由
@@ -242,8 +329,9 @@ def get_lora_data():
                     metadata_path = os.path.join(root, file)
 
                     try:
-                        with open(metadata_path, "r", encoding="utf-8") as f:
-                            metadata = json.load(f)
+                        metadata = load_json_file(metadata_path, None)
+                        if metadata is None:
+                            continue
 
                         # 获取类别（目录名）
                         rel_dir = os.path.relpath(root, lora_dir)
@@ -482,99 +570,294 @@ def update_category_progress(category, completed, total):
     _download_task["category_progress"][category]["total"] = total
 
 
-# ===== 提示词参考数据接口 =====
-async def get_prompt_reference_data():
+# ===== 缓存管理 =====
+_reference_cache = {
+    "categories": [],
+    "data_hash": "",
+    "category_cache": {},  # {category: {"hash": "", "data": [], "total": 0}}
+}
+
+
+def get_category_cache_path(category):
+    """获取类别缓存文件的路径"""
+    if not category:
+        category = "all"
+    safe_category = "".join(
+        c for c in category if c.isalnum() or c in ("_", "-")
+    ).strip()
+    return os.path.join(CACHE_DIR, f"reference_cache_{safe_category}.json")
+
+
+def compute_data_hash(data_list):
+    """计算数据列表的哈希值"""
+    if not data_list:
+        return ""
+
+    # 创建一个可哈希的字符串表示
+    hash_input = "|".join(
+        [
+            f"{item['lora_name']}|{item['category']}|{item['prompt'][:50]}"
+            for item in data_list
+        ]
+    )
+    return hashlib.md5(hash_input.encode("utf-8")).hexdigest()
+
+
+def load_category_cache(category):
+    """从磁盘加载类别缓存"""
+    cache_path = get_category_cache_path(category)
+    if os.path.exists(cache_path):
+        return load_json_file(cache_path)
+    return None
+
+
+def save_category_cache(category, cache_data):
+    """保存类别缓存到磁盘"""
+    cache_path = get_category_cache_path(category)
+    try:
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+        save_json_file(cache_path, cache_data, indent=2)
+    except Exception as e:
+        logger.warning(f"Failed to save cache for category {category}: {e}")
+
+
+async def get_prompt_reference_data(category=None, search=None, offset=0, limit=200):
     """
     从本地示例图目录读取图像和PNG metadata中的提示词信息
+    支持分页加载，带缓存机制
+
+    Args:
+        category: 类别筛选（None或空字符串表示所有类别）
+        search: 搜索关键词（None表示不搜索）
+        offset: 偏移量（从第几条开始）
+        limit: 返回数量限制（默认100条）
     """
     plugin_dir = os.path.dirname(__file__)
     comfyui_root = os.path.normpath(os.path.join(plugin_dir, "..", ".."))
 
     if not os.path.exists(EXAMPLE_DIR):
-        return {"categories": [], "references": []}
+        return {"categories": [], "references": [], "total": 0}
 
-    references = []
+    # 使用空字符串表示"全部类别"以避免None和空字符串的混淆
+    category_key = category if category else ""
+
+    # 检查是否有缓存
+    cache_key = category_key
+    if cache_key not in _reference_cache["category_cache"]:
+        # 尝试从磁盘加载缓存
+        disk_cache = load_category_cache(cache_key)
+        if disk_cache:
+            _reference_cache["category_cache"][cache_key] = disk_cache
+
+    # 扫描指定类别的目录
+    scan_dir = EXAMPLE_DIR
+    if category_key:
+        scan_dir = os.path.join(EXAMPLE_DIR, category_key)
+        if not os.path.exists(scan_dir):
+            # 类别目录不存在，返回空结果
+            return {
+                "categories": [],
+                "references": [],
+                "total": 0,
+                "offset": offset,
+                "limit": limit,
+                "has_more": False,
+            }
+
+    all_references = []
     categories = set()
 
     try:
-        from PIL import Image, PngImagePlugin
+        # 只扫描指定的目录（不递归子目录，因为每个类别是一个独立的目录）
+        for root, dirs, files in os.walk(scan_dir):
+            # 如果指定了类别，不要深入子目录（除非类别本身就是嵌套的）
+            if category_key and root != scan_dir:
+                continue
 
-        for root, dirs, files in os.walk(EXAMPLE_DIR):
             for file in files:
                 if file.lower().endswith((".png", ".jpg", ".jpeg")):
                     image_path = os.path.join(root, file)
 
                     try:
-                        # 读取图像和PNG metadata
-                        with Image.open(image_path) as img:
-                            # 获取PNG metadata
-                            png_metadata = {}
-                            if hasattr(img, "text"):
-                                png_metadata = img.text.copy()
+                        # 优先尝试读取 JSON 文件
+                        json_path = os.path.splitext(image_path)[0] + ".json"
+                        png_metadata = {}
 
-                            # 提取提示词
-                            prompt = png_metadata.get("prompt", "")
-                            if not prompt:
-                                continue
-
-                            # 获取类别（目录名）
-                            rel_dir = os.path.relpath(root, EXAMPLE_DIR)
-                            if rel_dir == ".":
-                                category = "root"
-                            else:
-                                category = rel_dir.replace("\\", "/")
-
-                            categories.add(category)
-
-                            # 获取Lora名称
-                            lora_name = png_metadata.get("lora_name", file)
-
-                            # 获取负向提示词
-                            negative_prompt = png_metadata.get("negative_prompt", "")
-
-                            # 生成图像URL
+                        if os.path.exists(json_path):
                             try:
-                                rel_path = os.path.relpath(image_path, comfyui_root)
-                                image_url = (
-                                    "/prompt_manage/example/image?path="
-                                    + rel_path.replace("\\", "/")
-                                )
+                                json_metadata = load_json_file(json_path)
+                                if json_metadata:
+                                    png_metadata = {
+                                        "prompt": json_metadata.get("prompt", ""),
+                                        "negative_prompt": json_metadata.get(
+                                            "negative_prompt", ""
+                                        ),
+                                        "steps": json_metadata.get("steps", ""),
+                                        "sampler": json_metadata.get("sampler", ""),
+                                        "cfg_scale": json_metadata.get("cfg_scale", ""),
+                                        "seed": json_metadata.get("seed", ""),
+                                        "model": json_metadata.get("model", ""),
+                                        "width": json_metadata.get("width", 0),
+                                        "height": json_metadata.get("height", 0),
+                                        "lora_name": json_metadata.get("lora_name", ""),
+                                    }
                             except Exception as e:
-                                logger.warning(f"Failed to convert image path: {e}")
-                                continue
+                                logger.debug(
+                                    f"Failed to read JSON for {file}: {e}, falling back to image"
+                                )
+                                png_metadata = {}
 
-                            references.append(
-                                {
-                                    "lora_name": lora_name,
-                                    "category": category,
-                                    "image_url": image_url,
-                                    "prompt": prompt,
-                                    "negative_prompt": negative_prompt,
-                                    "width": png_metadata.get("width", img.width),
-                                    "height": png_metadata.get("height", img.height),
-                                    "steps": png_metadata.get("steps", ""),
-                                    "sampler": png_metadata.get("sampler", ""),
-                                    "cfg_scale": png_metadata.get("cfg_scale", ""),
-                                    "seed": png_metadata.get("seed", ""),
-                                    "model": png_metadata.get("model", ""),
-                                }
+                        # 如果 JSON 不存在或读取失败，从图像提取
+                        if not png_metadata:
+                            # 读取图像和PNG metadata
+                            with Image.open(image_path) as img:
+                                if hasattr(img, "text"):
+                                    png_metadata = img.text.copy()
+
+                                # 获取图像尺寸（如果metadata中没有）
+                                if (
+                                    "width" not in png_metadata
+                                    or "height" not in png_metadata
+                                ):
+                                    png_metadata["width"] = img.width
+                                    png_metadata["height"] = img.height
+
+                        # 提取提示词
+                        prompt = png_metadata.get("prompt", "")
+                        if not prompt:
+                            continue
+
+                        # 获取类别（目录名）
+                        rel_dir = os.path.relpath(root, EXAMPLE_DIR)
+                        if rel_dir == ".":
+                            file_category = "root"
+                        else:
+                            file_category = rel_dir.replace("\\", "/")
+
+                        categories.add(file_category)
+
+                        # 获取Lora名称
+                        lora_name = png_metadata.get("lora_name", file)
+
+                        # 获取负向提示词
+                        negative_prompt = png_metadata.get("negative_prompt", "")
+
+                        # 生成图像URL
+                        try:
+                            rel_path = os.path.relpath(image_path, comfyui_root)
+                            image_url = (
+                                "/prompt_manage/example/image?path="
+                                + rel_path.replace("\\", "/")
                             )
+                        except Exception as e:
+                            logger.warning(f"Failed to convert image path: {e}")
+                            continue
 
-                    except ImportError:
-                        logger.error("PIL not installed, cannot read PNG metadata")
-                        break
+                        all_references.append(
+                            {
+                                "lora_name": lora_name,
+                                "category": file_category,
+                                "image_url": image_url,
+                                "prompt": prompt,
+                                "negative_prompt": negative_prompt,
+                                "width": png_metadata.get("width", png_metadata["width"]),
+                                "height": png_metadata.get("height", png_metadata["height"]),
+                                "steps": png_metadata.get("steps", ""),
+                                "sampler": png_metadata.get("sampler", ""),
+                                "cfg_scale": png_metadata.get("cfg_scale", ""),
+                                "seed": png_metadata.get("seed", ""),
+                                "model": png_metadata.get("model", ""),
+                            }
+                        )
                     except Exception as e:
                         logger.warning(f"Error reading image {image_path}: {e}")
+                        continue  # 跳过有问题的图像文件
 
     except Exception as e:
         logger.error(f"Error scanning for prompt reference: {e}")
 
-    return {"categories": sorted(list(categories)), "references": references}
+    # 计算数据的哈希值
+    current_hash = compute_data_hash(all_references)
+
+    # 检查缓存是否有效
+    cache_data = _reference_cache["category_cache"].get(cache_key)
+    if cache_data and cache_data.get("hash") == current_hash:
+        # 使用缓存的数据
+        filtered_references = cache_data["data"]
+        logger.debug(f"Using cached data for category {cache_key}")
+    else:
+        # 更新缓存
+        # 先应用搜索筛选（因为搜索不影响缓存）
+        if search:
+            search_lower = search.lower()
+            all_references = [
+                ref
+                for ref in all_references
+                if (
+                    search_lower in ref["lora_name"].lower()
+                    or search_lower in ref["prompt"].lower()
+                )
+            ]
+
+        cache_data = {
+            "hash": current_hash,
+            "data": all_references,
+            "total": len(all_references),
+        }
+        _reference_cache["category_cache"][cache_key] = cache_data
+        # 保存到磁盘
+        save_category_cache(cache_key, cache_data)
+        filtered_references = all_references
+
+    # 如果有搜索条件，再次筛选（因为缓存的数据可能不包含搜索筛选）
+    if search and cache_data.get("hash") == current_hash:
+        search_lower = search.lower()
+        filtered_references = [
+            ref
+            for ref in filtered_references
+            if (
+                search_lower in ref["lora_name"].lower()
+                or search_lower in ref["prompt"].lower()
+            )
+        ]
+
+    # 分页
+    total = len(filtered_references)
+    start_idx = offset
+    end_idx = min(offset + limit, total)
+    paginated_references = filtered_references[start_idx:end_idx]
+
+    # 获取所有类别列表（只在category为空时扫描）
+    all_categories = sorted(list(categories))
+    if not category_key and all_categories:
+        # 更新全局类别缓存
+        _reference_cache["categories"] = all_categories
+
+    return {
+        "categories": all_categories,
+        "references": paginated_references,
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "has_more": end_idx < total,
+    }
 
 
 async def get_prompt_references(request):
-    """获取提示词参考数据API"""
-    return web.json_response(await get_prompt_reference_data())
+    """获取提示词参考数据API（支持分页）"""
+    # 获取查询参数
+    category = request.query.get("category", None)
+    search = request.query.get("search", None)
+    try:
+        offset = int(request.query.get("offset", 0))
+        limit = int(request.query.get("limit", 200))
+    except ValueError:
+        offset = 0
+        limit = 200
+
+    return web.json_response(
+        await get_prompt_reference_data(category, search, offset, limit)
+    )
 
 
 async def get_cache_image(request):
@@ -639,87 +922,47 @@ async def get_cache_image(request):
 
 async def download_prompt_examples(request):
     """下载提示词示例图并写入metadata"""
-
     import requests
-
     # 检查是否有正在运行的任务
-
     if _download_task["running"]:
-
         return web.json_response(
             {"success": False, "message": "已有下载任务正在运行"}, status=400
         )
-
     plugin_dir = os.path.dirname(__file__)
-
     lora_dir = os.path.normpath(os.path.join(plugin_dir, "..", "..", "models", "loras"))
-
     comfyui_root = os.path.normpath(os.path.join(plugin_dir, "..", ".."))
-
     if not os.path.exists(lora_dir):
-
         return web.json_response(
             {"success": False, "message": f"Lora目录不存在: {lora_dir}"}, status=400
         )
-
     # 初始化任务状态
-
     reset_download_task()
-
     _download_task["running"] = True
-
     success_count = 0
-
     failed_count = 0
-
     skipped_count = 0
-
     failed_items = []
-
     total_images = 0
-
     processed_images = 0
-
     # 先统计总图像数
-
     for root, dirs, files in os.walk(lora_dir):
-
         for file in files:
-
             if file.endswith(".metadata.json"):
-
                 metadata_path = os.path.join(root, file)
-
                 try:
-
-                    with open(metadata_path, "r", encoding="utf-8") as f:
-
-                        metadata = json.load(f)
-
-                    if "civitai" in metadata and "images" in metadata["civitai"]:
-
+                    metadata = load_json_file(metadata_path)
+                    if metadata and "civitai" in metadata and "images" in metadata["civitai"]:
                         images = metadata["civitai"].get("images", [])
-
                         for img in images:
-
                             if "meta" in img and "prompt" in img["meta"]:
-
                                 prompt = img["meta"]["prompt"]
-
                                 if prompt and prompt.strip():
-
                                     total_images += 1
-
                 except Exception:
-
                     pass
-
     _download_task["total"] = total_images
-
     # 创建requests会话，带User-Agent头避免403
-
     session = requests.Session()
-
     session.headers.update(
         {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -727,135 +970,77 @@ async def download_prompt_examples(request):
     )
 
     try:
-
         for root, dirs, files in os.walk(lora_dir):
-
             # 检查是否被取消
-
             if is_download_cancelled():
-
                 logger.info("Download cancelled by user")
-
                 break
-
             for file in files:
-
                 if file.endswith(".metadata.json"):
-
                     metadata_path = os.path.join(root, file)
-
                     try:
-
-                        with open(metadata_path, "r", encoding="utf-8") as f:
-
-                            metadata = json.load(f)
-
+                        metadata = load_json_file(metadata_path)
+                        if metadata is None:
+                            continue
                         # 获取类别（目录名）
-
                         rel_dir = os.path.relpath(root, lora_dir)
-
                         if rel_dir == ".":
-
                             category = "root"
-
                         else:
-
                             category = rel_dir.replace("\\", "/")
-
                         # 创建示例图目录
-
                         example_category_dir = os.path.join(EXAMPLE_DIR, category)
-
                         os.makedirs(example_category_dir, exist_ok=True)
-
                         # 获取模型名称
-
                         model_name = metadata.get(
                             "model_name", metadata.get("file_name", "")
                         )
 
                         # 检查civitai数据中是否有图像和提示词
-
                         if "civitai" in metadata and "images" in metadata["civitai"]:
-
                             civitai_data = metadata["civitai"]
-
                             images = civitai_data.get("images", [])
-
                             # 遍历所有图像，下载有提示词的图像
-
                             for idx, img in enumerate(images):
-
                                 # 检查是否被取消
-
                                 if is_download_cancelled():
-
                                     logger.info("Download cancelled by user")
-
                                     break
-
                                 if "meta" in img and "prompt" in img["meta"]:
-
                                     prompt = img["meta"]["prompt"]
-
                                     # 检查提示词是否为空
-
                                     if not prompt or not prompt.strip():
-
                                         skipped_count += 1
-
                                         continue
-
                                     image_url = img.get("url", "")
-
                                     if not image_url:
-
                                         skipped_count += 1
-
                                         continue
-
                                     # 生成文件名
-
                                     base_name = file.replace(".metadata.json", "")
-
                                     safe_model_name = "".join(
                                         c
                                         for c in model_name
                                         if c.isalnum() or c in (" ", "-", "_")
                                     ).strip()
-
                                     filename = f"{safe_model_name}_{idx}.png"
-
                                     save_path = os.path.join(
                                         example_category_dir, filename
                                     )
 
                                     # 检查同名文件是否存在
-
                                     if os.path.exists(save_path):
-
                                         skipped_count += 1
-
                                         continue
-
                                     # 下载图像
-
                                     try:
-
                                         response = session.get(image_url, timeout=60)
-
                                         if response.status_code == 200:
-
                                             content = response.content
-
                                             # 保存图像
-
                                             with open(save_path, "wb") as f:
-
                                                 f.write(content)
-
                                             # 准备metadata
-
                                             png_metadata = {
                                                 "prompt": prompt,
                                                 "negative_prompt": img["meta"].get(
@@ -876,82 +1061,51 @@ async def download_prompt_examples(request):
                                                 "lora_category": category,
                                             }
 
-                                            # 写入PNG metadata
-
+                                            # 写入PNG metadata和JSON文件
                                             write_png_metadata(save_path, png_metadata)
-
+                                            save_json_metadata(save_path, png_metadata)
                                             success_count += 1
-
                                             processed_images += 1
-
                                             _download_task["progress"] = (
                                                 processed_images
                                             )
-
                                         else:
-
                                             logger.warning(
                                                 f"Failed to download: HTTP {response.status_code}"
                                             )
-
                                             failed_count += 1
-
                                             processed_images += 1
-
                                             _download_task["progress"] = (
                                                 processed_images
                                             )
-
                                             failed_items.append(image_url)
-
                                     except requests.exceptions.Timeout:
-
                                         logger.warning(
                                             f"Timeout downloading: {image_url}"
                                         )
-
                                         failed_count += 1
-
                                         processed_images += 1
-
                                         _download_task["progress"] = processed_images
-
                                         failed_items.append(image_url)
-
                                     except Exception as e:
-
                                         logger.error(
                                             f"Error downloading {image_url}: {e}"
                                         )
-
                                         failed_count += 1
-
                                         processed_images += 1
-
                                         _download_task["progress"] = processed_images
-
                                         failed_items.append(image_url)
-
                     except json.decoder.JSONDecodeError as e:
-
                         logger.warning(f"Failed to parse JSON in {metadata_path}: {e}")
-
                     except Exception as e:
-
                         logger.warning(f"Error processing {metadata_path}: {e}")
-
     except Exception as e:
-
         logger.error(f"Error scanning for prompt examples: {e}")
-
         return web.json_response(
             {"success": False, "message": f"扫描失败: {str(e)}"}, status=500
         )
-
     finally:
-
         session.close()
-
         _download_task["running"] = False
 
     logger.info(
@@ -1213,6 +1367,164 @@ PromptServer.instance.routes.get("/prompt_manage/reference/cancel")(cancel_downl
 PromptServer.instance.routes.get("/prompt_manage/reference/status")(get_download_status)
 PromptServer.instance.routes.get("/prompt_manage/example/image")(get_example_image)
 PromptServer.instance.routes.get("/prompt_manage/cache/image")(get_cache_image)
+
+# ===== Prompt Reader 相关 API =====
+
+# 检查 prompt_reader 是否已经在运行
+prompt_reader_process = None
+PROMPT_READER_URL = "http://127.0.0.1:8765"
+
+
+async def start_prompt_reader(request):
+    """启动 Prompt Reader 服务器"""
+    global prompt_reader_process
+
+    try:
+        # 检查端口是否被占用（更可靠的方法）
+        if is_port_in_use(8765):
+            logger.info("Prompt Reader already running on port 8765")
+            return web.json_response({"status": "success", "url": PROMPT_READER_URL, "message": "Prompt Reader 已经在运行"})
+
+        # 检查进程是否也在运行（作为备用检查）
+        if prompt_reader_process and prompt_reader_process.poll() is None:
+            logger.info("Prompt Reader process still running")
+            return web.json_response({"status": "success", "url": PROMPT_READER_URL, "message": "Prompt Reader 已经在运行"})
+
+        # 获取 prompt_reader 目录
+        script_dir = os.path.dirname(__file__)
+        prompt_reader_dir = os.path.join(script_dir, "prompt_reader")
+        app_py = os.path.join(prompt_reader_dir, "app.py")
+
+        # 检查 app.py 是否存在
+        if not os.path.exists(app_py):
+            return web.json_response(
+                {"status": "error", "message": f"Prompt Reader 未找到: {app_py}"},
+                status=404
+            )
+
+        # 启动新进程运行 prompt_reader
+        # Windows 上需要 CREATE_NEW_PROCESS_GROUP 来避免 Ctrl+C 影响
+        if sys.platform == "win32":
+            # 使用 CREATE_NEW_PROCESS_GROUP 标志在新窗口中启动
+            creation_flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+            # 使用 start 命令在新窗口中启动
+            start_cmd = f'start "Prompt Reader" cmd /c "cd /d {prompt_reader_dir} && python app.py"'
+            subprocess.Popen(start_cmd, shell=True)
+        else:
+            # Linux/Mac
+            subprocess.Popen(
+                [sys.executable, app_py],
+                cwd=prompt_reader_dir,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+
+        logger.info(f"Starting Prompt Reader at {PROMPT_READER_URL}")
+
+        # 等待一下让服务器启动
+        await asyncio.sleep(2)
+
+        return web.json_response({
+            "status": "success",
+            "url": PROMPT_READER_URL,
+            "message": "Prompt Reader 已启动"
+        })
+
+    except Exception as e:
+        logger.error(f"Error starting prompt reader: {e}")
+        return web.json_response(
+            {"status": "error", "message": f"启动失败: {str(e)}"},
+            status=500
+        )
+
+
+# 添加路由
+PromptServer.instance.routes.post("/prompt_manage/start_prompt_reader")(start_prompt_reader)
+
+
+# ===== 下载脚本相关 API =====
+
+async def download_by_civitaiwebnum(request):
+    """执行 download_by_civitaiwebnum.py"""
+    try:
+        script_dir = os.path.dirname(__file__)
+        script_path = os.path.join(script_dir, "downloadScripts", "download_by_civitaiwebnum.py")
+
+        if not os.path.exists(script_path):
+            return web.json_response(
+                {"status": "error", "message": f"Script not found: {script_path}"},
+                status=404
+            )
+
+        # 在新窗口中执行脚本
+        if sys.platform == "win32":
+            download_scripts_dir = os.path.join(script_dir, "downloadScripts")
+            start_cmd = f'start "Download by CivitAI" cmd /c "cd /d {download_scripts_dir} && python download_by_civitaiwebnum.py"'
+            subprocess.Popen(start_cmd, shell=True)
+        else:
+            subprocess.Popen(
+                [sys.executable, script_path],
+                cwd=os.path.join(script_dir, "downloadScripts"),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+
+        logger.info(f"Started download_by_civitaiwebnum.py")
+        return web.json_response({
+            "status": "success",
+            "message": "Download by CivitAI started in new window"
+        })
+
+    except Exception as e:
+        logger.error(f"Error starting download_by_civitaiwebnum: {e}")
+        return web.json_response(
+            {"status": "error", "message": f"Failed to start: {str(e)}"},
+            status=500
+        )
+
+
+async def download_lora_images(request):
+    """执行 download_lora_images.py"""
+    try:
+        script_dir = os.path.dirname(__file__)
+        script_path = os.path.join(script_dir, "downloadScripts", "download_lora_images.py")
+
+        if not os.path.exists(script_path):
+            return web.json_response(
+                {"status": "error", "message": f"Script not found: {script_path}"},
+                status=404
+            )
+
+        # 在新窗口中执行脚本
+        if sys.platform == "win32":
+            download_scripts_dir = os.path.join(script_dir, "downloadScripts")
+            start_cmd = f'start "Download Lora Images" cmd /c "cd /d {download_scripts_dir} && python download_lora_images.py"'
+            subprocess.Popen(start_cmd, shell=True)
+        else:
+            subprocess.Popen(
+                [sys.executable, script_path],
+                cwd=os.path.join(script_dir, "downloadScripts"),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+
+        logger.info(f"Started download_lora_images.py")
+        return web.json_response({
+            "status": "success",
+            "message": "Download Lora Images started in new window"
+        })
+
+    except Exception as e:
+        logger.error(f"Error starting download_lora_images: {e}")
+        return web.json_response(
+            {"status": "error", "message": f"Failed to start: {str(e)}"},
+            status=500
+        )
+
+
+# 添加路由
+PromptServer.instance.routes.post("/prompt_manage/download_by_civitaiwebnum")(download_by_civitaiwebnum)
+PromptServer.instance.routes.post("/prompt_manage/download_lora_images")(download_lora_images)
 
 # 静态文件服务
 web_dir = os.path.join(os.path.dirname(__file__), "web")

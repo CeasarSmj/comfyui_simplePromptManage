@@ -33,11 +33,14 @@ let referenceCategories = [];
 let referenceSearchText = "";
 let referenceDataLoaded = false;
 let currentRightTab = "generator";
+let referenceSelectedIndexes = [];  // 保存提示词参考的选择状态
 // 分页加载相关变量
-let referencePageSize = 200;  // 每次加载200张
+let referencePageSize = 100;  // 每次加载100张
 let referenceCurrentPage = 0;  // 当前页码
-let referenceFilteredData = [];  // 筛选后的数据
+let referenceTotalCount = 0;  // 总数量
+let referenceHasMore = true;  // 是否还有更多数据
 let referenceLoadingMore = false;  // 是否正在加载更多
+let referenceLoadedItemsCount = 0;  // 已加载的项目数量
 
 
 // 加载翻译和LLM模板
@@ -87,7 +90,9 @@ Promise.all([
             add_positive: "➕ 加入正向 (P)",
             add_negative: "➖ 加入负向 (N)",
             add_auto: "➕ 加入",
-            llm_generator_btn: "🤖 LLM提示词生成",
+            llm_generator_btn: "🤖 LLM生成",
+            // prompt_reader_btn 使用固定文本，不需要翻译
+            // prompt_reader_btn: "🖼️ Lora示例查看",
             llm_title: "🤖 LLM 大模型提示词生成器",
             llm_input_label: "需求输入（自然语言）:",
             llm_output_label: "生成的提示词模板:",
@@ -213,6 +218,7 @@ function initializeApp() {
 // 更新页面文本
 function updateUI() {
     const t = translations[currentLang];
+    console.log('[PromptManage] updateUI called, lang:', currentLang, 'translations:', t);
 
     // 如果翻译数据未加载,则不更新UI
     if (!t) {
@@ -403,6 +409,17 @@ function updateUI() {
         llmGeneratorBtn.textContent = t.llm_generator_btn;
     }
 
+    // 更新按钮文本
+    const promptReaderBtn = document.getElementById("promptReaderBtn");
+    if (promptReaderBtn) {
+        promptReaderBtn.textContent = t.prompt_reader_btn;
+    }
+
+    const downloadLoraImagesBtn = document.getElementById("downloadLoraImagesBtn");
+    if (downloadLoraImagesBtn) {
+        downloadLoraImagesBtn.textContent = t.download_lora_btn;
+    }
+
     // 更新提示词参考面板
     const referenceSearchInput = document.getElementById("referenceSearchInput");
     if (referenceSearchInput) {
@@ -444,6 +461,13 @@ function updateUI() {
 
     if (llmGeneratorBtnEl) {
         llmGeneratorBtnEl.textContent = t.llm_generator_btn;
+    }
+    const promptReaderBtnEl = document.getElementById("promptReaderBtn");
+    if (promptReaderBtnEl) {
+        promptReaderBtnEl.textContent = t.prompt_reader_btn;
+    }
+    if (downloadLoraImagesBtn) {
+        downloadLoraImagesBtn.textContent = t.download_lora_btn;
     }
     if (llmModalTitle) {
         llmModalTitle.textContent = t.llm_title;
@@ -508,6 +532,12 @@ function updateUI() {
         const currentCategory = referenceCategory.value;
         updateReferenceCategories();
         referenceCategory.value = currentCategory;
+    }
+
+    // 更新提示词参考面板的取消选择按钮
+    const referenceDeselectBtn = document.getElementById("referenceDeselectBtn");
+    if (referenceDeselectBtn) {
+        referenceDeselectBtn.textContent = t.reference_deselect_btn || "✕ 取消选择";
     }
 
     // 重新渲染提示词参考列表以更新语言相关的文本
@@ -1040,6 +1070,34 @@ llmGeneratorBtn.onclick = () => {
     llmInput.focus();
 };
 
+// ===== Prompt Reader 按钮 =====
+const promptReaderBtn = document.getElementById("promptReaderBtn");
+if (promptReaderBtn) {
+    promptReaderBtn.onclick = async () => {
+        try {
+            // 调用后端 API 启动 prompt_reader 服务器
+            const response = await fetch(`${API_BASE}/start_prompt_reader`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // 在新标签页中打开 prompt_reader 网页
+                window.open(data.url, '_blank');
+            } else {
+                console.error('Failed to start prompt reader:', response.statusText);
+                alert('启动 Prompt Reader 失败，请检查控制台');
+            }
+        } catch (error) {
+            console.error('Error starting prompt reader:', error);
+            alert('启动 Prompt Reader 时出错: ' + error.message);
+        }
+    };
+}
+
 // 关闭Modal
 function closeModal() {
     modal.style.display = "none";
@@ -1063,7 +1121,7 @@ document.addEventListener("keydown", (e) => {
 
 
 // 生成提示词模板
-llmGenerateBtn.onclick = () => {
+llmGenerateBtn.onclick = async () => {
     const t = translations[currentLang];
     const userDemand = llmInput.value.trim();
     if (!userDemand) {
@@ -1104,9 +1162,32 @@ llmGenerateBtn.onclick = () => {
         availablePrompts += "\n【已选择的Lora】\n" + loraInfo;
     }
 
+    // 获取右侧提示词参考中选中的示例
+    let referenceExamples = "";
+    if (referenceSelectedIndexes.length > 0) {
+        try {
+            // 从后端获取选中的提示词参考数据
+            const params = new URLSearchParams();
+            referenceSelectedIndexes.forEach(id => params.append("ids", id));
+            const res = await fetch(`${API_BASE}/reference/get_by_ids?${params.toString()}`, { method: "GET" });
+            if (res.ok) {
+                const data = await res.json();
+                const examples = data.references || [];
+                if (examples.length > 0) {
+                    referenceExamples = examples.map(item => 
+                        `- ${item.lora_name} (${item.category || "unknown"}):\n  Positive: ${item.prompt}${item.negative_prompt ? `\n  Negative: ${item.negative_prompt}` : ""}`
+                    ).join("\n\n");
+                }
+            }
+        } catch (err) {
+            console.error("[PromptManage] Error fetching reference examples:", err);
+        }
+    }
+
     // 从加载的模板生成
     const template = window.llmTemplates[currentLang]
         .replace('${availablePrompts}', availablePrompts)
+        .replace('${referenceExamples}', referenceExamples)
         .replace('${userDemand}', userDemand);
 
     llmOutput.value = template;
@@ -1184,6 +1265,15 @@ async function loadLoraData() {
 
         // 标记Lora数据已加载
         loraDataLoaded = true;
+
+        // 启用 CivitAI更新按钮
+        const loraRefreshBtn = document.getElementById("loraRefreshBtn");
+        if (loraRefreshBtn) {
+            loraRefreshBtn.disabled = false;
+            loraRefreshBtn.style.opacity = "1";
+            loraRefreshBtn.style.cursor = "pointer";
+            console.log("[PromptManage] Lora refresh button enabled");
+        }
     } catch (err) {
         console.error("[PromptManage] Error loading lora data:", err);
         console.error("[PromptManage] Stack:", err.stack);
@@ -1321,47 +1411,47 @@ document.getElementById("loraDeselectBtn").addEventListener("click", () => {
 });
 
 // Lora联网更新按钮 - 现在支持从CivitAI获取模型
-// document.getElementById("loraRefreshBtn").addEventListener("click", async () => {
-//     const t = translations[currentLang];
-//     const btn = document.getElementById("loraRefreshBtn");
+document.getElementById("loraRefreshBtn").addEventListener("click", async () => {
+    const t = translations[currentLang];
+    const btn = document.getElementById("loraRefreshBtn");
 
-//     // 禁用按钮并显示加载状态
-//     btn.disabled = true;
-//     const originalText = btn.textContent;
-//     btn.textContent = "⏳ 更新中...";
+    // 禁用按钮并显示加载状态
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = "⏳ 更新中...";
 
-//     try {
-//         // 调用后端API进行更新
-//         const response = await fetch("/prompt_manage/lora/refresh?mode=all");
-//         const result = await response.json();
+    try {
+        // 调用后端API进行更新
+        const response = await fetch("/prompt_manage/lora/refresh?mode=all");
+        const result = await response.json();
 
-//         if (result.success) {
-//             // 更新成功，重新加载Lora数据
-//             alert(t.lora_refresh_success || result.message);
-//             await loadLoraData();
-//             // 恢复之前选中的类别
-//             const categorySelect = document.getElementById("loraCategory");
-//             const savedCategory = localStorage.getItem("loraCategory") || "";
-//             categorySelect.value = savedCategory;
-//             renderLoraList(savedCategory);
-//         } else {
-//             alert(t.lora_refresh_failed || `更新失败: ${result.message}`);
-//         }
-//     } catch (err) {
-//         console.error("[PromptManage] Lora refresh error:", err);
-//         alert(t.lora_refresh_error || "更新过程中出错，请检查浏览器控制台");
-//     } finally {
-//         // 恢复按钮状态
-//         btn.disabled = true;
-//         btn.textContent = originalText;
-//     }
-// });
+        if (result.success) {
+            // 更新成功，重新加载Lora数据
+            alert(t.lora_refresh_success || result.message);
+            await loadLoraData();
+            // 恢复之前选中的类别
+            const categorySelect = document.getElementById("loraCategory");
+            const savedCategory = localStorage.getItem("loraCategory") || "";
+            categorySelect.value = savedCategory;
+            renderLoraList(savedCategory);
+        } else {
+            alert(t.lora_refresh_failed || `更新失败: ${result.message}`);
+        }
+    } catch (err) {
+        console.error("[PromptManage] Lora refresh error:", err);
+        alert(t.lora_refresh_error || "更新过程中出错，请检查浏览器控制台");
+    } finally {
+        // 恢复按钮状态
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+});
 
 // 启用Lora联网更新按钮
-// const loraRefreshBtn = document.getElementById("loraRefreshBtn");
-// loraRefreshBtn.disabled = true;
-// loraRefreshBtn.style.opacity = "1";
-// loraRefreshBtn.style.cursor = "pointer";
+const loraRefreshBtn = document.getElementById("loraRefreshBtn");
+loraRefreshBtn.disabled = false;
+loraRefreshBtn.style.opacity = "1";
+loraRefreshBtn.style.cursor = "pointer";
 
 // Lora搜索框事件
 document.getElementById("loraSearchInput").addEventListener("input", (e) => {
@@ -1369,7 +1459,7 @@ document.getElementById("loraSearchInput").addEventListener("input", (e) => {
     const category = document.getElementById("loraCategory").value;
     renderLoraList(category);
 });
-// loraRefreshBtn.title = "从CivitAI更新Lora模型的metadata和预览图像";
+loraRefreshBtn.title = "从CivitAI更新Lora模型的metadata和预览图像";
 
 // 添加Lora到生成器
 function addLoraToGenerator() {
@@ -1455,11 +1545,17 @@ function updateLoraText() {
 
 // ===== 提示词参考功能 =====
 
-// 加载提示词参考数据
+// 加载提示词参考数据（只加载类别列表）
 async function loadReferenceData() {
     try {
-        console.log("[PromptManage] Starting to load reference data from:", API_BASE + "/reference/list");
-        const res = await fetch(API_BASE + "/reference/list", { method: "GET" });
+        console.log("[PromptManage] Starting to load reference categories from:", API_BASE + "/reference/list");
+        
+        // 先获取类别列表（offset=0, limit=0 只返回类别和数据哈希）
+        const params = new URLSearchParams();
+        params.append("offset", "0");
+        params.append("limit", "0");
+        
+        const res = await fetch(`${API_BASE}/reference/list?${params.toString()}`, { method: "GET" });
         console.log("[PromptManage] Fetch response status:", res.status, res.statusText);
 
         if (!res.ok) {
@@ -1472,18 +1568,41 @@ async function loadReferenceData() {
         const data = await res.json();
         console.log("[PromptManage] Received reference data:", data);
 
-        referenceData = data.references || [];
         referenceCategories = data.categories || [];
 
-        console.log(`[PromptManage] Loaded ${referenceData.length} references in ${referenceCategories.length} categories:`, referenceCategories);
+        console.log(`[PromptManage] Loaded ${referenceCategories.length} categories:`, referenceCategories);
 
-        // 标记数据已加载
+        // 标记类别已加载
         referenceDataLoaded = true;
+
+        // 恢复选中状态
+        restoreReferenceSelectedIndexes();
 
         // 直接更新UI，不等待翻译加载
         updateReferenceCategories();
-        // 初始化第一页数据
-        initReferencePagination("");
+
+        // 设置默认类别为 selected（如果存在）
+        const categorySelect = document.getElementById("referenceCategory");
+        if (referenceCategories.length > 0) {
+            // 优先使用 selected 作为默认类别
+            if (referenceCategories.includes("selected")) {
+                categorySelect.value = "selected";
+                console.log("[PromptManage] Set default category to: selected");
+            } else {
+                // 如果没有 selected，使用第一个类别
+                categorySelect.value = referenceCategories[0];
+                console.log("[PromptManage] Set default category to:", referenceCategories[0]);
+            }
+            // 初始化第一页数据
+            initReferencePagination(categorySelect.value);
+        } else {
+            // 如果没有类别，显示空状态
+            categorySelect.value = "";
+            initReferencePagination("");
+        }
+
+        // 更新取消选择按钮的显示状态
+        updateReferenceDeselectButton();
     } catch (err) {
         console.error("[PromptManage] Error loading reference data:", err);
         console.error("[PromptManage] Stack:", err.stack);
@@ -1510,113 +1629,153 @@ function updateReferenceCategories() {
     }
 }
 
+// 保存提示词参考的选中状态到 localStorage
+function saveReferenceSelectedIndexes() {
+    localStorage.setItem("referenceSelectedIndexes", JSON.stringify(referenceSelectedIndexes));
+}
+
+// 从 localStorage 恢复提示词参考的选中状态
+function restoreReferenceSelectedIndexes() {
+    const saved = localStorage.getItem("referenceSelectedIndexes");
+    if (saved) {
+        try {
+            referenceSelectedIndexes = JSON.parse(saved);
+        } catch (e) {
+            console.error("[PromptManage] Failed to parse referenceSelectedIndexes:", e);
+            referenceSelectedIndexes = [];
+        }
+    }
+}
+
+// 更新取消选择按钮的显示状态
+function updateReferenceDeselectButton() {
+    const deselectBtn = document.getElementById("referenceDeselectBtn");
+    if (deselectBtn) {
+        deselectBtn.style.display = referenceSelectedIndexes.length > 0 ? "inline-block" : "none";
+    }
+}
+
 // 初始化参考列表分页
 function initReferencePagination(category = "") {
-    // 筛选数据
-    referenceFilteredData = referenceData.filter((item) => {
-        // 检查类别筛选
-        if (category && item.category !== category) return false;
-        // 检查搜索（模糊搜索）
-        if (referenceSearchText) {
-            const searchLower = referenceSearchText.toLowerCase();
-            const matchLora = item.lora_name.toLowerCase().includes(searchLower);
-            const matchPrompt = item.prompt.toLowerCase().includes(searchLower);
-            if (!matchLora && !matchPrompt) return false;
-        }
-        return true;
-    });
-
-    // 重置页码
+    // 重置页码、总数量和已加载项目计数
     referenceCurrentPage = 0;
+    referenceTotalCount = 0;
+    referenceLoadedItemsCount = 0;
+    referenceHasMore = true;
 
     // 清空列表
     const list = document.getElementById("referenceList");
     list.innerHTML = "";
 
-    // 加载第一页
-    loadMoreReferenceItems();
+    // 加载第一页数据
+    loadMoreReferenceItems(category);
 }
 
 // 加载更多参考项
-function loadMoreReferenceItems() {
+async function loadMoreReferenceItems(category = "") {
     if (referenceLoadingMore) return;
-    if (referenceCurrentPage * referencePageSize >= referenceFilteredData.length) return;
+    if (!referenceHasMore) return;
 
     referenceLoadingMore = true;
 
-    const list = document.getElementById("referenceList");
-    const startIndex = referenceCurrentPage * referencePageSize;
-    const endIndex = Math.min(startIndex + referencePageSize, referenceFilteredData.length);
+    const categorySelect = document.getElementById("referenceCategory");
+    const currentCategory = category || categorySelect.value;
 
-    for (let i = startIndex; i < endIndex; i++) {
-        const item = referenceFilteredData[i];
-        const div = document.createElement("div");
-        div.className = "reference-item";
-
-        // 创建名称和类别的容器
-        let nameWithCategory = `<div class="lora-name-row"><strong>${item.lora_name}</strong>`;
-        if (item.category) {
-            nameWithCategory += `<span class="lora-category">${item.category}</span>`;
-        }
-        nameWithCategory += `</div>`;
-
-        // 统一布局：左侧图片，右侧文字
-        let innerHTML = "";
-
-        // 图片部分
-        if (item.image_url) {
-            const t = translations[currentLang] || {};
-            const loadFailedText = encodeURIComponent(t.load_failed || "加载失败");
-            innerHTML += `<img src="${item.image_url}" alt="${item.lora_name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Crect fill=%22%23ccc%22 width=%22180%22 height=%22180%22/%3E%3Ctext fill=%22%23666%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E${loadFailedText}%3C/text%3E%3C/svg%3E'">`;
-        }
-
-        // 文字内容部分
-        innerHTML += `<div class="text-content">`;
-        innerHTML += nameWithCategory;
-        innerHTML += `<textarea class="prompt-textarea" readonly>${item.prompt}</textarea>`;
-        if (item.negative_prompt) {
-            innerHTML += `<textarea class="negative-textarea" readonly>${item.negative_prompt}</textarea>`;
-        }
-        innerHTML += `</div>`;
-
-        div.innerHTML = innerHTML;
-
-        // 点击复制提示词到生成器
-        div.onclick = () => {
-            // 复制提示词到正向提示词文本框
-            const positiveText = document.getElementById("positiveText");
-            const currentText = positiveText.value.trim();
-            const newPrompt = item.prompt;
-
-            if (currentText) {
-                positiveText.value = currentText + ",\n" + newPrompt;
-            } else {
-                positiveText.value = newPrompt;
-            }
-
-            // 如果有负向提示词，也复制到负向文本框
-            if (item.negative_prompt) {
-                const negativeText = document.getElementById("negativeText");
-                const currentNegative = negativeText.value.trim();
-                if (currentNegative) {
-                    negativeText.value = currentNegative + ",\n" + item.negative_prompt;
-                } else {
-                    negativeText.value = item.negative_prompt;
-                }
-            }
-
-            // 添加视觉反馈
-            div.style.borderColor = "var(--success-color)";
-            setTimeout(() => {
-                div.style.borderColor = "";
-            }, 500);
-        };
-
-        list.appendChild(div);
+    // 构建API参数
+    const params = new URLSearchParams();
+    if (currentCategory) {
+        params.append("category", currentCategory);
     }
+    if (referenceSearchText) {
+        params.append("search", referenceSearchText);
+    }
+    params.append("offset", referenceLoadedItemsCount);
+    params.append("limit", referencePageSize);
 
-    referenceCurrentPage++;
-    referenceLoadingMore = false;
+    try {
+        console.log("[PromptManage] Loading reference items with params:", params.toString());
+        const res = await fetch(`${API_BASE}/reference/list?${params.toString()}`, { method: "GET" });
+        const data = await res.json();
+
+        if (!res.ok) {
+            console.error(`[PromptManage] Failed to load reference items: HTTP ${res.status}`);
+            return;
+        }
+
+        console.log("[PromptManage] Received reference items:", data);
+
+        // 更新总数量和加载状态
+        if (referenceLoadedItemsCount === 0) {
+            referenceTotalCount = data.total || 0;
+        }
+        referenceHasMore = data.has_more || false;
+
+        // 渲染新加载的项目
+        const list = document.getElementById("referenceList");
+        const items = data.references || [];
+
+        for (const item of items) {
+            const div = document.createElement("div");
+            // 检查是否已选中
+            const isSelected = referenceSelectedIndexes.includes(item.id);
+            div.className = "reference-item" + (isSelected ? " selected" : "");
+
+            // 创建名称和类别的容器
+            let nameWithCategory = `<div class="lora-name-row"><strong>${item.lora_name}</strong>`;
+            if (item.category) {
+                nameWithCategory += `<span class="lora-category">${item.category}</span>`;
+            }
+            nameWithCategory += `</div>`;
+
+            // 统一布局：左侧图片，右侧文字
+            let innerHTML = "";
+
+            // 图片部分
+            if (item.image_url) {
+                const t = translations[currentLang] || {};
+                const loadFailedText = encodeURIComponent(t.load_failed || "加载失败");
+                innerHTML += `<img src="${item.image_url}" alt="${item.lora_name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Crect fill=%22%23ccc%22 width=%22180%22 height=%22180%22/%3E%3Ctext fill=%22%23666%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E${loadFailedText}%3C/text%3E%3C/svg%3E'">`;
+            }
+
+            // 文字内容部分
+            innerHTML += `<div class="text-content">`;
+            innerHTML += nameWithCategory;
+            innerHTML += `<textarea class="prompt-textarea" readonly>${item.prompt}</textarea>`;
+            if (item.negative_prompt) {
+                innerHTML += `<textarea class="negative-textarea" readonly>${item.negative_prompt}</textarea>`;
+            }
+            innerHTML += `</div>`;
+
+            div.innerHTML = innerHTML;
+
+            // 点击事件：处理多选逻辑
+            div.onclick = () => {
+                // 多选逻辑：点击一次选中，再点击取消
+                if (referenceSelectedIndexes.includes(item.id)) {
+                    referenceSelectedIndexes = referenceSelectedIndexes.filter(id => id !== item.id);
+                    div.classList.remove("selected");
+                } else {
+                    referenceSelectedIndexes.push(item.id);
+                    div.classList.add("selected");
+                }
+                // 持久化保存选中状态
+                saveReferenceSelectedIndexes();
+                // 更新取消选择按钮的显示状态
+                updateReferenceDeselectButton();
+            };
+
+            list.appendChild(div);
+        }
+
+        // 更新已加载项目计数
+        referenceLoadedItemsCount += items.length;
+        referenceCurrentPage++;
+    } catch (err) {
+        console.error("[PromptManage] Error loading reference items:", err);
+        console.error("[PromptManage] Stack:", err.stack);
+    } finally {
+        referenceLoadingMore = false;
+    }
 }
 
 // 滚动加载更多
@@ -1636,9 +1795,16 @@ function handleScroll() {
     const scrollHeight = list.scrollHeight;
     const clientHeight = list.clientHeight;
 
-    // 当滚动到底部1/4时加载更多
-    if (scrollTop + clientHeight >= scrollHeight - scrollHeight / 4) {
-        loadMoreReferenceItems();
+    // 计算剩余未显示的项目数量
+    const remainingScroll = scrollHeight - (scrollTop + clientHeight);
+    // 估算每个项目的高度（假设平均高度为150px）
+    const estimatedItemHeight = 150;
+    const estimatedRemainingItems = Math.ceil(remainingScroll / estimatedItemHeight);
+
+    // 当剩余未显示的项目少于50条时，加载更多
+    if (estimatedRemainingItems < 50 && referenceHasMore && !referenceLoadingMore) {
+        const categorySelect = document.getElementById("referenceCategory");
+        loadMoreReferenceItems(categorySelect.value);
     }
 }
 
@@ -1696,7 +1862,10 @@ async function downloadPromptExamples() {
     checkDownloadStatus();
 
     try {
-        const response = await fetch("/prompt_manage/reference/download");
+        // 调用 download_by_civitaiwebnum.py
+        const response = await fetch("/prompt_manage/download_by_civitaiwebnum", {
+            method: "POST"
+        });
         const result = await response.json();
 
         if (result.success) {
@@ -1787,3 +1956,47 @@ function renderDownloadProgress(categoryProgress) {
 
 // 下载示例图按钮事件
 document.getElementById("downloadExamplesBtn").addEventListener("click", downloadPromptExamples);
+
+// DownloadLoraImages 按钮事件
+async function downloadLoraImages() {
+    const btn = document.getElementById("downloadLoraImagesBtn");
+
+    if (!btn) return;
+
+    // 禁用按钮并显示加载状态
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    const t = translations[currentLang] || {};
+    btn.textContent = `⏳ Downloading...`;
+
+    try {
+        const response = await fetch("/prompt_manage/download_lora_images", {
+            method: "POST"
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            alert(result.message || "Download completed successfully!");
+        } else {
+            alert(result.message || "Download failed");
+        }
+    } catch (err) {
+        console.error("[PromptManage] Download Lora Images error:", err);
+        alert("Download failed: " + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+document.getElementById("downloadLoraImagesBtn").addEventListener("click", downloadLoraImages);
+
+// 提示词参考取消选择按钮事件
+document.getElementById("referenceDeselectBtn").addEventListener("click", () => {
+    referenceSelectedIndexes = [];
+    saveReferenceSelectedIndexes();
+    updateReferenceDeselectButton();
+    // 重新渲染当前列表以更新选中状态
+    const categorySelect = document.getElementById("referenceCategory");
+    renderReferenceList(categorySelect.value);
+});

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
 独立的 Lora 图像下载脚本
-从 Lora metadata 文件中读取提示词信息，下载示例图并写入 PNG metadata
+从 ComfyUI 的 Lora metadata 文件中读取提示词信息，下载示例图并写入 PNG metadata
 
 使用方法:
     python download_images.py [--lora-dir PATH] [--output-dir PATH]
 
 参数:
     --lora-dir: Lora 模型目录路径 (默认: ComfyUI/models/loras)
-    --output-dir: 输出目录路径 (默认: lora_prompt_examples)
+    --output-dir: 输出目录路径 (默认: lora_prompts)
 """
 
 import os
@@ -62,6 +62,24 @@ def write_png_metadata(image_path, metadata):
         return False
     except Exception as e:
         logger.error(f"Error writing PNG metadata: {e}")
+        return False
+
+
+def save_json_metadata(image_path, metadata):
+    """将 metadata 保存为同名的 JSON 文件"""
+    try:
+        json_path = Path(image_path).with_suffix('.json')
+        
+        # 添加提取时间戳
+        json_metadata = metadata.copy()
+        import time
+        json_metadata["extracted_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(json_metadata, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception as e:
+        logger.error(f"Error saving JSON metadata: {e}")
         return False
 
 
@@ -218,8 +236,10 @@ def scan_and_download(lora_dir, output_dir):
                                         "lora_category": category,
                                     }
 
-                                    # 写入 PNG metadata
+                                    # 写入 PNG metadata 和 JSON 文件
                                     if write_png_metadata(save_path, png_metadata):
+                                        # 同时保存 JSON 文件
+                                        save_json_metadata(save_path, png_metadata)
                                         success_count += 1
                                         logger.info(f"  成功: {filename}")
                                     else:
@@ -265,7 +285,7 @@ def main():
         "--output-dir",
         type=str,
         default=None,
-        help="输出目录路径 (默认: lora_prompt_examples)"
+        help="输出目录路径 (默认: lora_prompts)"
     )
 
     args = parser.parse_args()
@@ -280,8 +300,8 @@ def main():
         lora_dir = os.path.abspath(args.lora_dir)
 
     if args.output_dir is None:
-        # 默认: 插件目录下的 lora_prompt_examples
-        output_dir = os.path.join(script_dir, "lora_prompt_examples")
+        # 默认: 插件目录下的 lora_prompts
+        output_dir = os.path.join(script_dir, "lora_prompts")
     else:
         output_dir = os.path.abspath(args.output_dir)
 

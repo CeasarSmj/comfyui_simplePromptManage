@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Reader - Prompt查看工具</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body data-theme="dark">
+    <div class="header">
+        <div class="header-content">
+            <h1>📖 Prompt Reader</h1>
+            <p>查看 lora_prompts 目录下的图像和 Prompt 信息</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- 控制栏 -->
+        <div class="control-bar">
+            <input type="text" id="searchInput" placeholder="🔍 搜索 Prompt 或 Lora 名称..." class="search-input">
+            <select id="categorySelect" class="category-select">
+                <option value="">全部类别</option>
+            </select>
+            <button id="refreshBtn" class="btn btn-primary">🔄 刷新</button>
+            <label class="detail-toggle">
+                <input type="checkbox" id="detailCheckbox">
+                <span>显示详情</span>
+            </label>
+        </div>
+        
+        <!-- 加载状态 -->
+        <div id="loadingIndicator" class="loading-indicator">
+            <div class="spinner"></div>
+            <span>加载中...</span>
+        </div>
+        
+        <!-- 图像网格 -->
+        <div id="imageGrid" class="image-grid"></div>
+        
+        <!-- 加载更多按钮 -->
+        <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+            <button id="loadMoreBtn" class="btn btn-secondary">加载更多</button>
+        </div>
+        
+        <!-- 空状态 -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">📭</div>
+            <p>没有找到相关内容</p>
+        </div>
+    </div>
+    
+    <!-- 详情模态框 -->
+    <div id="detailModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="modalTitle">Prompt 详情</h2>
+                <button class="modal-close-btn" id="modalCloseBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-image-container">
+                    <img id="modalImage" src="" alt="预览图">
+                </div>
+                <div class="modal-info">
+                    <div class="info-group">
+                        <h3>📌 基本信息</h3>
+                        <div class="info-row">
+                            <span class="info-label">文件名:</span>
+                            <span class="info-value" id="modalFileName">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">类别:</span>
+                            <span class="info-value" id="modalCategory">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Lora 名称:</span>
+                            <span class="info-value" id="modalLoraName">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-group">
+                        <h3>🎨 图像参数</h3>
+                        <div class="info-row">
+                            <span class="info-label">尺寸:</span>
+                            <span class="info-value" id="modalSize">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">步数:</span>
+                            <span class="info-value" id="modalSteps">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">采样器:</span>
+                            <span class="info-value" id="modalSampler">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">CFG Scale:</span>
+                            <span class="info-value" id="modalCfg">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Seed:</span>
+                            <span class="info-value" id="modalSeed">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">模型:</span>
+                            <span class="info-value" id="modalModel">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-group">
+                        <h3>✅ 正向 Prompt</h3>
+                        <div class="prompt-box">
+                            <pre id="modalPrompt">-</pre>
+                            <button class="copy-btn" id="copyPromptBtn" title="复制">📋</button>
+                        </div>
+                    </div>
+                    
+                    <div class="info-group">
+                        <h3>❌ 负向 Prompt</h3>
+                        <div class="prompt-box">
+                            <pre id="modalNegativePrompt">-</pre>
+                            <button class="copy-btn" id="copyNegativeBtn" title="复制">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="static/app.js"></script>
+</body>
+</html>

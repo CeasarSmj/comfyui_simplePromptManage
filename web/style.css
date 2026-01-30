@@ -532,6 +532,27 @@ body {
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
+/* 确保按钮文本始终可见 */
+.header-controls .btn {
+    min-width: fit-content;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 小屏幕适配 */
+@media (max-width: 1200px) {
+    .header-controls {
+        gap: 0.5rem;
+    }
+    .header-controls .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        max-width: 150px;
+    }
+}
+
 .btn-danger {
     background: linear-gradient(135deg, var(--danger-color) 0%, #dc2626 100%);
     color: white;

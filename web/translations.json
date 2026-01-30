@@ -28,7 +28,9 @@
         "add_positive": "➕ 加入正向 (P)",
         "add_negative": "➖ 加入负向 (N)",
         "add_auto": "➕ 加入",
-        "llm_generator_btn": "🤖 LLM提示词生成",
+        "llm_generator_btn": "🤖 LLM生成",
+        "prompt_reader_btn": "🖼️ Lora示例查看",
+        "download_lora_btn": "📥 下载Lora示例",
         "llm_title": "🤖 LLM 大模型提示词生成器",
         "llm_input_label": "需求输入（自然语言）:",
         "llm_output_label": "生成的提示词模板:",
@@ -81,7 +83,7 @@
         "usage_video_title": "📹 使用方法教程",
         "prompt_library_tab": "📚 提示词库",
         "lora_library_tab": "🎨 Lora库",
-        "lora_refresh_btn": "🔄 更新",
+        "lora_refresh_btn": "🌐 CivitAI更新",
         "lora_refresh_success": "Lora库已从CivitAI更新成功",
         "lora_refresh_failed": "Lora库更新失败",
         "lora_refresh_error": "更新过程中出错，请检查浏览器控制台获取详细信息",
@@ -109,7 +111,8 @@
         "trigger_words_label": "触发词: ",
         "load_failed": "加载失败",
         "direction_item_label": "方向: ",
-        "type_item_label": "类型: "
+        "type_item_label": "类型: ",
+        "reference_deselect_btn": "✕ 取消选择"
     },
     "en": {
         "title": "✨ Prompt Manager",
@@ -140,7 +143,9 @@
         "add_positive": "➕ Add Positive (P)",
         "add_negative": "➖ Add Negative (N)",
         "add_auto": "➕ Add",
-        "llm_generator_btn": "🤖 LLM Prompt Generator",
+        "llm_generator_btn": "🤖 LLM Generator",
+        "prompt_reader_btn": "🖼️ Lora Viewer",
+        "download_lora_btn": "📥 Download Lora Examples",
         "llm_title": "🤖 LLM Prompt Generator",
         "llm_input_label": "Input Your Demand (Natural Language):",
         "llm_output_label": "Generated Prompt Template:",
@@ -193,7 +198,7 @@
         "usage_video_title": "📹 Usage Video Tutorial",
         "prompt_library_tab": "📚 Prompt Library",
         "lora_library_tab": "🎨 Lora Library",
-        "lora_refresh_btn": "🔄 Refresh",
+        "lora_refresh_btn": "🌐 CivitAI Update",
         "lora_refresh_success": "Lora library updated from CivitAI successfully",
         "lora_refresh_failed": "Failed to update Lora library",
         "lora_refresh_error": "An error occurred during update. Check browser console for details",
@@ -221,6 +226,7 @@
         "trigger_words_label": "Trigger Words: ",
         "load_failed": "Load Failed",
         "direction_item_label": "Direction: ",
-        "type_item_label": "Type: "
+        "type_item_label": "Type: ",
+        "reference_deselect_btn": "✕ Deselect"
     }
 }

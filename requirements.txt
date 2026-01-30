@@ -1,0 +1,16 @@
+# ComfyUI Prompt Manager Requirements
+
+# Core dependencies
+aiohttp>=3.9.0
+Pillow>=10.0.0
+requests>=2.31.0
+
+# Optional: Performance optimization
+orjson>=3.9.0
+
+# Optional: Lora update service
+# aiofiles>=23.0.0
+
+# Optional: Download from CivitAI (for download_by_civitaiwebnum.py)
+# selenium>=4.15.0
+# webdriver-manager>=4.0.0
