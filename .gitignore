@@ -1,2 +1,5 @@
 __pycache__
 data/prompts.json
+lora_prompt_examples/*
+lora_prompt_examples/*.png
+cache/reference_images/*

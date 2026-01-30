@@ -2,6 +2,9 @@
 
 An elegant AI prompt and Lora library management and generation system designed for ComfyUI. Efficiently manage, search, and generate Stable Diffusion prompts while organizing Lora models.
 
+
+Recommand to use together with comfyui-lora-manager.
+
 ***
 NOTICE: English version of default prompts is available in `data/prompts_default_en.json`, just replace the context of `data/prompts.json` with `data/prompts_default_en.json` to use for English users.
 ***
@@ -36,11 +39,12 @@ Restart ComfyUI and visit `http://localhost:8188/prompt_manage_web/` or click th
 
 The plugin has three main sections:
 
-| Section | Purpose |
-|---------|---------|
-| **Prompt Library** (Tab) | Manage prompts - Add, edit, delete, search prompts |
-| **Lora Library** (Tab) | Manage Lora models - Browse, categorize, organize local Lora models |
-| **Generator** (Right Panel) | Combine prompts and Lora to create positive/negative prompt pairs |
+| Section                     | Purpose                                                                  |
+| --------------------------- | ------------------------------------------------------------------------ |
+| **Prompt Library** (Tab)    | Manage prompts - Add, edit, delete, search prompts                       |
+| **Lora Library** (Tab)      | Manage Lora models - Browse, categorize, organize local Lora models      |
+| **Prompt Reference** (Tab)  | View and manage example images and prompts downloaded from Lora metadata |
+| **Generator** (Right Panel) | Combine prompts and Lora to create positive/negative prompt pairs        |
 
 Each prompt contains:
 - **Name**: Short identifier (e.g., "landscape", "beautiful woman")
@@ -50,6 +54,33 @@ Each prompt contains:
 - **Note** (optional): Usage tips and descriptions
 
 ---
+
+### 💡 Manage Prompt Reference
+
+#### Download Example Images
+1. Click the "💡 Prompt Reference" tab on the left
+2. Click the "📥 Download Examples" button
+3. The system will automatically download example images and prompts from CivitAI for Lora models
+4. Download progress for each directory will be displayed during the process
+5. After download, example images will appear in the list
+
+#### View and Use Prompts
+1. Browse example images in the prompt reference list
+2. Each example image displays:
+   - Thumbnail
+   - Positive prompt (scrollable to view full content)
+   - Negative prompt (if available)
+   - Generation parameters (steps, sampler, CFG, seed, etc.)
+3. Click any reference item to copy its prompt to the generator
+4. Use the search box to filter by Lora name or prompt content
+5. Use the category dropdown to filter by directory
+
+#### Download Features
+- **Smart Skip**: Existing files won't be downloaded again
+- **Empty Prompt Skip**: Images without prompts are skipped
+- **Cancellable**: Click the button again during download to cancel
+- **Progress Display**: Real-time download progress for each directory
+- **Parameter Saving**: All generation parameters saved to PNG metadata
 
 ## 🎯 Core Usage Methods
 
@@ -171,25 +202,25 @@ comfyui_PromptManage/
     ├── pic_loralib_cn.png      # Lora library screenshot (Chinese)
 #### Prompt Management API
 
-| Method | Endpoint | Function |
-|--------|----------|----------|
-| POST | `/prompt_manage/get` | Get all prompts |
-| POST | `/prompt_manage/add` | Add new prompt |
-| POST | `/prompt_manage/update` | Update specified prompt |
-| POST | `/prompt_manage/delete` | Delete specified prompt |
-| POST | `/prompt_manage/save` | Save all prompts |
+| Method | Endpoint                | Function                |
+| ------ | ----------------------- | ----------------------- |
+| POST   | `/prompt_manage/get`    | Get all prompts         |
+| POST   | `/prompt_manage/add`    | Add new prompt          |
+| POST   | `/prompt_manage/update` | Update specified prompt |
+| POST   | `/prompt_manage/delete` | Delete specified prompt |
+| POST   | `/prompt_manage/save`   | Save all prompts        |
 
 #### Lora Library API
 
-| Method | Endpoint | Function |
-|--------|----------|----------|
-| GET | `/prompt_manage/lora/list` | Get all Lora models list
-|--------|----------|----------|
-| POST | `/prompt_manage/get` | Get all prompts |
-| POST | `/prompt_manage/add` | Add new prompt |
-| POST | `/prompt_manage/update` | Update specified prompt |
-| POST | `/prompt_manage/delete` | Delete specified prompt |
-| POST | `/prompt_manage/save` | Save all prompts |
+| Method   | Endpoint                   | Function                 |
+| -------- | -------------------------- | ------------------------ |
+| GET      | `/prompt_manage/lora/list` | Get all Lora models list |
+| -------- | ----------                 | ----------               |
+| POST     | `/prompt_manage/get`       | Get all prompts          |
+| POST     | `/prompt_manage/add`       | Add new prompt           |
+| POST     | `/prompt_manage/update`    | Update specified prompt  |
+| POST     | `/prompt_manage/delete`    | Delete specified prompt  |
+| POST     | `/prompt_manage/save`      | Save all prompts         |
 
 #### API Usage Examples
 

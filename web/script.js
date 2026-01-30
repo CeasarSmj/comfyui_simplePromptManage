@@ -27,6 +27,19 @@ let loraDetailMode = false;
 let loraSearchText = "";
 let loraDataLoaded = false;  // 标志Lora数据是否已加载
 
+// 提示词参考变量
+let referenceData = [];
+let referenceCategories = [];
+let referenceSearchText = "";
+let referenceDataLoaded = false;
+let currentRightTab = "generator";
+// 分页加载相关变量
+let referencePageSize = 200;  // 每次加载200张
+let referenceCurrentPage = 0;  // 当前页码
+let referenceFilteredData = [];  // 筛选后的数据
+let referenceLoadingMore = false;  // 是否正在加载更多
+
+
 // 加载翻译和LLM模板
 Promise.all([
     fetch('translations.json').then(r => r.json()),
@@ -37,11 +50,115 @@ Promise.all([
     // 初始化应用
     initializeApp();
     loadPrompts();
+    // 恢复之前的右侧选项卡状态（必须在翻译加载完成后执行）
+    restoreRightTabState();
+    // 恢复之前的选项卡状态
+    restoreLeftTabState();
 }).catch(err => {
     console.error('Failed to load configuration files:', err);
+    // 加载失败时，提供默认的中文翻译，避免UI显示undefined
+    translations = {
+        zh: {
+            title: "✨ Prompt 管理系统",
+            subtitle: "优雅地管理和生成 AI 提示词",
+            library: "📚 提示词库",
+            search_placeholder: "🔍 搜索提示词...",
+            type_filter: "类型筛选",
+            fuzzy: "模糊",
+            exact: "精确",
+            add_title: "新增提示词",
+            edit_title: "编辑提示词",
+            name_placeholder: "名称",
+            note_placeholder: "备注（可选）",
+            text_placeholder: "输入提示词文本...",
+            add_btn: "✚ 添加",
+            confirm_edit_btn: "✓ 确认编辑",
+            edit_btn: "✏️ 编辑选中",
+            delete_btn: "🗑️ 删除选中",
+            cancel_edit_btn: "✕ 取消编辑",
+            alert_select: "请先选中一条提示词",
+            alert_required: "名称和提示词必填",
+            confirm_delete: "确认要删除提示词",
+            generator: "🎨 生成器",
+            positive: "✅ 正向提示词",
+            negative: "❌ 负向提示词",
+            positive_placeholder: "正向提示词将显示在这里...",
+            negative_placeholder: "负向提示词将显示在这里...",
+            add_positive: "➕ 加入正向 (P)",
+            add_negative: "➖ 加入负向 (N)",
+            add_auto: "➕ 加入",
+            llm_generator_btn: "🤖 LLM提示词生成",
+            llm_title: "🤖 LLM 大模型提示词生成器",
+            llm_input_label: "需求输入（自然语言）:",
+            llm_output_label: "生成的提示词模板:",
+            llm_input_placeholder: "例如：一个穿着红色连衣裙的女性，微笑，在花园里，阳光照耀，柔和光线...",
+            llm_generate_btn: "⚡ 生成",
+            llm_copy_btn: "📋 复制",
+            llm_copy_success: "✓ 已复制",
+            llm_no_input: "请输入需求说明",
+            llm_no_content: "没有内容可复制，请先点击生成",
+            llm_copy_failed: "复制失败，请手动复制",
+            search_mode_label: "搜索模式：",
+            no_filter: "无筛选",
+            direction_label: "方向：",
+            direction_none: "无",
+            direction_positive: "正向",
+            direction_negative: "反向",
+            type_label: "类型：",
+            quality: "质量",
+            style: "风格",
+            texture: "质感",
+            environment: "环境",
+            action: "动作",
+            expression: "表情",
+            clothing: "着装",
+            composition: "构图",
+            other: "其它",
+            detail_toggle: "显示细节",
+            deselect_btn: "✕ 取消选择",
+            clear_generator_btn: "🗑️ 全部清空",
+            light_mode: "☀️ 白天",
+            dark_mode: "🌙 黑夜",
+            prompt_library_tab: "📚 提示词库",
+            lora_library_tab: "🎨 Lora库",
+            lora_category_all: "全部",
+            lora_category_label: "类别：",
+            lora_detail_toggle: "显示细节",
+            llm_generator_info: "💡 说明：生成器部分的提示词和选中的 Lora 都会被加入到 LLM 的提示词中，确保生成的内容与当前选择保持一致。",
+            llm_usage_title: "📝 使用说明：",
+            llm_usage_step_1: "将上面生成的提示词模板复制",
+            llm_usage_step_2: "放入任何一个 LLM 大模型（如 ChatGPT、Claude、deepseek等）",
+            llm_usage_step_3: "大模型会根据你的需求生成优化后的 Stable Diffusion 提示词",
+            reference_tab: "💡 提示词参考",
+            search_reference_placeholder: "🔍 搜索提示词参考...",
+            reference_category_all: "全部类别",
+            reference_category_label: "类别：",
+            download_examples_btn: "📥 下载示例图",
+            download_cancelled: "下载已取消",
+            download_error: "下载过程中出错",
+            copy_prompt: "复制提示词",
+            downloading: "下载中",
+            scanning: "扫描中",
+            success: "成功",
+            failed: "失败",
+            skipped: "跳过",
+            trigger_words_label: "触发词: ",
+            load_failed: "加载失败",
+            direction_item_label: "方向: ",
+            type_item_label: "类型: "
+        }
+    };
+    window.llmTemplates = {};
+    console.warn('[PromptManage] Using fallback translations due to load failure');
+    // 初始化应用
+    initializeApp();
+    loadPrompts();
+    // 恢复之前的右侧选项卡状态（必须在翻译加载完成后执行）
+    restoreRightTabState();
+    // 恢复之前的选项卡状态
+    restoreLeftTabState();
 });
 
-// 获取ComfyUI的语言设置
 function getComfyUILanguage() {
     // 先尝试从app对象获取
     if (window.app && window.app.settings) {
@@ -52,18 +169,18 @@ function getComfyUILanguage() {
             // 如果失败，继续下一个方法
         }
     }
-    
+
     // 从localStorage获取ComfyUI的语言设置
     const storedLang = localStorage.getItem("Comfy.Settings.language");
     if (storedLang) return storedLang;
-    
+
     return null;
 }
 
 // 将ComfyUI语言转换为插件支持的语言
 function mapComfyLanguage(comfyLang) {
     if (!comfyLang) return null;
-    
+
     const langMap = {
         "zh": "zh",
         "zh_CN": "zh",
@@ -72,7 +189,7 @@ function mapComfyLanguage(comfyLang) {
         "en": "en",
         "en_US": "en"
     };
-    
+
     return langMap[comfyLang] || null;
 }
 
@@ -82,7 +199,7 @@ function initializeApp() {
     const comfyLang = getComfyUILanguage();
     const mappedLang = comfyLang ? mapComfyLanguage(comfyLang) : null;
     currentLang = mappedLang || localStorage.getItem("promptLang") || "zh";
-    
+
     document.documentElement.setAttribute("data-theme", currentTheme);
     document.documentElement.setAttribute("data-lang", currentLang);
     document.getElementById("themeToggle").value = currentTheme;
@@ -90,41 +207,112 @@ function initializeApp() {
     updateUI();
 }
 
+
+
+
 // 更新页面文本
 function updateUI() {
     const t = translations[currentLang];
-    
+
+    // 如果翻译数据未加载,则不更新UI
+    if (!t) {
+        console.warn('[PromptManage] Translations not loaded yet, skipping UI update');
+        return;
+    }
+
     // 更新 header
     document.querySelector(".header-main h1").textContent = t.title;
     document.querySelector(".header-main p").textContent = t.subtitle;
-    
+
     // 更新左侧面板
-    document.querySelector(".section-header h2").textContent = t.library;
-    document.getElementById("searchInput").placeholder = t.search_placeholder;
-    
-    const options = document.getElementById("searchMode").querySelectorAll("option");
-    options[0].textContent = t.fuzzy;
-    options[1].textContent = t.exact;
-    
-    document.querySelector(".add-form h3").textContent = t.add_title;
-    document.getElementById("newName").placeholder = t.name_placeholder;
-    document.getElementById("newNote").placeholder = t.note_placeholder;
-    document.getElementById("newText").placeholder = t.text_placeholder;
-    document.getElementById("addBtn").textContent = t.add_btn;
-    document.getElementById("confirmEditBtn").textContent = t.confirm_edit_btn;
-    document.getElementById("editBtn").textContent = t.edit_btn;
-    document.getElementById("deleteBtn").textContent = t.delete_btn;
-    document.getElementById("deselectBtn").textContent = t.deselect_btn;
-    document.getElementById("clearGeneratorBtn").textContent = t.clear_generator_btn;
-    document.getElementById("cancelEditBtn").textContent = t.cancel_edit_btn;
-    
+    const generatorTitle = document.getElementById("generatorTitle");
+    if (generatorTitle) {
+        generatorTitle.textContent = t.generator;
+    }
+
+    const positiveTitle = document.getElementById("positiveTitle");
+    if (positiveTitle) {
+        positiveTitle.textContent = t.positive;
+    }
+
+    const negativeTitle = document.getElementById("negativeTitle");
+    if (negativeTitle) {
+        negativeTitle.textContent = t.negative;
+    }
+
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+        searchInput.placeholder = t.search_placeholder;
+    }
+
+    const options = document.getElementById("searchMode")?.querySelectorAll("option");
+    if (options && options.length >= 2) {
+        options[0].textContent = t.fuzzy;
+        options[1].textContent = t.exact;
+    }
+
+    const addFormTitle = document.querySelector(".add-form h3");
+    if (addFormTitle) {
+        addFormTitle.textContent = t.add_title;
+    }
+
+    const newName = document.getElementById("newName");
+    if (newName) {
+        newName.placeholder = t.name_placeholder;
+    }
+
+    const newNote = document.getElementById("newNote");
+    if (newNote) {
+        newNote.placeholder = t.note_placeholder;
+    }
+
+    const newText = document.getElementById("newText");
+    if (newText) {
+        newText.placeholder = t.text_placeholder;
+    }
+
+    const addBtn = document.getElementById("addBtn");
+    if (addBtn) {
+        addBtn.textContent = t.add_btn;
+    }
+
+    const confirmEditBtn = document.getElementById("confirmEditBtn");
+    if (confirmEditBtn) {
+        confirmEditBtn.textContent = t.confirm_edit_btn;
+    }
+
+    const editBtn = document.getElementById("editBtn");
+    if (editBtn) {
+        editBtn.textContent = t.edit_btn;
+    }
+
+    const deleteBtn = document.getElementById("deleteBtn");
+    if (deleteBtn) {
+        deleteBtn.textContent = t.delete_btn;
+    }
+
+    const deselectBtn = document.getElementById("deselectBtn");
+    if (deselectBtn) {
+        deselectBtn.textContent = t.deselect_btn;
+    }
+
+    const clearGeneratorBtn = document.getElementById("clearGeneratorBtn");
+    if (clearGeneratorBtn) {
+        clearGeneratorBtn.textContent = t.clear_generator_btn;
+    }
+
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    if (cancelEditBtn) {
+        cancelEditBtn.textContent = t.cancel_edit_btn;
+    }
+
     // 更新左侧搜索和筛选
     const searchMode = document.getElementById("searchMode");
     if (searchMode) {
         searchMode.options[0].textContent = t.fuzzy;
         searchMode.options[1].textContent = t.exact;
     }
-    
+
     const typeFilter = document.getElementById("typeFilter");
     if (typeFilter) {
         typeFilter.options[0].textContent = t.no_filter;
@@ -138,13 +326,13 @@ function updateUI() {
         typeFilter.options[8].textContent = t.composition;
         typeFilter.options[9].textContent = t.other;
     }
-    
+
     // 更新显示细节标签
     const detailLabel = document.querySelector(".detail-checkbox span");
     if (detailLabel) {
         detailLabel.textContent = t.detail_toggle;
     }
-    
+
     // 更新新增表单的下拉框
     const newDirection = document.getElementById("newDirection");
     if (newDirection) {
@@ -152,7 +340,7 @@ function updateUI() {
         newDirection.options[1].textContent = t.direction_label + t.direction_positive;
         newDirection.options[2].textContent = t.direction_label + t.direction_negative;
     }
-    
+
     const newType = document.getElementById("newType");
     if (newType) {
         newType.options[0].textContent = t.type_label + t.other;
@@ -165,61 +353,167 @@ function updateUI() {
         newType.options[7].textContent = t.type_label + t.clothing;
         newType.options[8].textContent = t.type_label + t.composition;
     }
-    
+
     // 更新主题选择
     const themeToggle = document.getElementById("themeToggle");
     if (themeToggle) {
         themeToggle.options[0].textContent = t.light_mode;
         themeToggle.options[1].textContent = t.dark_mode;
     }
-    
-    // 更新右侧面板
-    document.getElementById("generatorTitle").textContent = t.generator;
-    document.getElementById("positiveTitle").textContent = t.positive;
-    document.getElementById("negativeTitle").textContent = t.negative;
-    
-    document.getElementById("positiveText").placeholder = t.positive_placeholder;
-    document.getElementById("negativeText").placeholder = t.negative_placeholder;
-    
-    document.getElementById("addToGenerate").textContent = t.add_auto;
-    document.getElementById("addToPositive").textContent = t.add_positive;
-    document.getElementById("addToNegative").textContent = t.add_negative;    
-    // 更新 LLM 生成器
-    document.getElementById("llmGeneratorBtn").textContent = t.llm_generator_btn;
-    document.getElementById("llmModalTitle").textContent = t.llm_title;
-    document.getElementById("llmInputLabel").textContent = t.llm_input_label;
-    document.getElementById("llmOutputLabel").textContent = t.llm_output_label;
-    document.getElementById("llmInput").placeholder = t.llm_input_placeholder;
-    document.getElementById("llmGenerateBtn").textContent = t.llm_generate_btn;
-    document.getElementById("llmCopyBtn").textContent = t.llm_copy_btn;
-    
-    // 更新 LLM 说明文本
-    document.getElementById("llmGeneratorInfo").textContent = t.llm_generator_info;
-    document.getElementById("llmUsageTitle").textContent = t.llm_usage_title;
-    document.getElementById("llmUsageStep1").textContent = t.llm_usage_step_1;
-    document.getElementById("llmUsageStep2").textContent = t.llm_usage_step_2;
-    document.getElementById("llmUsageStep3").textContent = t.llm_usage_step_3;
-    
-    // 更新选项卡按钮
-    document.getElementById("promptTabBtn").textContent = t.prompt_library_tab || "📚 提示词库";
-    document.getElementById("loraTabBtn").textContent = t.lora_library_tab || "🎨 Lora库";
-    
-    // 更新Lora库控制按钮
+
+    // 更新左侧选项卡
+    const promptTabBtn = document.getElementById("promptTabBtn");
+    const loraTabBtn = document.getElementById("loraTabBtn");
+    if (promptTabBtn) {
+        promptTabBtn.textContent = t.prompt_library_tab;
+    }
+    if (loraTabBtn) {
+        loraTabBtn.textContent = t.lora_library_tab;
+    }
+
+    // 更新Lora库元素
+    const loraSearchInput = document.getElementById("loraSearchInput");
+    if (loraSearchInput) {
+        loraSearchInput.placeholder = "🔍 " + t.search_placeholder.replace("提示词", "Lora");
+    }
+
     const loraDeselectBtn = document.getElementById("loraDeselectBtn");
+    if (loraDeselectBtn) {
+        loraDeselectBtn.textContent = "✕ " + t.deselect_btn;
+    }
+
+    const loraDetailLabel = document.querySelector("#loraDetailToggle + span");
+    if (loraDetailLabel) {
+        loraDetailLabel.textContent = t.lora_detail_toggle;
+    }
+
+    // 更新右侧选项卡
+    const generatorTabBtn = document.getElementById("generatorTabBtn");
+    const referenceTabBtn = document.getElementById("referenceTabBtn");
+    if (generatorTabBtn) {
+        generatorTabBtn.textContent = t.generator;
+    }
+    // referenceTabBtn 使用固定英文文本，不进行翻译更新
+
+    // 更新LLM按钮
+    const llmGeneratorBtn = document.getElementById("llmGeneratorBtn");
+    if (llmGeneratorBtn) {
+        llmGeneratorBtn.textContent = t.llm_generator_btn;
+    }
+
+    // 提示词参考面板使用固定英文文本，不进行翻译更新
+
+    // 更新生成器面板的标题
+    const positiveText = document.getElementById("positiveText");
+    const negativeText = document.getElementById("negativeText");
+    if (positiveText) {
+        positiveText.placeholder = t.positive_placeholder;
+    }
+    if (negativeText) {
+        negativeText.placeholder = t.negative_placeholder;
+    }
+
+    // 更新按钮文本
+    const addToGenerate = document.getElementById("addToGenerate");
+    const addToPositive = document.getElementById("addToPositive");
+    const addToNegative = document.getElementById("addToNegative");
+    if (addToGenerate) {
+        addToGenerate.textContent = t.add_auto;
+    }
+    if (addToPositive) {
+        addToPositive.textContent = t.add_positive;
+    }
+    if (addToNegative) {
+        addToNegative.textContent = t.add_negative;
+    }
+
+    // 更新 LLM 生成器
+    const llmGeneratorBtnEl = document.getElementById("llmGeneratorBtn");
+    const llmModalTitle = document.getElementById("llmModalTitle");
+    const llmInputLabel = document.getElementById("llmInputLabel");
+    const llmOutputLabel = document.getElementById("llmOutputLabel");
+    const llmInput = document.getElementById("llmInput");
+    const llmGenerateBtn = document.getElementById("llmGenerateBtn");
+    const llmCopyBtn = document.getElementById("llmCopyBtn");
+
+    if (llmGeneratorBtnEl) {
+        llmGeneratorBtnEl.textContent = t.llm_generator_btn;
+    }
+    if (llmModalTitle) {
+        llmModalTitle.textContent = t.llm_title;
+    }
+    if (llmInputLabel) {
+        llmInputLabel.textContent = t.llm_input_label;
+    }
+    if (llmOutputLabel) {
+        llmOutputLabel.textContent = t.llm_output_label;
+    }
+    if (llmInput) {
+        llmInput.placeholder = t.llm_input_placeholder;
+    }
+    if (llmGenerateBtn) {
+        llmGenerateBtn.textContent = t.llm_generate_btn;
+    }
+    if (llmCopyBtn) {
+        llmCopyBtn.textContent = t.llm_copy_btn;
+    }
+
+    // 更新 LLM 说明文本
+    const llmGeneratorInfo = document.getElementById("llmGeneratorInfo");
+    const llmUsageTitle = document.getElementById("llmUsageTitle");
+    const llmUsageStep1 = document.getElementById("llmUsageStep1");
+    const llmUsageStep2 = document.getElementById("llmUsageStep2");
+    const llmUsageStep3 = document.getElementById("llmUsageStep3");
+
+    if (llmGeneratorInfo) {
+        llmGeneratorInfo.textContent = t.llm_generator_info;
+    }
+    if (llmUsageTitle) {
+        llmUsageTitle.textContent = t.llm_usage_title;
+    }
+    if (llmUsageStep1) {
+        llmUsageStep1.textContent = t.llm_usage_step_1;
+    }
+    if (llmUsageStep2) {
+        llmUsageStep2.textContent = t.llm_usage_step_2;
+    }
+    if (llmUsageStep3) {
+        llmUsageStep3.textContent = t.llm_usage_step_3;
+    }
+
+    // 更新Lora库控制按钮
     if (loraDeselectBtn) {
         loraDeselectBtn.textContent = t.deselect_btn;
     }
-    
-    // const loraRefreshBtn = document.getElementById("loraRefreshBtn");
-    // if (loraRefreshBtn) {
-    //     loraRefreshBtn.textContent = t.lora_refresh_btn || "🔄 更新";
-    // }
-    
-    const loraDetailLabel = document.querySelectorAll(".lora-section .detail-checkbox span")[0];
-    if (loraDetailLabel) {
-        loraDetailLabel.textContent = t.detail_toggle;
+
+    const loraDetailLabelSection = document.querySelectorAll(".lora-section .detail-checkbox span")[0];
+    if (loraDetailLabelSection) {
+        loraDetailLabelSection.textContent = t.detail_toggle;
+    }
+
+    // 更新提示词参考面板的类别下拉框
+    if (referenceCategory && referenceDataLoaded) {
+        const currentCategory = referenceCategory.value;
+        updateReferenceCategories();
+        referenceCategory.value = currentCategory;
+    }
+
+    // 重新渲染提示词参考列表以更新语言相关的文本
+    if (referenceDataLoaded) {
+        renderReferenceList(referenceCategory.value);
     }
 }
+
+
+
+// 确保页面加载完成后执行必要的初始化
+document.addEventListener('DOMContentLoaded', function () {
+    // 检查并初始化参考面板
+    if (!referenceDataLoaded && currentRightTab === 'reference') {
+        loadReferenceData();
+    }
+});
+
 
 // 语言切换
 document.getElementById("langToggle").addEventListener("change", (e) => {
@@ -254,7 +548,7 @@ function switchTab(tab) {
     } else if (tab === "lora") {
         // 在切换到lora前，保存typeFilter的值
         savedTypeFilterValue = document.getElementById("typeFilter").value;
-        
+
         promptTabBtn.classList.remove("active");
         loraTabBtn.classList.add("active");
         promptPanel.style.display = "none";
@@ -272,24 +566,73 @@ function switchTab(tab) {
 promptTabBtn.addEventListener("click", () => switchTab("prompt"));
 loraTabBtn.addEventListener("click", () => switchTab("lora"));
 
-// 恢复之前的选项卡状态（仅恢复UI，不加载数据）
-const activeTab = localStorage.getItem("promptActiveTab") || "prompt";
-if (activeTab === "prompt") {
-    currentTab = "prompt";
-    promptTabBtn.classList.add("active");
-    loraTabBtn.classList.remove("active");
-    promptPanel.style.display = "flex";
-    loraPanel.style.display = "none";
-} else if (activeTab === "lora") {
-    currentTab = "lora";
-    promptTabBtn.classList.remove("active");
-    loraTabBtn.classList.add("active");
-    promptPanel.style.display = "none";
-    loraPanel.style.display = "flex";
-    
-    // 如果还没有加载Lora数据，则加载
-    if (!loraDataLoaded) {
-        loadLoraData();
+// ===== 右侧选项卡切换逻辑 =====
+const generatorTabBtn = document.getElementById("generatorTabBtn");
+const referenceTabBtn = document.getElementById("referenceTabBtn");
+const generatorPanel = document.getElementById("generatorPanel");
+const referencePanel = document.getElementById("referencePanel");
+
+function switchRightTab(tab) {
+    currentRightTab = tab;
+    if (tab === "generator") {
+        generatorTabBtn.classList.add("active");
+        referenceTabBtn.classList.remove("active");
+        generatorPanel.style.display = "flex";
+        referencePanel.style.display = "none";
+        localStorage.setItem("promptActiveRightTab", "generator");
+    } else if (tab === "reference") {
+        generatorTabBtn.classList.remove("active");
+        referenceTabBtn.classList.add("active");
+        generatorPanel.style.display = "none";
+        referencePanel.style.display = "flex";
+        localStorage.setItem("promptActiveRightTab", "reference");
+        // 进入提示词参考选项卡时，只有在数据未加载时才加载数据
+        if (!referenceDataLoaded) {
+            loadReferenceData();
+        }
+    }
+}
+
+// 右侧选项卡按钮点击事件
+generatorTabBtn.addEventListener("click", () => switchRightTab("generator"));
+referenceTabBtn.addEventListener("click", () => switchRightTab("reference"));
+
+// 恢复之前的右侧选项卡状态（必须在翻译加载完成后调用）
+function restoreRightTabState() {
+    const activeRightTab = localStorage.getItem("promptActiveRightTab") || "generator";
+    if (activeRightTab === "reference") {
+        currentRightTab = "reference";
+        generatorTabBtn.classList.remove("active");
+        referenceTabBtn.classList.add("active");
+        generatorPanel.style.display = "none";
+        referencePanel.style.display = "flex";
+
+        if (!referenceDataLoaded) {
+            loadReferenceData();
+        }
+    }
+}
+
+// 恢复之前的选项卡状态（必须在翻译加载完成后调用）
+function restoreLeftTabState() {
+    const activeTab = localStorage.getItem("promptActiveTab") || "prompt";
+    if (activeTab === "prompt") {
+        currentTab = "prompt";
+        promptTabBtn.classList.add("active");
+        loraTabBtn.classList.remove("active");
+        promptPanel.style.display = "flex";
+        loraPanel.style.display = "none";
+    } else if (activeTab === "lora") {
+        currentTab = "lora";
+        promptTabBtn.classList.remove("active");
+        loraTabBtn.classList.add("active");
+        promptPanel.style.display = "none";
+        loraPanel.style.display = "flex";
+
+        // 如果还没有加载Lora数据，则加载
+        if (!loraDataLoaded) {
+            loadLoraData();
+        }
     }
 }
 
@@ -307,45 +650,46 @@ function renderList(filter = "") {
     const deleteBtn = document.getElementById("deleteBtn");
     const editBtn = document.getElementById("editBtn");
     const typeFilter = document.getElementById("typeFilter").value;
-    
+
     // 根据详细模式更新容器类
     if (detailMode) {
         list.classList.add("detail-mode");
     } else {
         list.classList.remove("detail-mode");
     }
-    
+
     prompts.forEach((item, idx) => {
         const mode = document.getElementById("searchMode").value;
         const text = `${item.name} ${item.note || ""} ${item.text}`.toLowerCase();
         const query = filter.toLowerCase();
         const match = mode === "exact" ? text.includes(query) && query : text.includes(query);
-        
+
         // 检查文本匹配
         if (filter && !match) return;
-        
+
         // 检查类型筛选
         const itemType = item.type || "其它";
         if (typeFilter && itemType !== typeFilter) return;
-        
+
         const div = document.createElement("div");
         const viewClass = detailMode ? "detail-view" : "compact-view";
-        
+
         // 根据类型和方向确定样式类
         const typeClass = `type-${itemType}`;
         const directionClass = `direction-${item.direction || "无"}`;
-        
+
         const isSelected = selectedIndexes.includes(idx);
         div.className = "prompt-item " + viewClass + " " + typeClass + " " + directionClass + (isSelected ? " selected" : "");
-        
+
         const directionText = item.direction || "无";
-        
+
         if (detailMode) {
-            div.innerHTML = `<strong>${item.name}</strong><br><small>方向: ${directionText} | 类型: ${itemType}</small><small>${item.note || ""}</small><pre>${item.text.substring(0, 100)}${item.text.length > 100 ? "..." : ""}</pre>`;
+            const t = translations[currentLang];
+            div.innerHTML = `<strong>${item.name}</strong><br><small>${t.direction_item_label}${directionText} | ${t.type_item_label}${itemType}</small><small>${item.note || ""}</small><pre>${item.text.substring(0, 100)}${item.text.length > 100 ? "..." : ""}</pre>`;
         } else {
             div.innerHTML = `<strong>${item.name}</strong>`;
         }
-        
+
         div.onclick = () => {
             // 多选逻辑：点击一次选中，再点击取消
             if (selectedIndexes.includes(idx)) {
@@ -358,7 +702,7 @@ function renderList(filter = "") {
         };
         list.appendChild(div);
     });
-    
+
     updateButtonVisibility();
 }
 
@@ -367,7 +711,7 @@ function updateButtonVisibility() {
     const deleteBtn = document.getElementById("deleteBtn");
     const editBtn = document.getElementById("editBtn");
     const deselectBtn = document.getElementById("deselectBtn");
-    
+
     if (selectedIndexes.length === 0) {
         deleteBtn.style.display = "none";
         editBtn.style.display = "none";
@@ -413,21 +757,21 @@ if (savedDetailMode !== null) {
 function editSelected() {
     const t = translations[currentLang];
     if (selectedIndexes.length !== 1) return alert(t.alert_select);
-    
+
     const idx = selectedIndexes[0];
     const item = prompts[idx];
     editingIndex = idx;
-    
+
     // 填充表单
     document.getElementById("newName").value = item.name;
     document.getElementById("newDirection").value = item.direction || "无";
     document.getElementById("newType").value = item.type || "其它";
     document.getElementById("newNote").value = item.note || "";
     document.getElementById("newText").value = item.text;
-    
+
     // 更新标题
     document.getElementById("addFormTitle").textContent = t.edit_title;
-    
+
     // 编辑模式：显示确认和取消按钮，隐藏添加按钮
     document.getElementById("addBtn").style.display = "none";
     document.getElementById("confirmEditBtn").style.display = "inline-block";
@@ -441,22 +785,22 @@ document.getElementById("editBtn").onclick = editSelected;
 function cancelEdit() {
     const t = translations[currentLang];
     editingIndex = -1;
-    
+
     // 清空表单
     document.getElementById("newName").value = "";
     document.getElementById("newDirection").value = "无";
     document.getElementById("newType").value = "其它";
     document.getElementById("newNote").value = "";
     document.getElementById("newText").value = "";
-    
+
     // 恢复标题
     document.getElementById("addFormTitle").textContent = t.add_title;
-    
+
     // 隐藏确认和取消按钮，显示添加按钮
     document.getElementById("addBtn").style.display = "inline-block";
     document.getElementById("confirmEditBtn").style.display = "none";
     document.getElementById("cancelEditBtn").style.display = "none";
-    
+
     selectedIndexes = [];
 }
 
@@ -472,13 +816,13 @@ document.getElementById("addBtn").onclick = async () => {
     const text = document.getElementById("newText").value.trim();
     const t = translations[currentLang];
     if (!name || !text) return alert(t.alert_required);
-    
+
     await fetch(API_BASE + "/add", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({name, direction, type, note, text})
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, direction, type, note, text })
     });
-    
+
     document.getElementById("newName").value = "";
     document.getElementById("newDirection").value = "无";
     document.getElementById("newType").value = "其它";
@@ -497,13 +841,13 @@ document.getElementById("confirmEditBtn").onclick = async () => {
     const text = document.getElementById("newText").value.trim();
     const t = translations[currentLang];
     if (!name || !text) return alert(t.alert_required);
-    
+
     await fetch(API_BASE + "/update", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({index: editingIndex, name, direction, type, note, text})
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ index: editingIndex, name, direction, type, note, text })
     });
-    
+
     document.getElementById("newName").value = "";
     document.getElementById("newDirection").value = "无";
     document.getElementById("newType").value = "其它";
@@ -518,24 +862,24 @@ document.getElementById("confirmEditBtn").onclick = async () => {
 function deleteSelected() {
     const t = translations[currentLang];
     if (selectedIndexes.length === 0) return alert(t.alert_select);
-    
+
     const names = selectedIndexes.map(idx => prompts[idx].name).join("、");
-    const msg = selectedIndexes.length === 1 
+    const msg = selectedIndexes.length === 1
         ? `${t.confirm_delete} "${names}" ${currentLang === "zh" ? "吗？" : "?"}`
         : `${t.confirm_delete} ${selectedIndexes.length} ${currentLang === "zh" ? "条提示词吗？" : "prompts?"}`;
-    
+
     if (!confirm(msg)) {
         return;
     }
-    
+
     // 按从大到小的顺序删除，避免索引错乱
     const sortedIndexes = [...selectedIndexes].sort((a, b) => b - a);
-    
-    Promise.all(sortedIndexes.map(idx => 
+
+    Promise.all(sortedIndexes.map(idx =>
         fetch(API_BASE + "/delete", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({index: idx})
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ index: idx })
         })
     )).then(() => {
         selectedIndexes = [];
@@ -561,25 +905,25 @@ document.getElementById("clearGeneratorBtn").onclick = () => {
 };
 
 // 键盘快捷键
-document.addEventListener("keydown", e => { 
-    if (e.key === "Delete" && selectedIndexes.length > 0) deleteSelected(); 
+document.addEventListener("keydown", e => {
+    if (e.key === "Delete" && selectedIndexes.length > 0) deleteSelected();
 });
 
 // 生成区逻辑
 function updateText(isPositive) {
     const tagsDiv = document.getElementById(isPositive ? "positiveTags" : "negativeTags");
     const textArea = document.getElementById(isPositive ? "positiveText" : "negativeText");
-    
+
     // 如果是正向提示词且有Lora数据，使用按顺序拼接的逻辑
     if (isPositive && loraData && loraData.length > 0) {
         updateLoraText();
         return;
     }
-    
+
     // 获取所有选中的text，保持每个tag的内容分离（用换行分隔）
     let selectedPhrases = Array.from(tagsDiv.querySelectorAll(".tag-item input:checked"))
         .map(cb => prompts[cb.dataset.index].text);
-    
+
     // 不同tag之间用换行分隔，最后以逗号结尾
     textArea.value = selectedPhrases.length > 0 ? selectedPhrases.join(",\n") + "," : "";
 }
@@ -596,18 +940,18 @@ function getGeneratorTags() {
 function addToGenerateAuto() {
     const t = translations[currentLang];
     if (selectedIndexes.length === 0) return alert(t.alert_select);
-    
+
     selectedIndexes.forEach(idx => {
         const item = prompts[idx];
         const direction = item.direction || "无";
         const isPositive = direction !== "反向";  // 如果是反向则放入负向，否则放入正向
-        
+
         const tagsDiv = document.getElementById(isPositive ? "positiveTags" : "negativeTags");
-        
+
         // 检查是否已经添加
         const existing = Array.from(tagsDiv.querySelectorAll(".tag-item input")).find(cb => cb.dataset.index == idx);
         if (existing) return;
-        
+
         const tag = document.createElement("div");
         tag.className = `tag-item type-${item.type || "其它"} direction-${direction}`;
         tag.innerHTML = `
@@ -622,7 +966,7 @@ function addToGenerateAuto() {
         };
         tagsDiv.appendChild(tag);
     });
-    
+
     updateText(true);
     updateText(false);
 }
@@ -632,14 +976,14 @@ function addToGenerate(isPositive) {
     const t = translations[currentLang];
     if (selectedIndexes.length === 0) return alert(t.alert_select);
     const tagsDiv = document.getElementById(isPositive ? "positiveTags" : "negativeTags");
-    
+
     selectedIndexes.forEach(idx => {
         const item = prompts[idx];
-        
+
         // 检查是否已经添加
         const existing = Array.from(tagsDiv.querySelectorAll(".tag-item input")).find(cb => cb.dataset.index == idx);
         if (existing) return;
-        
+
         const tag = document.createElement("div");
         tag.className = `tag-item type-${item.type || "其它"} direction-${item.direction || "无"}`;
         tag.innerHTML = `
@@ -654,7 +998,7 @@ function addToGenerate(isPositive) {
         };
         tagsDiv.appendChild(tag);
     });
-    
+
     updateText(isPositive);
 }
 
@@ -714,10 +1058,10 @@ llmGenerateBtn.onclick = () => {
         alert(t.llm_no_input);
         return;
     }
-    
+
     // 获取生成器中已添加的tags
     const generatorTagIndices = getGeneratorTags();
-    
+
     // 如果生成器中已添加了tag，则只使用这些tag；否则使用所有提示词
     let availablePrompts = "";
     if (generatorTagIndices.size > 0) {
@@ -730,7 +1074,7 @@ llmGenerateBtn.onclick = () => {
         // 使用所有可用的提示词
         availablePrompts = prompts.map(p => `- ${p.name} (${p.type}${p.direction !== "无" ? ", " + p.direction : ""}): ${p.text}`).join("\n");
     }
-    
+
     // 获取生成器中的Lora信息
     const positiveLoraTags = document.getElementById("positiveTags");
     const loraInfo = Array.from(positiveLoraTags.querySelectorAll(".tag-item.type-lora input:checked"))
@@ -742,17 +1086,17 @@ llmGenerateBtn.onclick = () => {
             return `- ${item.name}`;
         })
         .join("\n");
-    
+
     // 添加Lora信息到提示词
     if (loraInfo) {
         availablePrompts += "\n【已选择的Lora】\n" + loraInfo;
     }
-    
+
     // 从加载的模板生成
     const template = window.llmTemplates[currentLang]
         .replace('${availablePrompts}', availablePrompts)
         .replace('${userDemand}', userDemand);
-    
+
     llmOutput.value = template;
 };
 
@@ -764,7 +1108,7 @@ llmCopyBtn.onclick = () => {
         alert(t.llm_no_content);
         return;
     }
-    
+
     navigator.clipboard.writeText(llmOutput.value).then(() => {
         const originalText = llmCopyBtn.textContent;
         llmCopyBtn.textContent = t.llm_copy_success;
@@ -784,25 +1128,25 @@ async function loadLoraData() {
         console.log("[PromptManage] Starting to load Lora data from:", LORA_API_BASE + "/list");
         const res = await fetch(LORA_API_BASE + "/list", { method: "GET" });
         console.log("[PromptManage] Fetch response status:", res.status, res.statusText);
-        
+
         if (!res.ok) {
             console.error(`[PromptManage] Failed to load lora data: HTTP ${res.status}`);
             const errorText = await res.text();
             console.error("[PromptManage] Response:", errorText);
             return;
         }
-        
+
         const data = await res.json();
         console.log("[PromptManage] Received data:", data);
-        
+
         loraData = data.loras || [];
         loraCategories = data.categories || [];
-        
+
         console.log(`[PromptManage] Loaded ${loraData.length} Loras in ${loraCategories.length} categories:`, loraCategories);
-        
+
         // 更新类别下拉框
         updateLoraCategories();
-        
+
         // 设置默认类别为第一个子目录（如果有多个类别）
         const categorySelect = document.getElementById("loraCategory");
         if (loraCategories.length > 0) {
@@ -814,10 +1158,10 @@ async function loadLoraData() {
             categorySelect.value = "";
             console.log("[PromptManage] No categories found, showing all");
         }
-        
+
         // 渲染Lora列表（使用当前选中的类别）
         renderLoraList(categorySelect.value);
-        
+
         // 恢复之前保存的typeFilter值（如果有的话）
         if (savedTypeFilterValue !== undefined) {
             const typeFilter = document.getElementById("typeFilter");
@@ -825,7 +1169,7 @@ async function loadLoraData() {
                 typeFilter.value = savedTypeFilterValue;
             }
         }
-        
+
         // 标记Lora数据已加载
         loraDataLoaded = true;
     } catch (err) {
@@ -836,8 +1180,9 @@ async function loadLoraData() {
 
 // 更新Lora类别下拉框
 function updateLoraCategories() {
+    const t = translations[currentLang];
     const categorySelect = document.getElementById("loraCategory");
-    categorySelect.innerHTML = '<option value="">全部</option>';
+    categorySelect.innerHTML = `<option value="">${t.lora_category_all}</option>`;
     loraCategories.forEach(cat => {
         const option = document.createElement("option");
         option.value = cat;
@@ -850,14 +1195,14 @@ function updateLoraCategories() {
 function renderLoraList(category = "") {
     const list = document.getElementById("loraList");
     list.innerHTML = "";
-    
+
     // 根据详细模式更新容器类
     if (loraDetailMode) {
         list.classList.add("detail-mode");
     } else {
         list.classList.remove("detail-mode");
     }
-    
+
     loraData.forEach((item) => {
         // 获取原始索引
         const idx = loraData.indexOf(item);
@@ -871,40 +1216,41 @@ function renderLoraList(category = "") {
             const matchBase = item.base_model && item.base_model.toLowerCase().includes(searchLower);
             if (!matchName && !matchFilename && !matchBase) return;
         }
-        
+
         const div = document.createElement("div");
         const viewClass = loraDetailMode ? "detail-view" : "compact-view";
         const isSelected = loraSelectedIndexes.includes(idx);
         div.className = "lora-item " + viewClass + (isSelected ? " selected" : "");
-        
+
         // 创建名称和base_model的容器（两者都显示）
         let nameWithBase = `<div class="lora-name-row"><strong>${item.name}</strong>`;
         if (item.base_model) {
             nameWithBase += `<span class="base-model">${item.base_model}</span>`;
         }
         nameWithBase += `</div>`;
-        
+
         let innerHTML = nameWithBase;
-        
+
         if (loraDetailMode) {
+            const t = translations[currentLang];
             let textContent = `<div class="text-content">`;
             textContent += nameWithBase;
             textContent += `<small class="filename">${item.filename || ""}</small>`;
             if (item.trigger_words && item.trigger_words.length > 0) {
-                textContent += `<small class="trigger-words">触发词: ${item.trigger_words.join(", ")}</small>`;
+                textContent += `<small class="trigger-words">${t.trigger_words_label}${item.trigger_words.join(", ")}</small>`;
             }
             if (item.notes) {
                 textContent += `<pre>${item.notes.substring(0, 100)}${item.notes.length > 100 ? "..." : ""}</pre>`;
             }
             textContent += `</div>`;
-            
+
             if (item.preview_url) {
                 // 检测文件类型
                 const url = new URL(item.preview_url, window.location.origin);
                 const pathParam = url.searchParams.get('path') || '';
                 const fileExt = pathParam.split('.').pop().toLowerCase();
                 const videoExts = ['mp4', 'avi', 'mov', 'mkv', 'webm'];
-                
+
                 if (videoExts.includes(fileExt)) {
                     // 视频文件：显示第一帧作为预览
                     innerHTML = `<video src="${item.preview_url}" 
@@ -917,9 +1263,9 @@ function renderLoraList(category = "") {
                 innerHTML = textContent;
             }
         }
-        
+
         div.innerHTML = innerHTML;
-        
+
         div.onclick = () => {
             // 多选逻辑
             if (loraSelectedIndexes.includes(idx)) {
@@ -965,17 +1311,17 @@ document.getElementById("loraDeselectBtn").addEventListener("click", () => {
 // document.getElementById("loraRefreshBtn").addEventListener("click", async () => {
 //     const t = translations[currentLang];
 //     const btn = document.getElementById("loraRefreshBtn");
-    
+
 //     // 禁用按钮并显示加载状态
 //     btn.disabled = true;
 //     const originalText = btn.textContent;
 //     btn.textContent = "⏳ 更新中...";
-    
+
 //     try {
 //         // 调用后端API进行更新
 //         const response = await fetch("/prompt_manage/lora/refresh?mode=all");
 //         const result = await response.json();
-        
+
 //         if (result.success) {
 //             // 更新成功，重新加载Lora数据
 //             alert(t.lora_refresh_success || result.message);
@@ -1016,41 +1362,41 @@ document.getElementById("loraSearchInput").addEventListener("input", (e) => {
 function addLoraToGenerator() {
     const t = translations[currentLang];
     if (loraSelectedIndexes.length === 0) return alert(t.alert_select);
-    
+
     loraSelectedIndexes.forEach(idx => {
         const item = loraData[idx];
         const tagsDiv = document.getElementById("positiveTags");
-        
+
         // 检查是否已经添加
-        const existing = Array.from(tagsDiv.querySelectorAll(".tag-item")).find(tag => 
+        const existing = Array.from(tagsDiv.querySelectorAll(".tag-item")).find(tag =>
             tag.dataset.loraIndex == idx
         );
         if (existing) return;
-        
+
         const tag = document.createElement("div");
         tag.className = "tag-item type-lora";
         tag.dataset.loraIndex = idx;
-        
+
         let triggerWords = "";
         if (item.trigger_words && item.trigger_words.length > 0) {
-            triggerWords = item.trigger_words[0];
+            triggerWords = item.trigger_words.join(", ");
         }
-        
+
         tag.innerHTML = `
             <input type="checkbox" checked data-lora-index="${idx}">
             <span>${item.name}${triggerWords ? " (" + triggerWords + ")" : ""}</span>
             <button class="del-tag">×</button>
         `;
-        
+
         tag.querySelector("input").onchange = () => updateLoraText();
         tag.querySelector(".del-tag").onclick = () => {
             tag.remove();
             updateLoraText();
         };
-        
+
         tagsDiv.appendChild(tag);
     });
-    
+
     updateLoraText();
 }
 
@@ -1058,16 +1404,16 @@ function addLoraToGenerator() {
 function updateLoraText() {
     const textArea = document.getElementById("positiveText");
     const positiveTags = document.getElementById("positiveTags");
-    
+
     // 获取所有标签（按DOM顺序，保持添加顺序）
     const allTags = Array.from(positiveTags.querySelectorAll(".tag-item"));
-    
+
     let textParts = [];
-    
+
     allTags.forEach(tag => {
         const checkbox = tag.querySelector("input:checked");
         if (!checkbox) return;
-        
+
         if (tag.classList.contains("type-lora")) {
             // 这是一个Lora标签
             const loraIndex = checkbox.dataset.loraIndex;
@@ -1084,12 +1430,335 @@ function updateLoraText() {
             }
         }
     });
-    
+
     // 拼接所有部分，每个部分之间用换行分隔，最后以逗号结尾
     let text = "";
     if (textParts.length > 0) {
         text = textParts.join(",\n") + ",";
     }
-    
+
     textArea.value = text;
 }
+
+// ===== 提示词参考功能 =====
+
+// 加载提示词参考数据
+async function loadReferenceData() {
+    try {
+        console.log("[PromptManage] Starting to load reference data from:", API_BASE + "/reference/list");
+        const res = await fetch(API_BASE + "/reference/list", { method: "GET" });
+        console.log("[PromptManage] Fetch response status:", res.status, res.statusText);
+
+        if (!res.ok) {
+            console.error(`[PromptManage] Failed to load reference data: HTTP ${res.status}`);
+            const errorText = await res.text();
+            console.error("[PromptManage] Response:", errorText);
+            return;
+        }
+
+        const data = await res.json();
+        console.log("[PromptManage] Received reference data:", data);
+
+        referenceData = data.references || [];
+        referenceCategories = data.categories || [];
+
+        console.log(`[PromptManage] Loaded ${referenceData.length} references in ${referenceCategories.length} categories:`, referenceCategories);
+
+        // 标记数据已加载
+        referenceDataLoaded = true;
+
+        // 直接更新UI，不等待翻译加载
+        updateReferenceCategories();
+        // 初始化第一页数据
+        initReferencePagination("");
+    } catch (err) {
+        console.error("[PromptManage] Error loading reference data:", err);
+        console.error("[PromptManage] Stack:", err.stack);
+    }
+}
+
+// 更新参考类别下拉框（使用固定英文文本）
+function updateReferenceCategories() {
+    const categorySelect = document.getElementById("referenceCategory");
+    categorySelect.innerHTML = `<option value="">All Categories</option>`;
+    referenceCategories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+    });
+}
+
+// 初始化参考列表分页
+function initReferencePagination(category = "") {
+    // 筛选数据
+    referenceFilteredData = referenceData.filter((item) => {
+        // 检查类别筛选
+        if (category && item.category !== category) return false;
+        // 检查搜索（模糊搜索）
+        if (referenceSearchText) {
+            const searchLower = referenceSearchText.toLowerCase();
+            const matchLora = item.lora_name.toLowerCase().includes(searchLower);
+            const matchPrompt = item.prompt.toLowerCase().includes(searchLower);
+            if (!matchLora && !matchPrompt) return false;
+        }
+        return true;
+    });
+
+    // 重置页码
+    referenceCurrentPage = 0;
+
+    // 清空列表
+    const list = document.getElementById("referenceList");
+    list.innerHTML = "";
+
+    // 加载第一页
+    loadMoreReferenceItems();
+}
+
+// 加载更多参考项
+function loadMoreReferenceItems() {
+    if (referenceLoadingMore) return;
+    if (referenceCurrentPage * referencePageSize >= referenceFilteredData.length) return;
+
+    referenceLoadingMore = true;
+
+    const list = document.getElementById("referenceList");
+    const startIndex = referenceCurrentPage * referencePageSize;
+    const endIndex = Math.min(startIndex + referencePageSize, referenceFilteredData.length);
+
+    for (let i = startIndex; i < endIndex; i++) {
+        const item = referenceFilteredData[i];
+        const div = document.createElement("div");
+        div.className = "reference-item";
+
+        // 创建名称和类别的容器
+        let nameWithCategory = `<div class="lora-name-row"><strong>${item.lora_name}</strong>`;
+        if (item.category) {
+            nameWithCategory += `<span class="lora-category">${item.category}</span>`;
+        }
+        nameWithCategory += `</div>`;
+
+        // 统一布局：左侧图片，右侧文字
+        let innerHTML = "";
+
+        // 图片部分（使用固定英文文本）
+        if (item.image_url) {
+            const loadFailedText = encodeURIComponent("Load Failed");
+            innerHTML += `<img src="${item.image_url}" alt="${item.lora_name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Crect fill=%22%23ccc%22 width=%22180%22 height=%22180%22/%3E%3Ctext fill=%22%23666%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E${loadFailedText}%3C/text%3E%3C/svg%3E'">`;
+        }
+
+        // 文字内容部分
+        innerHTML += `<div class="text-content">`;
+        innerHTML += nameWithCategory;
+        innerHTML += `<textarea class="prompt-textarea" readonly>${item.prompt}</textarea>`;
+        if (item.negative_prompt) {
+            innerHTML += `<textarea class="negative-textarea" readonly>${item.negative_prompt}</textarea>`;
+        }
+        innerHTML += `</div>`;
+
+        div.innerHTML = innerHTML;
+
+        // 点击复制提示词到生成器
+        div.onclick = () => {
+            // 复制提示词到正向提示词文本框
+            const positiveText = document.getElementById("positiveText");
+            const currentText = positiveText.value.trim();
+            const newPrompt = item.prompt;
+
+            if (currentText) {
+                positiveText.value = currentText + ",\n" + newPrompt;
+            } else {
+                positiveText.value = newPrompt;
+            }
+
+            // 如果有负向提示词，也复制到负向文本框
+            if (item.negative_prompt) {
+                const negativeText = document.getElementById("negativeText");
+                const currentNegative = negativeText.value.trim();
+                if (currentNegative) {
+                    negativeText.value = currentNegative + ",\n" + item.negative_prompt;
+                } else {
+                    negativeText.value = item.negative_prompt;
+                }
+            }
+
+            // 添加视觉反馈
+            div.style.borderColor = "var(--success-color)";
+            setTimeout(() => {
+                div.style.borderColor = "";
+            }, 500);
+        };
+
+        list.appendChild(div);
+    }
+
+    referenceCurrentPage++;
+    referenceLoadingMore = false;
+}
+
+// 滚动加载更多
+function setupScrollListener() {
+    const list = document.getElementById("referenceList");
+
+    // 移除旧的监听器
+    list.removeEventListener("scroll", handleScroll);
+
+    // 添加新的监听器
+    list.addEventListener("scroll", handleScroll);
+}
+
+function handleScroll() {
+    const list = document.getElementById("referenceList");
+    const scrollTop = list.scrollTop;
+    const scrollHeight = list.scrollHeight;
+    const clientHeight = list.clientHeight;
+
+    // 当滚动到底部1/4时加载更多
+    if (scrollTop + clientHeight >= scrollHeight - scrollHeight / 4) {
+        loadMoreReferenceItems();
+    }
+}
+
+// 渲染参考列表（用于兼容性，调用初始化函数）
+function renderReferenceList(category = "") {
+    initReferencePagination(category);
+    setupScrollListener();
+}
+
+// 参考类别变化事件
+document.getElementById("referenceCategory").addEventListener("change", (e) => {
+    renderReferenceList(e.target.value);
+});
+
+// 参考搜索框事件
+document.getElementById("referenceSearchInput").addEventListener("input", (e) => {
+    referenceSearchText = e.target.value;
+    const category = document.getElementById("referenceCategory").value;
+    renderReferenceList(category);
+});
+
+// 提示词参考下载状态
+let referenceDownloadRunning = false;
+let referenceDownloadInterval = null;
+
+// 下载提示词示例图
+async function downloadPromptExamples() {
+    const btn = document.getElementById("downloadExamplesBtn");
+
+    if (referenceDownloadRunning) {
+        // 如果正在运行，则取消下载
+        try {
+            const response = await fetch("/prompt_manage/reference/cancel", {
+                method: "POST"
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert("Download cancelled");
+            }
+        } catch (err) {
+            console.error("[PromptManage] Cancel download error:", err);
+        }
+        return;
+    }
+
+    // 禁用按钮并显示加载状态
+    referenceDownloadRunning = true;
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = `⏳ Downloading...`;
+
+    // 启动状态检查
+    checkDownloadStatus();
+
+    try {
+        const response = await fetch("/prompt_manage/reference/download");
+        const result = await response.json();
+
+        if (result.success) {
+            const message = `${result.message}\nSuccess: ${result.success_count}, Failed: ${result.failed_count}, Skipped: ${result.skipped_count || 0}`;
+            alert(message);
+            // 下载完成，重新加载数据
+            await loadReferenceData();
+        } else {
+            alert(result.message || "Download failed");
+        }
+    } catch (err) {
+        console.error("[PromptManage] Download error:", err);
+        alert("An error occurred during download");
+    } finally {
+        // 停止状态检查
+        if (referenceDownloadInterval) {
+            clearInterval(referenceDownloadInterval);
+            referenceDownloadInterval = null;
+        }
+        referenceDownloadRunning = false;
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+// 检查下载状态
+async function checkDownloadStatus() {
+    referenceDownloadInterval = setInterval(async () => {
+        try {
+            const response = await fetch("/prompt_manage/reference/status");
+            const status = await response.json();
+
+            const btn = document.getElementById("downloadExamplesBtn");
+            if (status.running) {
+                if (status.total > 0) {
+                    const percent = Math.round((status.progress / status.total) * 100);
+                    btn.textContent = `⏳ Downloading... ${percent}% (${status.progress}/${status.total})`;
+                } else {
+                    btn.textContent = `⏳ Scanning...`;
+                }
+
+                // 在提示词参考面板中显示目录进度条
+                renderDownloadProgress(status.category_progress);
+            }
+        } catch (err) {
+            console.error("[PromptManage] Status check error:", err);
+        }
+    }, 1000);
+}
+
+// 渲染下载进度条
+function renderDownloadProgress(categoryProgress) {
+    const list = document.getElementById("referenceList");
+
+    // 如果已经有进度条，更新它
+    let progressContainer = document.getElementById("downloadProgressContainer");
+    if (!progressContainer) {
+        // 创建进度容器
+        progressContainer = document.createElement("div");
+        progressContainer.id = "downloadProgressContainer";
+        progressContainer.className = "download-progress-container";
+        list.innerHTML = "";
+        list.appendChild(progressContainer);
+    }
+
+    // 清空现有进度条
+    progressContainer.innerHTML = "";
+
+    // 为每个目录创建进度条
+    for (const [category, progress] of Object.entries(categoryProgress)) {
+        const percent = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0;
+
+        const progressItem = document.createElement("div");
+        progressItem.className = "download-progress-item";
+        progressItem.innerHTML = `
+            <div class="progress-info">
+                <span class="progress-category">${category}</span>
+                <span class="progress-text">${progress.completed}/${progress.total}</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${percent}%"></div>
+            </div>
+        `;
+        progressContainer.appendChild(progressItem);
+    }
+}
+
+// 下载示例图按钮事件
+document.getElementById("downloadExamplesBtn").addEventListener("click", downloadPromptExamples);

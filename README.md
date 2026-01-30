@@ -2,8 +2,9 @@
 
 为 ComfyUI 设计的优雅 AI 提示词和 Lora 库管理与生成系统，帮助您高效地管理、搜索和生成 Stable Diffusion 提示词，同时管理和组织 Lora 模型。
 
-**[中文](README.md) | [English](README.en.md)**
+建议和 comfyui-lora-manager 搭配使用。
 
+**[中文](README.md) | [English](README.en.md)**
 
 ---
 
@@ -26,11 +27,12 @@ git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
 
 插件包含三大核心功能：
 
-| 功能 | 说明 |
-|------|------|
-| **提示词库**（选项卡） | 提示词库管理 - 添加、编辑、删除、搜索提示词 |
-| **Lora库**（选项卡） | Lora 模型管理 - 浏览、分类、组织本地 Lora 模型 |
-| **生成器**（右侧面板） | 提示词生成器 - 组合提示词和 Lora 生成完整的正向/负向提示词 |
+| 功能                     | 说明                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| **提示词库**（选项卡）   | 提示词库管理 - 添加、编辑、删除、搜索提示词                  |
+| **Lora库**（选项卡）     | Lora 模型管理 - 浏览、分类、组织本地 Lora 模型               |
+| **提示词参考**（选项卡） | 提示词参考 - 查看和管理从 Lora metadata 下载的示例图和提示词 |
+| **生成器**（右侧面板）   | 提示词生成器 - 组合提示词和 Lora 生成完整的正向/负向提示词   |
 
 每条提示词包含：
 - **名称**：提示词的简短标识（如"风景"、"人物"）
@@ -46,6 +48,7 @@ git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
 ### 📚 管理提示词库
 
 ![](./asset/pic_promptlib_cn.png)
+
 #### 添加提示词
 1. 在左侧"新增提示词"表单中填写：
    - **名称**：例如 "高质量画面"、"美女角色"
@@ -92,9 +95,12 @@ git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
 5. 点击"📋 复制"按钮复制生成结果
 6. 可选：粘贴到文本框继续微调
 
-### � 管理 Lora 库
+![](./asset/pic_llmgenerate_cn.png)
+
+### 🎨 管理 Lora 库
 
 ![](./asset/pic_loralib_cn.png)
+
 #### 浏览和分类
 1. 点击左侧选项卡切换到"🎨 Lora库"
 2. 从"全部"下拉菜单选择 Lora 分类（自动按目录生成）
@@ -113,6 +119,34 @@ git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
 - Lora 触发词会自动从元数据中提取
 - 支持同时添加多个 Lora，提示词会依次拼接
 
+### 💡 管理提示词参考
+
+#### 下载示例图
+1. 点击左侧选项卡切换到"💡 Reference"
+2. 点击"📥 Download Examples"按钮
+3. 系统会自动从 CivitAI 下载 Lora 模型的示例图像和提示词
+4. 下载过程中会显示每个目录的下载进度
+5. 下载完成后，示例图会显示在列表中
+
+#### 查看和使用提示词
+1. 在提示词参考列表中浏览示例图（支持分页加载，每次200张）
+2. 每个示例图显示：
+   - 缩略图
+   - 正向提示词（可滚动查看完整内容）
+   - 负向提示词（如果有）
+   - 生成参数（步数、采样器、CFG、种子等）
+3. 点击任意参考项可复制其提示词到生成器
+4. 使用搜索框按 Lora 名称或提示词内容筛选
+5. 使用类别下拉菜单按目录筛选
+6. 滚动到底部会自动加载更多内容
+
+#### 下载功能特点
+- **智能跳过**：已存在的文件不会重复下载
+- **空提示词跳过**：跳过没有提示词的图像
+- **可中断**：下载过程中再次点击按钮可取消下载
+- **进度显示**：实时显示每个目录的下载进度
+- **参数保存**：所有生成参数保存到 PNG metadata 中
+
 ### 🎛️ 界面设置
 
 - **语言切换**：点击左上角"🌐"图标选择中文或英文
@@ -127,7 +161,24 @@ git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
 - ✅ **Lora 库管理** - 浏览、分类和组织本地 Lora 模型
 - ✅ **智能搜索** - 支持模糊搜索和精确搜索
 - ✅ **多维度分类** - 按方向和类型组织提示词，按目录分类 Lora
-- ✅ **AI 辅助生成** - LLM 大模型生成高质量提示词（包括 Lora API）
+- ✅ **AI 辅助生成** - LLM 大模型生成高质量提示词
+- ✅ **灵活组合** - 按添加顺序拼接提示词和 Lora，支持自由组合
+- ✅ **快捷键支持** - P 和 N 键快速添加
+- ✅ **双语界面** - 完整支持中文和英文
+- ✅ **主题切换** - 亮色和暗色模式
+- ✅ **自动保存** - 提示词自动保存到本地 JSON
+- ✅ **响应式设计** - 适配各种屏幕尺寸
+- ✅ **分页加载** - 提示词参考支持大容量数据的分页加载
+
+---
+
+## 🛠️ 技术文档
+
+### 项目架构
+
+```
+comfyui_PromptManage/
+├── __init__.py                 # 后端：Python API 服务器
 ├── data/
 │   ├── prompts.json            # 用户提示词数据存储
 │   ├── prompts_default.json    # 默认提示词库（中文）
@@ -143,43 +194,29 @@ git clone https://github.com/CeasarSmj/comfyui_simplePromptManage.git
     ├── pic_promptlib_cn.png    # 提示词库界面截图（中文）
     ├── pic_promptlib_en.png    # 提示词库界面截图（英文）
     ├── pic_loralib_cn.png      # Lora 库界面截图（中文）
+    ├── pic_loralib_en.png      # Lora 库界面截图（英文）
     ├── pic_llmgenerate_cn.png  # LLM 生成界面截图（中文）
-    └── pic_llmgenerate_en.png  # LLM 生成界面截图（英文）
-### 项目架构
-
+    ├── pic_llmgenerate_en.png  # LLM 生成界面截图（英文）
+    └── entrance.png            # 入口截图
 ```
-comfyui_PromptManage/
-├── __init__.py                 # 后端：Python API 服务器
-├── data/
-│   └── prompts.json            # 用户提示词数据存储
-├── web/                        # 前端：Web 界面
-│   ├── index.html              # HTML 页面结构
-│   ├── script.js               # JavaScript 交互逻辑
-│   ├── style.css               # 样式表
-│   ├── translations.json       # 多语言翻译配置
-│   ├── llm-templates.json      # LLM 生成规则模板
-│   ├── top_menu_extension.js   # ComfyUI 菜单集成
+
+### API 接口
+
 #### 提示词管理 API
 
-| 方法 | 端点 | 功能 |
-|------|------|------|
-| POST | `/prompt_manage/get` | 获取所有提示词 |
-| POST | `/prompt_manage/add` | 添加新提示词 |
+| 方法 | 端点                    | 功能           |
+| ---- | ----------------------- | -------------- |
+| POST | `/prompt_manage/get`    | 获取所有提示词 |
+| POST | `/prompt_manage/add`    | 添加新提示词   |
 | POST | `/prompt_manage/update` | 更新指定提示词 |
 | POST | `/prompt_manage/delete` | 删除指定提示词 |
-| POST | `/prompt_manage/save` | 保存所有提示词 |
+| POST | `/prompt_manage/save`   | 保存所有提示词 |
 
 #### Lora 库管理 API
 
-| 方法 | 端点 | 功能 |
-|------|------|------|
-| GET | `/prompt_manage/lora/list` | 获取所有 Lora 模型列表
-|------|------|------|
-| POST | `/prompt_manage/get` | 获取所有提示词 |
-| POST | `/prompt_manage/add` | 添加新提示词 |
-| POST | `/prompt_manage/update` | 更新指定提示词 |
-| POST | `/prompt_manage/delete` | 删除指定提示词 |
-| POST | `/prompt_manage/save` | 保存所有提示词 |
+| 方法   | 端点                       | 功能                   |
+| ------ | -------------------------- | ---------------------- |
+| GET    | `/prompt_manage/lora/list` | 获取所有 Lora 模型列表 |
 
 #### API 使用示例
 
@@ -222,11 +259,7 @@ Content-Type: application/json
     }
 ]
 ```
-- **Lora 库管理** - 加载、分类、浏览、选择 Lora 模型
-- **搜索和筛选** - 模糊搜索、精确搜索和分类筛选逻辑
-- **快捷键处理** - P/N 键事件监听和处理
-- **LLM 集成** - 调用大模型 API 生成提示词
-- **按顺序拼接** - 根据用户添加顺序拼接提示词和 Lora
+
 ### 代码说明
 
 #### 后端 (__init__.py)
@@ -234,6 +267,7 @@ Content-Type: application/json
 - **save_prompts(data)** - 将提示词保存到 JSON 文件
 - **API 路由处理** - 处理添加、删除、更新、获取提示词的请求
 - **web 目录挂载** - 静态文件服务，提供 Web 界面
+- **Lora 库管理** - 加载、分类、浏览、选择 Lora 模型
 
 #### 前端 (script.js)
 - **国际化系统** - 从 translations.json 加载多语言配置
@@ -242,6 +276,7 @@ Content-Type: application/json
 - **快捷键处理** - P/N 键事件监听和处理
 - **LLM 集成** - 调用大模型 API 生成提示词
 - **主题和语言** - 动态切换界面主题和语言，使用 localStorage 持久化
+- **分页加载** - 提示词参考的滚动分页加载
 
 #### 样式 (style.css)
 - **响应式布局** - 两栏设计（左侧库，右侧生成器）
@@ -250,7 +285,6 @@ Content-Type: application/json
 
 ### LLM 提示词生成规则
 
-![](./asset/pic_llmgenerate_cn.png)
 LLM 生成器基于预设的 8 条规则，确保生成的提示词：
 1. 全英文，无中文
 2. 优先使用简短短语，非必要不写完整句子
@@ -283,5 +317,7 @@ MIT License
 ---
 
 **版本**：1.2.0  
-**最后更新**：2026 年 1 月 29 日  
+**最后更新**：2026 年 1 月 30 日  
+**GitHub**：[comfyui_PromptManage](https://github.com/CeasarSmj/comfyui_PromptManage)
 
+欢迎提交 Issue 和 Pull Request！
