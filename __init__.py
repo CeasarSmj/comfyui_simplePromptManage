@@ -1407,8 +1407,8 @@ async def start_prompt_reader(request):
         if sys.platform == "win32":
             # 使用 CREATE_NEW_PROCESS_GROUP 标志在新窗口中启动
             creation_flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
-            # 使用 start 命令在新窗口中启动
-            start_cmd = f'start "Prompt Reader" cmd /c "cd /d {prompt_reader_dir} && python app.py"'
+            # 使用 start 命令在新窗口中启动，使用 sys.executable 确保使用相同的 Python 环境
+            start_cmd = f'start "Prompt Reader" cmd /c "cd /d {prompt_reader_dir} && {sys.executable} app.py"'
             subprocess.Popen(start_cmd, shell=True)
         else:
             # Linux/Mac
@@ -1459,7 +1459,8 @@ async def download_by_civitaiwebnum(request):
         # 在新窗口中执行脚本
         if sys.platform == "win32":
             download_scripts_dir = os.path.join(script_dir, "downloadScripts")
-            start_cmd = f'start "Download by CivitAI" cmd /c "cd /d {download_scripts_dir} && python download_by_civitaiwebnum.py"'
+            # 使用 sys.executable 确保使用相同的 Python 环境
+            start_cmd = f'start "Download by CivitAI" cmd /c "cd /d {download_scripts_dir} && {sys.executable} download_by_civitaiwebnum.py"'
             subprocess.Popen(start_cmd, shell=True)
         else:
             subprocess.Popen(
@@ -1498,7 +1499,8 @@ async def download_lora_images(request):
         # 在新窗口中执行脚本
         if sys.platform == "win32":
             download_scripts_dir = os.path.join(script_dir, "downloadScripts")
-            start_cmd = f'start "Download Lora Images" cmd /c "cd /d {download_scripts_dir} && python download_lora_images.py"'
+            # 使用 sys.executable 确保使用相同的 Python 环境
+            start_cmd = f'start "Download Lora Images" cmd /c "cd /d {download_scripts_dir} && {sys.executable} download_lora_images.py"'
             subprocess.Popen(start_cmd, shell=True)
         else:
             subprocess.Popen(
