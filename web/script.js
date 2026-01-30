@@ -393,7 +393,9 @@ function updateUI() {
     if (generatorTabBtn) {
         generatorTabBtn.textContent = t.generator;
     }
-    // referenceTabBtn 使用固定英文文本，不进行翻译更新
+    if (referenceTabBtn) {
+        referenceTabBtn.textContent = t.reference_tab;
+    }
 
     // 更新LLM按钮
     const llmGeneratorBtn = document.getElementById("llmGeneratorBtn");
@@ -401,7 +403,11 @@ function updateUI() {
         llmGeneratorBtn.textContent = t.llm_generator_btn;
     }
 
-    // 提示词参考面板使用固定英文文本，不进行翻译更新
+    // 更新提示词参考面板
+    const referenceSearchInput = document.getElementById("referenceSearchInput");
+    if (referenceSearchInput) {
+        referenceSearchInput.placeholder = t.search_reference_placeholder;
+    }
 
     // 更新生成器面板的标题
     const positiveText = document.getElementById("positiveText");
@@ -491,8 +497,14 @@ function updateUI() {
         loraDetailLabelSection.textContent = t.detail_toggle;
     }
 
+    // 更新提示词参考面板的下载按钮
+    const downloadExamplesBtn = document.getElementById("downloadExamplesBtn");
+    if (downloadExamplesBtn) {
+        downloadExamplesBtn.textContent = t.download_examples_btn;
+    }
+
     // 更新提示词参考面板的类别下拉框
-    if (referenceCategory && referenceDataLoaded) {
+    if (referenceCategory) {
         const currentCategory = referenceCategory.value;
         updateReferenceCategories();
         referenceCategory.value = currentCategory;
@@ -1232,12 +1244,13 @@ function renderLoraList(category = "") {
         let innerHTML = nameWithBase;
 
         if (loraDetailMode) {
-            const t = translations[currentLang];
+            const t = translations[currentLang] || {};
+            const triggerWordsLabel = t.trigger_words_label || "触发词: ";
             let textContent = `<div class="text-content">`;
             textContent += nameWithBase;
             textContent += `<small class="filename">${item.filename || ""}</small>`;
             if (item.trigger_words && item.trigger_words.length > 0) {
-                textContent += `<small class="trigger-words">${t.trigger_words_label}${item.trigger_words.join(", ")}</small>`;
+                textContent += `<small class="trigger-words">${triggerWordsLabel}${item.trigger_words.join(", ")}</small>`;
             }
             if (item.notes) {
                 textContent += `<pre>${item.notes.substring(0, 100)}${item.notes.length > 100 ? "..." : ""}</pre>`;
@@ -1477,16 +1490,24 @@ async function loadReferenceData() {
     }
 }
 
-// 更新参考类别下拉框（使用固定英文文本）
+// 更新参考类别下拉框
 function updateReferenceCategories() {
+    const t = translations[currentLang] || {};
     const categorySelect = document.getElementById("referenceCategory");
-    categorySelect.innerHTML = `<option value="">All Categories</option>`;
-    referenceCategories.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        categorySelect.appendChild(option);
-    });
+    if (!categorySelect) return;
+
+    const allCategoriesText = t.reference_category_all || "全部类别";
+    categorySelect.innerHTML = `<option value="">${allCategoriesText}</option>`;
+
+    // 只有在 referenceCategories 有数据时才添加类别选项
+    if (referenceCategories && referenceCategories.length > 0) {
+        referenceCategories.forEach(cat => {
+            const option = document.createElement("option");
+            option.value = cat;
+            option.textContent = cat;
+            categorySelect.appendChild(option);
+        });
+    }
 }
 
 // 初始化参考列表分页
@@ -1542,9 +1563,10 @@ function loadMoreReferenceItems() {
         // 统一布局：左侧图片，右侧文字
         let innerHTML = "";
 
-        // 图片部分（使用固定英文文本）
+        // 图片部分
         if (item.image_url) {
-            const loadFailedText = encodeURIComponent("Load Failed");
+            const t = translations[currentLang] || {};
+            const loadFailedText = encodeURIComponent(t.load_failed || "加载失败");
             innerHTML += `<img src="${item.image_url}" alt="${item.lora_name}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Crect fill=%22%23ccc%22 width=%22180%22 height=%22180%22/%3E%3Ctext fill=%22%23666%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3E${loadFailedText}%3C/text%3E%3C/svg%3E'">`;
         }
 
@@ -1653,8 +1675,9 @@ async function downloadPromptExamples() {
                 method: "POST"
             });
             const result = await response.json();
+            const t = translations[currentLang] || {};
             if (result.success) {
-                alert("Download cancelled");
+                alert(t.download_cancelled || "下载已取消");
             }
         } catch (err) {
             console.error("[PromptManage] Cancel download error:", err);
@@ -1666,7 +1689,8 @@ async function downloadPromptExamples() {
     referenceDownloadRunning = true;
     btn.disabled = true;
     const originalText = btn.textContent;
-    btn.textContent = `⏳ Downloading...`;
+    const t = translations[currentLang] || {};
+    btn.textContent = `⏳ ${t.downloading || "下载中"}...`;
 
     // 启动状态检查
     checkDownloadStatus();
@@ -1676,16 +1700,16 @@ async function downloadPromptExamples() {
         const result = await response.json();
 
         if (result.success) {
-            const message = `${result.message}\nSuccess: ${result.success_count}, Failed: ${result.failed_count}, Skipped: ${result.skipped_count || 0}`;
+            const message = `${result.message}\n${t.success || "成功"}: ${result.success_count}, ${t.failed || "失败"}: ${result.failed_count}, ${t.skipped || "跳过"}: ${result.skipped_count || 0}`;
             alert(message);
             // 下载完成，重新加载数据
             await loadReferenceData();
         } else {
-            alert(result.message || "Download failed");
+            alert(result.message || t.download_error || "下载过程中出错");
         }
     } catch (err) {
         console.error("[PromptManage] Download error:", err);
-        alert("An error occurred during download");
+        alert(t.download_error || "下载过程中出错");
     } finally {
         // 停止状态检查
         if (referenceDownloadInterval) {
@@ -1706,12 +1730,13 @@ async function checkDownloadStatus() {
             const status = await response.json();
 
             const btn = document.getElementById("downloadExamplesBtn");
+            const t = translations[currentLang] || {};
             if (status.running) {
                 if (status.total > 0) {
                     const percent = Math.round((status.progress / status.total) * 100);
-                    btn.textContent = `⏳ Downloading... ${percent}% (${status.progress}/${status.total})`;
+                    btn.textContent = `⏳ ${t.downloading || "下载中"}... ${percent}% (${status.progress}/${status.total})`;
                 } else {
-                    btn.textContent = `⏳ Scanning...`;
+                    btn.textContent = `⏳ ${t.scanning || "扫描中"}...`;
                 }
 
                 // 在提示词参考面板中显示目录进度条
