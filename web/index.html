@@ -44,6 +44,9 @@
             </div>
         </div>
         <div class="container">
+            <!-- 隐藏的文件上传输入框 -->
+            <input type="file" id="imageFileInput" multiple accept="image/*" style="display: none;">
+            
             <!-- 左侧：提示词管理 (50%) -->
             <div class="left-panel">
                 <!-- 选项卡导航 -->
@@ -208,7 +211,9 @@
                             <button id="referenceDeselectBtn"
                                 class="btn btn-secondary" style="display:none;">✕ 取消选择</button>
                             <button id="downloadExamplesBtn"
-                                class="btn btn-primary">📥 Download Examples</button>
+                                class="btn btn-primary">🌐📥</button>
+                            <button id="uploadImagesBtn"
+                                class="btn btn-success" style="margin-left: 0.5rem;">📤⬆️</button>
                         </div>
                     </div>
                     <div id="referenceList"

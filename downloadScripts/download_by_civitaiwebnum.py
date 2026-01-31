@@ -16,8 +16,9 @@ import sys
 
 # 配置
 SCRIPT_DIR = Path(__file__).parent
-LIST_FILE = SCRIPT_DIR / "prompt_example" / "selected_img_list.txt"
-OUTPUT_DIR = SCRIPT_DIR / "prompt_example" / "selected"
+PROJECT_ROOT = SCRIPT_DIR.parent  # 项目根目录
+LIST_FILE = PROJECT_ROOT / "prompt_example" / "selected_img_list.txt"
+OUTPUT_DIR = PROJECT_ROOT / "prompt_example" / "selected"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # CivitAI API配置

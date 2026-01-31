@@ -17,10 +17,20 @@ from .downloadScripts.lora_update_service import LoraUpdateService
 # 尝试使用 orjson（比标准 json 快 2-3 倍）
 try:
     import orjson
+
     JSON_DUMP = orjson.dumps
     JSON_LOAD = orjson.loads
     JSON_ENSURE_ASCII = False
     ORJSON_AVAILABLE = True
+
+    # 检查 orjson 是否支持 OPT_INDENT_2
+    try:
+        ORJSON_OPT_INDENT = orjson.OPT_INDENT_2
+    except AttributeError:
+        # 旧版本 orjson 不支持 OPT_INDENT_2，禁用 orjson
+        ORJSON_AVAILABLE = False
+        JSON_DUMP = json.dumps
+        JSON_LOAD = json.loads
 except ImportError:
     JSON_DUMP = json.dumps
     JSON_LOAD = json.loads
@@ -33,13 +43,15 @@ logger = logging.getLogger(__name__)
 def is_port_in_use(port: int) -> bool:
     """检查指定端口是否被占用"""
     import socket
+
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(1)
-            result = s.connect_ex(('127.0.0.1', port))
+            result = s.connect_ex(("127.0.0.1", port))
             return result == 0
     except Exception:
         return False
+
 
 # 数据文件路径
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
@@ -106,7 +118,7 @@ def save_json_metadata(image_path, metadata):
         # 使用优化的 JSON 写入
         if ORJSON_AVAILABLE:
             # orjson 返回 bytes，使用 option 参数格式化
-            json_bytes = JSON_DUMP(json_metadata, option=orjson.OPT_INDENT_2)
+            json_bytes = JSON_DUMP(json_metadata, option=ORJSON_OPT_INDENT)
             with open(json_path, "wb") as f:
                 f.write(json_bytes)
         else:
@@ -142,9 +154,8 @@ def save_json_file(file_path, data, indent=2):
     """优化的 JSON 文件写入函数"""
     try:
         if ORJSON_AVAILABLE:
-            # orjson 使用 option 参数控制缩进
-            option_map = {2: orjson.OPT_INDENT_2, 4: orjson.OPT_INDENT_4}
-            json_bytes = JSON_DUMP(data, option=option_map.get(indent, orjson.OPT_INDENT_2))
+            # orjson 只支持 OPT_INDENT_2（2空格缩进），忽略其他缩进值
+            json_bytes = JSON_DUMP(data, option=ORJSON_OPT_INDENT)
             with open(file_path, "wb") as f:
                 f.write(json_bytes)
         else:
@@ -760,8 +771,12 @@ async def get_prompt_reference_data(category=None, search=None, offset=0, limit=
                                 "image_url": image_url,
                                 "prompt": prompt,
                                 "negative_prompt": negative_prompt,
-                                "width": png_metadata.get("width", png_metadata["width"]),
-                                "height": png_metadata.get("height", png_metadata["height"]),
+                                "width": png_metadata.get(
+                                    "width", png_metadata["width"]
+                                ),
+                                "height": png_metadata.get(
+                                    "height", png_metadata["height"]
+                                ),
                                 "steps": png_metadata.get("steps", ""),
                                 "sampler": png_metadata.get("sampler", ""),
                                 "cfg_scale": png_metadata.get("cfg_scale", ""),
@@ -923,6 +938,7 @@ async def get_cache_image(request):
 async def download_prompt_examples(request):
     """下载提示词示例图并写入metadata"""
     import requests
+
     # 检查是否有正在运行的任务
     if _download_task["running"]:
         return web.json_response(
@@ -951,7 +967,11 @@ async def download_prompt_examples(request):
                 metadata_path = os.path.join(root, file)
                 try:
                     metadata = load_json_file(metadata_path)
-                    if metadata and "civitai" in metadata and "images" in metadata["civitai"]:
+                    if (
+                        metadata
+                        and "civitai" in metadata
+                        and "images" in metadata["civitai"]
+                    ):
                         images = metadata["civitai"].get("images", [])
                         for img in images:
                             if "meta" in img and "prompt" in img["meta"]:
@@ -1383,12 +1403,24 @@ async def start_prompt_reader(request):
         # 检查端口是否被占用（更可靠的方法）
         if is_port_in_use(8765):
             logger.info("Prompt Reader already running on port 8765")
-            return web.json_response({"status": "success", "url": PROMPT_READER_URL, "message": "Prompt Reader 已经在运行"})
+            return web.json_response(
+                {
+                    "status": "success",
+                    "url": PROMPT_READER_URL,
+                    "message": "Prompt Reader 已经在运行",
+                }
+            )
 
         # 检查进程是否也在运行（作为备用检查）
         if prompt_reader_process and prompt_reader_process.poll() is None:
             logger.info("Prompt Reader process still running")
-            return web.json_response({"status": "success", "url": PROMPT_READER_URL, "message": "Prompt Reader 已经在运行"})
+            return web.json_response(
+                {
+                    "status": "success",
+                    "url": PROMPT_READER_URL,
+                    "message": "Prompt Reader 已经在运行",
+                }
+            )
 
         # 获取 prompt_reader 目录
         script_dir = os.path.dirname(__file__)
@@ -1399,14 +1431,16 @@ async def start_prompt_reader(request):
         if not os.path.exists(app_py):
             return web.json_response(
                 {"status": "error", "message": f"Prompt Reader 未找到: {app_py}"},
-                status=404
+                status=404,
             )
 
         # 启动新进程运行 prompt_reader
         # Windows 上需要 CREATE_NEW_PROCESS_GROUP 来避免 Ctrl+C 影响
         if sys.platform == "win32":
             # 使用 CREATE_NEW_PROCESS_GROUP 标志在新窗口中启动
-            creation_flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+            creation_flags = (
+                subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+            )
             # 使用 start 命令在新窗口中启动，使用 sys.executable 确保使用相同的 Python 环境
             start_cmd = f'start "Prompt Reader" cmd /c "cd /d {prompt_reader_dir} && {sys.executable} app.py"'
             subprocess.Popen(start_cmd, shell=True)
@@ -1416,7 +1450,7 @@ async def start_prompt_reader(request):
                 [sys.executable, app_py],
                 cwd=prompt_reader_dir,
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stderr=subprocess.DEVNULL,
             )
 
         logger.info(f"Starting Prompt Reader at {PROMPT_READER_URL}")
@@ -1424,63 +1458,71 @@ async def start_prompt_reader(request):
         # 等待一下让服务器启动
         await asyncio.sleep(2)
 
-        return web.json_response({
-            "status": "success",
-            "url": PROMPT_READER_URL,
-            "message": "Prompt Reader 已启动"
-        })
+        return web.json_response(
+            {
+                "status": "success",
+                "url": PROMPT_READER_URL,
+                "message": "Prompt Reader 已启动",
+            }
+        )
 
     except Exception as e:
         logger.error(f"Error starting prompt reader: {e}")
         return web.json_response(
-            {"status": "error", "message": f"启动失败: {str(e)}"},
-            status=500
+            {"status": "error", "message": f"启动失败: {str(e)}"}, status=500
         )
 
 
 # 添加路由
-PromptServer.instance.routes.post("/prompt_manage/start_prompt_reader")(start_prompt_reader)
+PromptServer.instance.routes.post("/prompt_manage/start_prompt_reader")(
+    start_prompt_reader
+)
 
 
 # ===== 下载脚本相关 API =====
+
 
 async def download_by_civitaiwebnum(request):
     """执行 download_by_civitaiwebnum.py"""
     try:
         script_dir = os.path.dirname(__file__)
-        script_path = os.path.join(script_dir, "downloadScripts", "download_by_civitaiwebnum.py")
+        script_path = os.path.join(
+            script_dir, "downloadScripts", "download_by_civitaiwebnum.py"
+        )
 
         if not os.path.exists(script_path):
             return web.json_response(
                 {"status": "error", "message": f"Script not found: {script_path}"},
-                status=404
+                status=404,
             )
 
         # 在新窗口中执行脚本
         if sys.platform == "win32":
             download_scripts_dir = os.path.join(script_dir, "downloadScripts")
             # 使用 sys.executable 确保使用相同的 Python 环境
-            start_cmd = f'start "Download by CivitAI" cmd /c "cd /d {download_scripts_dir} && {sys.executable} download_by_civitaiwebnum.py"'
+            # 添加 pause 以便看到错误信息
+            start_cmd = f'start "Download by CivitAI" cmd /c "cd /d {download_scripts_dir} && {sys.executable} download_by_civitaiwebnum.py && pause"'
             subprocess.Popen(start_cmd, shell=True)
         else:
             subprocess.Popen(
                 [sys.executable, script_path],
                 cwd=os.path.join(script_dir, "downloadScripts"),
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stderr=subprocess.DEVNULL,
             )
 
         logger.info(f"Started download_by_civitaiwebnum.py")
-        return web.json_response({
-            "status": "success",
-            "message": "Download by CivitAI started in new window"
-        })
+        return web.json_response(
+            {
+                "status": "success",
+                "message": "Download by CivitAI started in new window",
+            }
+        )
 
     except Exception as e:
         logger.error(f"Error starting download_by_civitaiwebnum: {e}")
         return web.json_response(
-            {"status": "error", "message": f"Failed to start: {str(e)}"},
-            status=500
+            {"status": "error", "message": f"Failed to start: {str(e)}"}, status=500
         )
 
 
@@ -1488,45 +1530,349 @@ async def download_lora_images(request):
     """执行 download_lora_images.py"""
     try:
         script_dir = os.path.dirname(__file__)
-        script_path = os.path.join(script_dir, "downloadScripts", "download_lora_images.py")
+        script_path = os.path.join(
+            script_dir, "downloadScripts", "download_lora_images.py"
+        )
 
         if not os.path.exists(script_path):
             return web.json_response(
                 {"status": "error", "message": f"Script not found: {script_path}"},
-                status=404
+                status=404,
             )
 
         # 在新窗口中执行脚本
         if sys.platform == "win32":
             download_scripts_dir = os.path.join(script_dir, "downloadScripts")
             # 使用 sys.executable 确保使用相同的 Python 环境
-            start_cmd = f'start "Download Lora Images" cmd /c "cd /d {download_scripts_dir} && {sys.executable} download_lora_images.py"'
+            # 添加 pause 以便看到错误信息
+            start_cmd = f'start "Download Lora Images" cmd /c "cd /d {download_scripts_dir} && {sys.executable} download_lora_images.py && pause"'
             subprocess.Popen(start_cmd, shell=True)
         else:
             subprocess.Popen(
                 [sys.executable, script_path],
                 cwd=os.path.join(script_dir, "downloadScripts"),
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                stderr=subprocess.DEVNULL,
             )
 
         logger.info(f"Started download_lora_images.py")
-        return web.json_response({
-            "status": "success",
-            "message": "Download Lora Images started in new window"
-        })
+        return web.json_response(
+            {
+                "status": "success",
+                "message": "Download Lora Images started in new window",
+            }
+        )
 
     except Exception as e:
         logger.error(f"Error starting download_lora_images: {e}")
         return web.json_response(
-            {"status": "error", "message": f"Failed to start: {str(e)}"},
-            status=500
+            {"status": "error", "message": f"Failed to start: {str(e)}"}, status=500
         )
 
 
 # 添加路由
-PromptServer.instance.routes.post("/prompt_manage/download_by_civitaiwebnum")(download_by_civitaiwebnum)
-PromptServer.instance.routes.post("/prompt_manage/download_lora_images")(download_lora_images)
+PromptServer.instance.routes.post("/prompt_manage/download_by_civitaiwebnum")(
+    download_by_civitaiwebnum
+)
+PromptServer.instance.routes.post("/prompt_manage/download_lora_images")(
+    download_lora_images
+)
+
+
+# ===== 上传图像功能 =====
+
+
+def extract_workflow_metadata(image_data: bytes):
+    """
+    从图像数据中提取 ComfyUI workflow metadata
+    如果没有 workflow 格式的 metadata，尝试从 prompt 字段提取
+    与 workflow2js.py 的逻辑保持一致
+    """
+    import io
+    import re
+    from PIL import Image
+
+    try:
+        img = Image.open(io.BytesIO(image_data))
+
+        if not hasattr(img, "text"):
+            return None
+
+        text_data = img.text
+        workflow_str = text_data.get("workflow", "")
+        prompt_str = text_data.get("prompt", "")
+
+        # 初始化结果
+        result = {
+            "prompt": "",
+            "negative_prompt": "",
+            "steps": "",
+            "sampler": "",
+            "cfg_scale": "",
+            "seed": "",
+            "model": "",
+            "width": str(img.width),
+            "height": str(img.height),
+        }
+
+        # 尝试解析 workflow JSON
+        workflow = None
+        if workflow_str:
+            try:
+                workflow = json.loads(workflow_str)
+            except json.JSONDecodeError:
+                workflow = None
+
+        # 如果有 workflow，从中提取参数
+        if workflow:
+            # 提取 prompt 和 negative prompt
+            prompt_text = ""
+            negative_prompt = ""
+
+            for node in workflow.get("nodes", []):
+                node_type = node.get("type", "")
+
+                if node_type == "CLIPTextEncode":
+                    widgets = node.get("widgets_values", [])
+                    if widgets and isinstance(widgets, list) and len(widgets) > 0:
+                        text = str(widgets[0])
+                        if text:
+                            # 判断是否是 negative prompt
+                            if "negative" in text.lower() or "nsfw" in text.lower():
+                                negative_prompt = text
+                            elif (
+                                "low quality" in text.lower()
+                                or "worst quality" in text.lower()
+                            ):
+                                negative_prompt = text
+                            elif not prompt_text or len(text) > len(prompt_text):
+                                prompt_text = text
+
+            # 提取采样参数
+            params = {
+                "steps": "",
+                "sampler": "",
+                "cfg_scale": "",
+                "seed": "",
+                "width": "",
+                "height": "",
+                "model": "",
+            }
+
+            for node in workflow.get("nodes", []):
+                if node.get("type") in ["KSampler", "KSamplerAdvanced"]:
+                    widgets = node.get("widgets_values", [])
+                    if widgets and isinstance(widgets, list) and len(widgets) >= 5:
+                        params["seed"] = (
+                            str(widgets[0]) if widgets[0] is not None else ""
+                        )
+                        params["steps"] = (
+                            str(widgets[1]) if widgets[1] is not None else ""
+                        )
+                        params["cfg_scale"] = (
+                            str(widgets[2]) if widgets[2] is not None else ""
+                        )
+                        params["sampler"] = (
+                            str(widgets[3]) if widgets[3] is not None else ""
+                        )
+
+            for node in workflow.get("nodes", []):
+                if node.get("type") == "EmptyLatentImage":
+                    widgets = node.get("widgets_values", [])
+                    if widgets and isinstance(widgets, list) and len(widgets) >= 2:
+                        params["width"] = (
+                            str(widgets[0]) if widgets[0] is not None else ""
+                        )
+                        params["height"] = (
+                            str(widgets[1]) if widgets[1] is not None else ""
+                        )
+
+            for node in workflow.get("nodes", []):
+                if node.get("type") == "CheckpointLoaderSimple":
+                    widgets = node.get("widgets_values", [])
+                    if widgets and isinstance(widgets, list) and len(widgets) > 0:
+                        params["model"] = (
+                            str(widgets[0]) if widgets[0] is not None else ""
+                        )
+
+            result["prompt"] = prompt_text
+            result["negative_prompt"] = negative_prompt
+            result["steps"] = params.get("steps", "")
+            result["sampler"] = params.get("sampler", "")
+            result["cfg_scale"] = params.get("cfg_scale", "")
+            result["seed"] = params.get("seed", "")
+            result["model"] = params.get("model", "")
+            result["width"] = params.get("width", str(img.width))
+            result["height"] = params.get("height", str(img.height))
+        else:
+            # 如果没有 workflow，尝试从 prompt 字段解析（与 workflow2js.py 一致）
+            if prompt_str:
+                result["prompt"] = prompt_str
+                result["negative_prompt"] = ""
+
+                # 尝试从正则表达式提取参数
+                steps_match = re.search(r"Steps:\s*(\d+)", prompt_str)
+                if steps_match:
+                    result["steps"] = steps_match.group(1)
+
+                sampler_match = re.search(r"Sampler:\s*([a-zA-Z0-9_]+)", prompt_str)
+                if sampler_match:
+                    result["sampler"] = sampler_match.group(1)
+
+                cfg_match = re.search(r"CFG scale:\s*([\d.]+)", prompt_str)
+                if cfg_match:
+                    result["cfg_scale"] = cfg_match.group(1)
+
+                seed_match = re.search(r"Seed:\s*(\d+)", prompt_str)
+                if seed_match:
+                    result["seed"] = seed_match.group(1)
+
+                size_match = re.search(r"Size:\s*(\d+)x(\d+)", prompt_str)
+                if size_match:
+                    result["width"] = size_match.group(1)
+                    result["height"] = size_match.group(2)
+
+                model_match = re.search(r"Model:\s*([^\n,]+)", prompt_str)
+                if model_match:
+                    result["model"] = model_match.group(1).strip()
+
+                # 分离正负 prompt
+                if "Negative prompt:" in prompt_str:
+                    parts = prompt_str.split("Negative prompt:", 1)
+                    result["prompt"] = parts[0].strip()
+                    result["negative_prompt"] = parts[1].strip()
+
+        return result
+
+    except Exception as e:
+        logger.warning(f"Error extracting workflow metadata: {e}")
+        return None
+
+
+async def upload_images(request):
+    """
+    上传图像文件，保存到 generate/ 目录，并提取 metadata 保存为 JSON
+    """
+    try:
+        data = await request.json()
+        files = data.get("files", [])
+
+        if not files:
+            return web.json_response(
+                {"success": False, "message": "No files provided"}, status=400
+            )
+
+        import base64
+        import io
+
+        success_count = 0
+        failed_count = 0
+        errors = []
+
+        for file_info in files:
+            try:
+                file_name = file_info.get("name", "")
+                file_data = file_info.get("data", "")
+
+                if not file_name or not file_data:
+                    failed_count += 1
+                    errors.append(f"Invalid file data: {file_name}")
+                    continue
+
+                # 解码 base64 数据
+                if "," in file_data:
+                    file_data = file_data.split(",", 1)[1]
+
+                image_bytes = base64.b64decode(file_data)
+
+                # 生成唯一文件名（防止冲突）
+                base_name = os.path.splitext(file_name)[0]
+                ext = os.path.splitext(file_name)[1].lower()
+                if ext not in [".png", ".jpg", ".jpeg", ".webp"]:
+                    ext = ".png"  # 默认使用 PNG
+
+                # 检查文件名是否已存在，如果存在则添加时间戳
+                dest_path = os.path.join(EXAMPLE_DIR, "generate", file_name)
+                if os.path.exists(dest_path):
+                    timestamp = int(time.time())
+                    dest_path = os.path.join(
+                        EXAMPLE_DIR, "generate", f"{base_name}_{timestamp}{ext}"
+                    )
+
+                # 保存图像文件
+                os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+                with open(dest_path, "wb") as f:
+                    f.write(image_bytes)
+
+                # 提取 metadata
+                metadata = extract_workflow_metadata(image_bytes)
+
+                # 准备保存的 JSON 数据
+                json_metadata = {
+                    "file_name": os.path.basename(dest_path),
+                    "prompt": metadata.get("prompt", "") if metadata else "",
+                    "negative_prompt": (
+                        metadata.get("negative_prompt", "") if metadata else ""
+                    ),
+                    "steps": metadata.get("steps", "") if metadata else "",
+                    "sampler": metadata.get("sampler", "") if metadata else "",
+                    "cfg_scale": metadata.get("cfg_scale", "") if metadata else "",
+                    "seed": metadata.get("seed", "") if metadata else "",
+                    "model": metadata.get("model", "") if metadata else "",
+                    "width": metadata.get("width", "") if metadata else "",
+                    "height": metadata.get("height", "") if metadata else "",
+                    "extracted_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                }
+
+                # 检查是否提取到了有效数据
+                has_metadata = metadata and (
+                    metadata.get("prompt")
+                    or metadata.get("steps")
+                    or metadata.get("sampler")
+                    or metadata.get("cfg_scale")
+                    or metadata.get("seed")
+                    or metadata.get("model")
+                )
+
+                if not has_metadata:
+                    logger.info(
+                        f"No valid metadata found in {file_name}, saving with minimal fields"
+                    )
+
+                # 保存 JSON 文件
+                json_path = os.path.splitext(dest_path)[0] + ".json"
+                save_json_file(json_path, json_metadata, indent=2)
+
+                success_count += 1
+
+            except Exception as e:
+                failed_count += 1
+                errors.append(f"{file_info.get('name', 'unknown')}: {str(e)}")
+                logger.error(
+                    f"Error processing uploaded file {file_info.get('name')}: {e}"
+                )
+
+        result = {
+            "success": True,
+            "success_count": success_count,
+            "failed_count": failed_count,
+            "message": f"Processed {success_count + failed_count} files: {success_count} successful, {failed_count} failed",
+        }
+
+        if errors:
+            result["errors"] = errors[:10]  # 只返回前10个错误
+
+        return web.json_response(result)
+
+    except Exception as e:
+        logger.error(f"Error in upload_images: {e}")
+        return web.json_response(
+            {"success": False, "message": f"Server error: {str(e)}"}, status=500
+        )
+
+
+# 添加上传图像路由
+PromptServer.instance.routes.post("/prompt_manage/upload_images")(upload_images)
 
 # 静态文件服务
 web_dir = os.path.join(os.path.dirname(__file__), "web")

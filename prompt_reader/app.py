@@ -22,7 +22,16 @@ try:
     JSON_LOAD = orjson.loads
     JSON_ENSURE_ASCII = False
     ORJSON_AVAILABLE = True
-    print("✅ 使用 orjson (高性能 JSON 库)")
+
+    # 检查 orjson 是否支持 OPT_INDENT_2
+    try:
+        ORJSON_OPT_INDENT = orjson.OPT_INDENT_2
+    except AttributeError:
+        # 旧版本 orjson 不支持 OPT_INDENT_2，禁用 orjson
+        ORJSON_AVAILABLE = False
+        JSON_DUMP = json.dumps
+        JSON_LOAD = json.loads
+        print("⚠️  orjson version does not support OPT_INDENT_2, falling back to standard json")
 except ImportError:
     JSON_DUMP = json.dumps
     JSON_LOAD = json.loads
@@ -85,7 +94,7 @@ class CacheManager:
         cache_file = self.get_cache_file_path(category)
         try:
             json_bytes = JSON_DUMP(
-                data, option=orjson.OPT_INDENT_2 if ORJSON_AVAILABLE else None
+                data, option=ORJSON_OPT_INDENT if ORJSON_AVAILABLE else None
             )
             with open(cache_file, "wb") as f:  # 使用二进制模式
                 f.write(json_bytes)

@@ -139,6 +139,16 @@ Promise.all([
             reference_category_all: "全部类别",
             reference_category_label: "类别：",
             download_examples_btn: "📥 下载示例图",
+            upload_images_btn: "📤 上传图像",
+            upload_images_title: "上传图像",
+            upload_images_confirm: "确认上传",
+            upload_images_confirm_multiple: "确认上传 {count} 个文件？",
+            upload_images_cancel: "取消",
+            upload_images_select_files: "选择图像文件（可多选）",
+            upload_images_success: "上传成功",
+            upload_images_failed: "上传失败",
+            upload_images_processing: "正在处理...",
+            upload_images_no_files: "请选择至少一个图像文件",
             download_cancelled: "下载已取消",
             download_error: "下载过程中出错",
             copy_prompt: "复制提示词",
@@ -521,11 +531,7 @@ function updateUI() {
         loraDetailLabelSection.textContent = t.detail_toggle;
     }
 
-    // 更新提示词参考面板的下载按钮
-    const downloadExamplesBtn = document.getElementById("downloadExamplesBtn");
-    if (downloadExamplesBtn) {
-        downloadExamplesBtn.textContent = t.download_examples_btn;
-    }
+    // 下载示例图和上传图像按钮使用固定图标，不需要翻译
 
     // 更新提示词参考面板的类别下拉框
     if (referenceCategory) {
@@ -1174,7 +1180,7 @@ llmGenerateBtn.onclick = async () => {
                 const data = await res.json();
                 const examples = data.references || [];
                 if (examples.length > 0) {
-                    referenceExamples = examples.map(item => 
+                    referenceExamples = examples.map(item =>
                         `- ${item.lora_name} (${item.category || "unknown"}):\n  Positive: ${item.prompt}${item.negative_prompt ? `\n  Negative: ${item.negative_prompt}` : ""}`
                     ).join("\n\n");
                 }
@@ -1549,12 +1555,12 @@ function updateLoraText() {
 async function loadReferenceData() {
     try {
         console.log("[PromptManage] Starting to load reference categories from:", API_BASE + "/reference/list");
-        
+
         // 先获取类别列表（offset=0, limit=0 只返回类别和数据哈希）
         const params = new URLSearchParams();
         params.append("offset", "0");
         params.append("limit", "0");
-        
+
         const res = await fetch(`${API_BASE}/reference/list?${params.toString()}`, { method: "GET" });
         console.log("[PromptManage] Fetch response status:", res.status, res.statusText);
 
@@ -1956,6 +1962,83 @@ function renderDownloadProgress(categoryProgress) {
 
 // 下载示例图按钮事件
 document.getElementById("downloadExamplesBtn").addEventListener("click", downloadPromptExamples);
+
+// ===== 上传图像功能 =====
+
+// 上传图像按钮事件
+document.getElementById("uploadImagesBtn").addEventListener("click", () => {
+    const fileInput = document.getElementById("imageFileInput");
+    if (fileInput) {
+        fileInput.click();
+    }
+});
+
+// 文件选择事件
+document.getElementById("imageFileInput").addEventListener("change", async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const t = translations[currentLang] || {};
+    const confirmText = t.upload_images_confirm_multiple || t.upload_images_confirm || "Confirm upload";
+    const message = confirmText.replace("{count}", files.length);
+    if (!confirm(message)) {
+        e.target.value = ""; // 清空选择
+        return;
+    }
+
+    const btn = document.getElementById("uploadImagesBtn");
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = `${t.upload_images_processing || "Processing..."} (0/${files.length})`;
+
+    try {
+        // 读取所有文件并转换为 base64
+        const fileDataList = [];
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            btn.textContent = `${t.upload_images_processing || "Processing..."} (${i + 1}/${files.length})`;
+
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+
+            fileDataList.push({
+                name: file.name,
+                data: base64
+            });
+        }
+
+        // 发送到服务器
+        const response = await fetch("/prompt_manage/upload_images", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ files: fileDataList })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert(`${t.upload_images_success || "Upload successful"}: ${result.success_count}/${files.length}`);
+            // 刷新提示词参考数据
+            referenceDataLoaded = false;
+            if (currentRightTab === "reference") {
+                loadReferenceData();
+            }
+        } else {
+            alert(`${t.upload_images_failed || "Upload failed"}: ${result.message}`);
+        }
+    } catch (err) {
+        console.error("[PromptManage] Upload images error:", err);
+        alert(`${t.upload_images_failed || "Upload failed"}: ${err.message}`);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        e.target.value = ""; // 清空选择
+    }
+});
 
 // DownloadLoraImages 按钮事件
 async function downloadLoraImages() {
