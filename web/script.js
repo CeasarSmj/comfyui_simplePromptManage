@@ -2083,3 +2083,74 @@ document.getElementById("referenceDeselectBtn").addEventListener("click", () => 
     const categorySelect = document.getElementById("referenceCategory");
     renderReferenceList(categorySelect.value);
 });
+
+// ===== 分割条拖动功能 =====
+const resizer = document.getElementById('resizer');
+const leftPanel = document.querySelector('.left-panel');
+const rightPanel = document.querySelector('.right-panel');
+const container = document.querySelector('.container');
+
+let isResizing = false;
+
+// 恢复之前保存的面板比例
+function restorePanelWidth() {
+    const savedWidth = localStorage.getItem('leftPanelWidth');
+    if (savedWidth) {
+        leftPanel.style.width = savedWidth;
+    }
+}
+
+// 保存面板比例
+function savePanelWidth() {
+    localStorage.setItem('leftPanelWidth', leftPanel.style.width);
+}
+
+// 初始化分割条拖动
+resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    resizer.classList.add('resizing');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none'; // 防止拖动时选中文本
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    
+    const containerRect = container.getBoundingClientRect();
+    const containerWidth = containerRect.width;
+    
+    // 计算新的左侧面板宽度
+    let newWidth = e.clientX - containerRect.left;
+    
+    // 限制最小和最大宽度
+    const minWidth = 200;
+    const maxWidth = containerWidth - 200;
+    
+    if (newWidth < minWidth) newWidth = minWidth;
+    if (newWidth > maxWidth) newWidth = maxWidth;
+    
+    // 计算百分比
+    const percentage = (newWidth / containerWidth) * 100;
+    
+    leftPanel.style.width = percentage + '%';
+});
+
+document.addEventListener('mouseup', () => {
+    if (isResizing) {
+        isResizing = false;
+        resizer.classList.remove('resizing');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        savePanelWidth();
+    }
+});
+
+// 防止拖动时的默认行为
+resizer.addEventListener('dblclick', () => {
+    // 双击分割条恢复默认 50/50 比例
+    leftPanel.style.width = '50%';
+    savePanelWidth();
+});
+
+// 页面加载时恢复面板比例
+window.addEventListener('load', restorePanelWidth);

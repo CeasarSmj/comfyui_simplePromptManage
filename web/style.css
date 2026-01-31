@@ -159,15 +159,32 @@ body {
 
 .left-panel {
     width: 50%;
+    min-width: 200px;
     display: flex;
     flex-direction: column;
     background: var(--bg-secondary);
-    border-right: 1px solid var(--border-color);
+    border-right: none;
     overflow: hidden;
 }
 
+/* 分割条样式 */
+.resizer {
+    width: 6px;
+    background: var(--border-color);
+    cursor: col-resize;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.resizer:hover,
+.resizer.resizing {
+    background: var(--primary-color);
+}
+
 .right-panel {
-    width: 50%;
+    flex: 1;
+    min-width: 200px;
     display: flex;
     flex-direction: column;
     background: var(--bg-secondary);
